@@ -2573,11 +2573,11 @@ RR.init=function(opts){
     m=/^#\/read\/(.+)$/.exec(h||''); if(m){ var id=''; try{ id=decodeURIComponent(m[1]); }catch(e){} var L=lessons().filter(function(x){ return x.id===id; })[0]; if(L) return {v:'read',L:L}; }
     return null;
   }
-  function go(v,keepScroll){ view=v; render(); pushNav(); if(!keepScroll) window.scrollTo(0,0); }
+  function go(v,keepScroll){ if(v==='home'&&opts.noHome) v='lib'; view=v; render(); pushNav(); if(!keepScroll) window.scrollTo(0,0); }
   window.addEventListener('popstate',function(){
     var h=location.hash||'';
     if(opts.mode==='studio'&&(!h||h==='#/edit')){ if(!root.hidden&&opts.onEdit){ navLock=true; try{ opts.onEdit(); }finally{ navLock=false; } } return; }
-    var p=parseHash(h)||{v:'home'};
+    var p=parseHash(h)||{v:'home'}; if(p.v==='home'&&opts.noHome) p={v:'lib'};
     navLock=true; try{ if(root.hidden){ root.hidden=false; if(opts.onBack) opts.onBack(); } view=p.v; if(p.L) current=p.L; render(); window.scrollTo(0,0); }finally{ navLock=false; }
   });
   root.querySelector('.rr-themes').addEventListener('click',function(e){
@@ -4450,7 +4450,7 @@ function studentDoc(data){
    '<script id="rd-runtime">'+get('rd-runtime')+'<\/script><script id="rr-runtime">'+get('rr-runtime')+'<\/script>'+
    '<script>(function(){var D=JSON.parse(document.getElementById("rr-data").textContent);var H0=location.hash;try{if(!localStorage.getItem("rr:theme"))localStorage.setItem("rr:theme",D.theme||"stage");}catch(e){}'+
    'function work(L){try{return JSON.parse(localStorage.getItem("rd:"+L.id+":blank"))||null;}catch(e){return null;}}'+
-   'var ctl=RR.init({root:document.getElementById("rr-root"),mode:"student",logoHome:D.start?location.href.split(/[?#]/)[0]:"",share:D.cloud?function(L){return location.href.split(/[?#]/)[0]+"?kho="+D.cloud.id+"#/read/"+encodeURIComponent(L.id);}:null,app:function(){return D.app;},lessons:function(){return D.lessons;},folders:function(){return D.folders||{};},foRoot:(D.cloud&&D.cloud.id==="chung")?"chung":"",'+
+   'var ctl=RR.init({root:document.getElementById("rr-root"),mode:"student",noHome:!!D.start,logoHome:D.start?location.href.split(/[?#]/)[0]:"",share:D.cloud?function(L){return location.href.split(/[?#]/)[0]+"?kho="+D.cloud.id+"#/read/"+encodeURIComponent(L.id);}:null,app:function(){return D.app;},lessons:function(){return D.lessons;},folders:function(){return D.folders||{};},foRoot:(D.cloud&&D.cloud.id==="chung")?"chung":"",'+
    'status:function(L){var w=work(L);if(!w)return{st:"new",p:0};var I=RR.info(L),tot=I.questions+I.notes,done=0;Object.keys(w.answers||{}).forEach(function(k){if(String(w.answers[k]).trim())done++;});Object.keys(w.notes||{}).forEach(function(k){if(String(w.notes[k]).trim())done++;});'+
    'var p=tot?Math.min(100,Math.round(done/tot*100)):((w.comments||[]).length?50:0);return{st:w.submitted?"done":((done||(w.comments||[]).length)?"doing":"new"),p:w.submitted?100:p};},'+
    'teacher:null,loading:function(){return D.loading;},usage:function(){if(!D.cloud)return Promise.resolve(null);var C=D.cloud,ac=new AbortController();setTimeout(function(){ac.abort();},8000);return fetch(C.url+"/rest/v1/rpc/get_usage",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.ok?r.json():null;});},openLesson:function(L,host){return RD.mount(host,L,{},{persist:true});}});'+
