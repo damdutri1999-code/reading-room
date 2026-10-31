@@ -1453,6 +1453,19 @@ html.rr-fs-on{overflow:hidden}
 .rr-fsbar span{min-width:44px;text-align:center;opacity:.75}
 @media (max-width:640px){.rr-fsb span{display:none}}
 /* Toàn màn hình + task đọc hiểu: bài đọc và thanh theme dịch sang trái, không bị panel che */
+/* Thanh đầu trang: một hàng gọn, tiêu đề co bằng dấu ba chấm, không rớt dòng */
+.rr-vh{flex-wrap:nowrap}
+.rr-vh h2{flex:1 1 0;max-width:none}
+.rr-vh .rr-logo,.rr-vh .rr-lbtn,.rr-vh .rr-share,.rr-vh .rr-who{flex:none}
+.rr-vh .rr-share{margin-left:0}
+.rr-vh .rr-share+.rr-share{margin-left:0}
+@media (min-width:1280px){
+  /* Khi mở task, nội dung hẹp lại: thu gọn nút thành biểu tượng */
+  html.rd-ex-open .rr-vh .rr-share span,html.rd-ex-open .rr-vh .rr-logo b,html.rd-ex-open .rr-themes button span{display:none}
+  html.rd-ex-open .rr-vh .rr-share{padding:9px 11px}
+  html.rd-ex-open .rr-themes button{padding:0 10px}
+  html.rd-ex-open .rr-vh,html.rd-ex-open .rr-vh:has(.rr-who),html.rd-ex-open .rr-vh:has(.rr-share){padding-right:max(150px,env(safe-area-inset-right,0px))}
+}
 @media (min-width:1280px){
   html.rd-ex-open .rr-main{padding-right:424px;transition:padding-right .45s cubic-bezier(.2,.8,.2,1)}
   html.rd-ex-open .rr-main .rd.qopen .rd-wrap{margin-right:auto;max-width:100%}
@@ -2549,7 +2562,7 @@ RR.init=function(opts){
   try{ th=localStorage.getItem('rr:theme')||th; libMode=localStorage.getItem('rr:lib')||libMode; }catch(e){}
   root.classList.add('rr');
   root.innerHTML='<div class="rr-bd rr-skybg"></div><div class="rr-bd rr-stars"></div><div class="rr-bd rr-spot"></div><div class="rr-bd rr-paper"></div>'+
-    '<div class="rr-themes" role="radiogroup" aria-label="Chọn theme"><button type="button" role="radio" data-th="stage">'+IC.stage+'<span>Sân khấu</span></button><button type="button" role="radio" data-th="notebook">'+IC.nb+'<span>Vở ghi</span></button><button type="button" role="radio" data-th="constellation">'+IC.star+'<span>Chòm sao</span></button></div>'+
+    '<div class="rr-themes" role="radiogroup" aria-label="Chọn theme"><button type="button" role="radio" data-th="stage" title="Sân khấu">'+IC.stage+'<span>Sân khấu</span></button><button type="button" role="radio" data-th="notebook" title="Vở ghi">'+IC.nb+'<span>Vở ghi</span></button><button type="button" role="radio" data-th="constellation" title="Chòm sao">'+IC.star+'<span>Chòm sao</span></button></div>'+
     '<div class="rr-main"></div><div class="rr-toast" role="status"></div>';
   var main=root.querySelector('.rr-main'), toastEl=root.querySelector('.rr-toast'), toastT;
   function toast(m){ toastEl.textContent=m; toastEl.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(function(){ toastEl.classList.remove('show'); },2200); }
@@ -2631,7 +2644,7 @@ RR.init=function(opts){
     if(!list.length){ box.innerHTML=folderMode?(subs.length?'':'<div class="rr-empty">Thư mục này chưa có bài đọc.</div>'):'<div class="rr-empty">Không có bài nào khớp. Thử từ khoá khác hoặc chọn “Tất cả”.</div>'; return; }
     box.innerHTML=rowHtml(list);
   }
-  function readHtml(L){ var fsb='<button type="button" class="rr-share rr-fsb" data-fs aria-label="Đọc toàn màn hình" title="Đọc toàn màn hình (F)"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span>Toàn màn hình</span></button>', sb=fsb+(opts.share?'<button type="button" class="rr-share" data-share aria-label="Chia sẻ bài đọc này"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Chia sẻ</span></button>':''); return '<section class="rr-view rr-read">'+header(L.title||'Bài đọc',sb,'lib','Kho bài đọc')+'<div data-reader></div></section>'; }
+  function readHtml(L){ var fsb='<button type="button" class="rr-share rr-fsb" data-fs aria-label="Đọc toàn màn hình" title="Đọc toàn màn hình (F)"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span>Toàn màn hình</span></button>', sb=fsb+(opts.share?'<button type="button" class="rr-share" data-share aria-label="Chia sẻ bài đọc này" title="Chia sẻ bài đọc này"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Chia sẻ</span></button>':''); return '<section class="rr-view rr-read">'+header(L.title||'Bài đọc',sb,'lib','Kho bài đọc')+'<div data-reader></div></section>'; }
   var loginMode='in', loginOk='';
   function loginHtml(){
     var up=loginMode==='up';
