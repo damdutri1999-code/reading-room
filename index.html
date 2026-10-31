@@ -1277,6 +1277,12 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
 .rr-copied{position:absolute;right:0;top:calc(100% + 10px);white-space:nowrap;background:#1f2547;color:#fff;font:600 12.5px/1 var(--rr-ui);padding:9px 12px;border-radius:9px;box-shadow:0 10px 24px -10px rgba(0,0,0,.5);opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .2s,transform .2s;z-index:30}
 .rr-copied::before{content:"";position:absolute;right:20px;top:-5px;width:10px;height:10px;background:#1f2547;transform:rotate(45deg)}
 .rr-share.ok .rr-copied{opacity:1;transform:none}
+.rr-ltabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:12px;background:color-mix(in srgb,var(--rr-fg) 8%,transparent);margin:2px 0 4px}
+.rr-ltabs button{border:0;border-radius:9px;background:none;color:var(--rr-muted);font:600 13.5px/1 var(--rr-ui);padding:11px 8px;cursor:pointer}
+.rr-ltabs button[aria-selected="true"]{background:var(--rr-accent);color:var(--rr-accent-fg)}
+.rr-ltabs button:focus-visible{outline:2px solid var(--rr-accent);outline-offset:2px}
+.rr-lcard .ok{min-height:0;font:500 13px/1.45 var(--rr-ui);color:#2fa36b}
+.rr-lcard .ok:empty{display:none}
 </style>
 <style id="code-style"></style>
 <style id="style-css"></style>
@@ -2372,11 +2378,15 @@ RR.init=function(opts){
     }).join(''):'<div class="rr-empty">Không có bài nào khớp. Thử từ khoá khác hoặc chọn “Tất cả”.</div>';
   }
   function readHtml(L){ var sb=opts.share?'<button type="button" class="rr-share" data-share aria-label="Chia sẻ bài đọc này"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Chia sẻ</span></button>':''; return '<section class="rr-view rr-read">'+header(L.title||'Bài đọc',sb,'lib','Kho bài đọc')+'<div data-reader></div></section>'; }
+  var loginMode='in', loginOk='';
   function loginHtml(){
-    return '<section class="rr-view rr-gut rr-login"><button type="button" class="rr-lbtn" data-go="home">'+IC.back+'Trang chủ</button><form class="rr-lcard" data-login novalidate><span class="ri">'+IC.pen+'</span><h2>Đăng nhập giáo viên</h2><p>Học viên không cần đăng nhập. Chỉ giáo viên mới vào được khu soạn bài.</p>'+
-      '<label>Tên đăng nhập hoặc email<input name="u" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>'+
-      '<label>Mật khẩu<span class="pw"><input name="p" type="password" autocomplete="current-password" required><button type="button" class="pwt" data-pw aria-label="Hiện mật khẩu">Hiện</button></span></label>'+
-      '<div class="err" data-lerr role="alert" aria-live="polite"></div><button type="submit" class="rr-lgo">Đăng nhập</button></form></section>';
+    var up=loginMode==='up';
+    return '<section class="rr-view rr-gut rr-login"><button type="button" class="rr-lbtn" data-go="home">'+IC.back+'Trang chủ</button><form class="rr-lcard" data-login data-mode="'+loginMode+'" novalidate><span class="ri">'+IC.pen+'</span>'+
+      '<div class="rr-ltabs" role="tablist"><button type="button" role="tab" data-lmode="in" aria-selected="'+(!up)+'">Đăng nhập</button><button type="button" role="tab" data-lmode="up" aria-selected="'+up+'">Tạo tài khoản</button></div>'+
+      '<h2>'+(up?'Tạo tài khoản mới':'Đăng nhập giáo viên')+'</h2><p>'+(up?'Chỉ cần một tên đăng nhập và mật khẩu, không cần email. Tài khoản mới chưa có quyền soạn bài; chủ sở hữu sẽ cấp quyền khi cần.':'Học viên không cần đăng nhập. Chỉ giáo viên được cấp quyền mới vào được khu soạn bài.')+'</p>'+
+      '<label>'+(up?'Tên đăng nhập':'Tên đăng nhập')+'<input name="u" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>'+
+      '<label>Mật khẩu<span class="pw"><input name="p" type="password" autocomplete="'+(up?'new-password':'current-password')+'" required><button type="button" class="pwt" data-pw aria-label="Hiện mật khẩu">Hiện</button></span></label>'+
+      '<div class="ok" data-lok role="status" aria-live="polite">'+esc(loginOk)+'</div><div class="err" data-lerr role="alert" aria-live="polite"></div><button type="submit" class="rr-lgo">'+(up?'Tạo tài khoản':'Đăng nhập')+'</button></form></section>';
   }
   function render(){
     try{ th=localStorage.getItem('rr:theme')||th; }catch(e){}
@@ -2433,12 +2443,22 @@ RR.init=function(opts){
     if(e.target.closest('[data-logout]')){ opts.gate.logout(); go('home'); return; }
     var pw=e.target.closest('[data-pw]'); if(pw){ var i=pw.parentNode.querySelector('input'); var sh=i.type==='password'; i.type=sh?'text':'password'; pw.textContent=sh?'Ẩn':'Hiện'; }
   });
+  main.addEventListener('click',function(e){
+    var lm=e.target.closest('[data-lmode]'); if(lm){ loginMode=lm.getAttribute('data-lmode'); loginOk=''; render(); }
+  });
   main.addEventListener('submit',function(e){
     var f=e.target.closest('[data-login]'); if(!f) return; e.preventDefault();
-    var er=f.querySelector('[data-lerr]'), b=f.querySelector('.rr-lgo'), u=f.u.value.trim(), p=f.p.value;
+    var up=f.getAttribute('data-mode')==='up';
+    var er=f.querySelector('[data-lerr]'), ok=f.querySelector('[data-lok]'), b=f.querySelector('.rr-lgo'), u=f.u.value.trim(), p=f.p.value, lab=b.textContent;
+    ok.textContent='';
     if(!u||!p){ er.textContent='Hãy nhập tên đăng nhập và mật khẩu.'; return; }
-    er.textContent=''; b.disabled=true; b.textContent='Đang đăng nhập…';
-    Promise.resolve(opts.gate.login(u,p)).then(function(){ go('teacher'); },function(x){ er.textContent=String(x&&x.message||x); b.disabled=false; b.textContent='Đăng nhập'; f.p.select(); });
+    er.textContent=''; b.disabled=true; b.textContent=up?'Đang tạo…':'Đang đăng nhập…';
+    if(up){
+      Promise.resolve(opts.gate.register(u,p)).then(function(msg){ loginMode='in'; loginOk=String(msg||'Đã tạo tài khoản.'); render(); var i2=main.querySelector('[name=u]'); if(i2) i2.value=u; },function(x){ er.textContent=String(x&&x.message||x); b.disabled=false; b.textContent=lab; });
+      return;
+    }
+    loginOk='';
+    Promise.resolve(opts.gate.login(u,p)).then(function(){ go('teacher'); },function(x){ er.textContent=String(x&&x.message||x); b.disabled=false; b.textContent=lab; f.p.select(); });
   });
   main.addEventListener('input',function(e){ if(e.target.hasAttribute('data-q')){ libQ=e.target.value; renderLib(); } });
   var onMove=function(e){ html.style.setProperty('--mx',e.clientX+'px'); html.style.setProperty('--my',e.clientY+'px'); };
@@ -3799,7 +3819,7 @@ function showHome(v){
   if(!$('#studio').hidden||!$('#preview').hidden){ if(!$('#preview').hidden) setMode('edit'); changed(true); }
   document.body.classList.add('rr-on');
   if(!rrCtl) rrCtl=RR.init({root:rrRoot, mode:'studio', studentHref:function(){ return khoLink('chung'); }, app:function(){ return LIB.app; }, lessons:libLessons,
-    status:function(){ return {st:'new',p:0}; }, teacher:renderTeacherHub, usage:function(){ var c=cl(); if(!(c&&clUrl(c.url)&&c.key)) return Promise.resolve(null); return clCall('get_usage',{}); }, gate:{ok:authOk,name:authName,login:authLogin,logout:authLogout}, onEdit:function(){ leaveHome(); }, onBack:function(){ document.body.classList.add('rr-on'); if($('#preview')&&!$('#preview').hidden) setMode('edit'); },
+    status:function(){ return {st:'new',p:0}; }, teacher:renderTeacherHub, usage:function(){ var c=cl(); if(!(c&&clUrl(c.url)&&c.key)) return Promise.resolve(null); return clCall('get_usage',{}); }, gate:{ok:authOk,name:authName,login:authLogin,register:authRegister,logout:authLogout}, onEdit:function(){ leaveHome(); }, onBack:function(){ document.body.classList.add('rr-on'); if($('#preview')&&!$('#preview').hidden) setMode('edit'); },
     openLesson:function(x,host){ return RD.mount(host,x,{},{persist:false}); }});
   rrCtl.show(v||'home');
 }
@@ -3941,6 +3961,23 @@ function authLogin(u,p){
       authLogout(); throw new Error('Không kiểm tra được quyền: '+(err&&err.message||err));
     }).then(function(){ var c=cl(); if(!c.id){ var s=em.split('@')[0].replace(/[^a-z0-9-]/g,'-'); if(s.length>=3) c.id=s; saveLib(); } });
   },function(e){ throw new Error(authErr(e)); });
+}
+function authRegister(u,p){
+  u=String(u||'').trim();
+  if(u.indexOf('@')>=0) return Promise.reject(new Error('Tên đăng nhập không dùng ký tự @. Chỉ cần tên, không cần email.'));
+  var em=authEmail(u); if(!em||em.split('@')[0].length<2) return Promise.reject(new Error('Tên đăng nhập cần ít nhất 2 chữ cái hoặc số.'));
+  return authRaw('signup',{email:em,password:p,data:{name:u}}).then(function(j){
+    if(!(j&&j.access_token)) return 'Tài khoản đã tạo nhưng đang chờ xác nhận. Chủ sở hữu hãy tắt “Confirm email” trong Supabase.';
+    return 'Đã tạo tài khoản “'+u+'”. Tài khoản này chưa có quyền soạn bài, chủ sở hữu sẽ cấp quyền khi cần.';
+  },function(e){
+    var m=String(e&&e.message||e), cd=String(e&&e.code||'');
+    if(/already|registered|exists/i.test(m+cd)) throw new Error('Tên đăng nhập này đã có người dùng. Hãy chọn tên khác.');
+    if(/weak_password|at least|short/i.test(m+cd)) throw new Error('Mật khẩu quá ngắn. Cần tối thiểu 6 ký tự.');
+    if(/signup.*disabled|not allowed|disabled/i.test(m+cd)) throw new Error('Hiện chưa mở đăng ký tài khoản mới.');
+    if(/rate limit/i.test(m+cd)) throw new Error('Thử quá nhiều lần. Chờ một lát rồi thử lại.');
+    if(/Failed to fetch|NetworkError|Load failed/i.test(m)) throw new Error('Không kết nối được. Kiểm tra mạng rồi thử lại.');
+    throw new Error('Không tạo được tài khoản: '+m);
+  });
 }
 function authLogout(){ AUTH=null; authSave(); }
 function authToken(){
