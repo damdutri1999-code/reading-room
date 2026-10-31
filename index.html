@@ -1060,7 +1060,15 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 @keyframes rdShake{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 /* Paragraph letters for matching tasks */
 .rd-blk[data-pl]::before{content:attr(data-pl);display:inline-grid;place-items:center;width:1.5em;height:1.5em;margin-right:.6em;border-radius:6px;background:var(--ex);color:#fff;font:700 .68em/1 var(--rd-ui);vertical-align:.18em;float:none}
-@media (max-width:1079px){.rd-exam{width:min(440px,100vw)}}
+/* Panel task: cột phải ≥1280px (nội dung dịch sang trái); dưới 1280px là khay dưới, bài đọc vẫn nhìn thấy ở trên */
+.rd-ex-body{overscroll-behavior:contain}
+@media (min-width:1280px){ .rd.qopen .rd-wrap{margin-left:auto;margin-right:420px;max-width:min(1260px,calc(100vw - 440px))} }
+@media (max-width:1279px){
+  .rd-exam{top:auto;left:0;right:0;width:100%;height:48vh;height:48dvh;border-left:0;border-top:4px solid var(--ex);box-shadow:0 -18px 50px -20px rgba(40,20,120,.55);transform:translateY(104%)}
+  .rd-exam.open{transform:none}
+  .rd.qopen .rd-wrap{padding-bottom:calc(48dvh + 16px)}
+}
+
 
 @media (prefers-reduced-motion:reduce){.rd *,.rd *::before,.rd *::after{animation:none!important;transition:none!important}}
 
@@ -1152,6 +1160,7 @@ body.rr-on{background:var(--rr-bg);color:var(--rr-fg);transition:background-colo
 /* Reading drawer opens on the right: slide the theme switcher left so they never overlap */
 html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-inset-right,0px))}
 @media (max-width:560px){html.rd-dr-open .rr-themes{opacity:0;pointer-events:none}}
+@media (max-width:1279px){html.rd-ex-open:not(.rd-dr-open) .rr-themes{right:calc(14px + env(safe-area-inset-right,0px));opacity:1;pointer-events:auto}}
 @media (max-width:640px){.rr-themes button span{display:none}.rr-themes button{padding:0 10px}}
 
 .rr-main{position:relative;z-index:1}
@@ -1422,6 +1431,11 @@ html.rr-fs-on{overflow:hidden}
 .rr-fsbar button:hover{background:color-mix(in srgb,var(--rr-fg) 12%,transparent)}.rr-fsbar .x{background:var(--rr-accent);color:var(--rr-accent-fg)}
 .rr-fsbar span{min-width:44px;text-align:center;opacity:.75}
 @media (max-width:640px){.rr-fsb span{display:none}}
+/* Toàn màn hình + task đọc hiểu: bài đọc và thanh theme dịch sang trái, không bị panel che */
+@media (min-width:1280px){
+  html.rd-ex-open .rr-read.rr-fs .rd-wrap{margin-right:424px!important}
+  html.rd-ex-open .rr-fsbar{right:calc(410px * var(--fsz,1.2) + 14px)}
+}
 
 .rr-fh{font:600 12px var(--rr-ui);letter-spacing:.05em;text-transform:uppercase;color:var(--rr-muted);margin:18px 2px 10px}
 .rr-fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
@@ -1911,7 +1925,9 @@ RD.mount = function(root, lesson, init, opts){
     b.querySelectorAll('.hl').forEach(function(m,k){ m.style.setProperty('--d',(200+k*150)+'ms'); }); });
   // Paragraph letters (A, B, C…) when the task asks to match paragraphs
   if(EX&&EX.groups.some(function(G){ return G.type==='match'&&(/paragraph|section/i.test(G.title+' '+G.instr)||G.items.some(function(I){ return /^(paragraph|section)\s+[A-Z]\b/i.test(I.q); })); })){
-    var pl=0; blocks.forEach(function(b){ if(b.tagName==='P'&&!/\bps-/.test(b.className||'')&&b.textContent.trim()&&pl<26) b.setAttribute('data-pl',String.fromCharCode(65+pl++)); });
+    var bp=blocks.filter(function(b){ return b.tagName==='P'&&!/\bps-/.test(b.className||'')&&b.textContent.trim(); });
+    var lab=bp.filter(function(b){ return /^\s*[A-Z]\s*[.):]\s/.test(b.textContent); }).length;
+    if(lab<Math.ceil(bp.length/2)) bp.forEach(function(b,i){ if(i<26) b.setAttribute('data-pl',String.fromCharCode(65+i)); });
   }
   // Each paragraph sits in its own row: notes column (left) + text (right)
   blocks.forEach(function(b){ if(b.classList.contains('nb')) return; var row=h('div','rd-row'); art.insertBefore(row,b); row.appendChild(b); });
@@ -2321,6 +2337,7 @@ RD.mount = function(root, lesson, init, opts){
       if(o) closeDrawer();
       R.classList.toggle('qopen',o); exP.classList.toggle('open',o); exP.setAttribute('aria-hidden',String(!o)); exBtn.setAttribute('aria-pressed',String(o)); var rb=$('.rd-mode-read'); if(rb) rb.setAttribute('aria-pressed',String(!o));
       document.documentElement.classList.toggle('rd-dr-open',o);
+      document.documentElement.classList.toggle('rd-ex-open',o);
       linkClear(); setTimeout(function(){ prog(); },460);
       if(o) exRender();
     }
@@ -2337,7 +2354,7 @@ RD.mount = function(root, lesson, init, opts){
     on(exP,'input',function(e){ var el=e.target; if(el.classList.contains('rd-ex-in')){ st.exam['q'+el.getAttribute('data-q')]=el.value; save(); var d=exDone(); exProg.textContent=d+'/'+EX.count+' câu'; var n=$('.rd-ex-n'); if(n) n.textContent=d?d+'/'+EX.count:EX.count; } });
     on(exP,'change',function(e){ var el=e.target; if(el.classList.contains('rd-ex-sel')||el.classList.contains('rd-ex-in')){ st.exam['q'+el.getAttribute('data-q')]=el.value; save(); exRender(el.classList.contains('rd-ex-in')); } });
     exRender();
-    cleanup.push(function(){ document.documentElement.classList.remove('rd-dr-open'); });
+    cleanup.push(function(){ document.documentElement.classList.remove('rd-dr-open','rd-ex-open'); });
     if(lesson.examOpen && !opts.noAutoExam) setTimeout(function(){ exOpen(true); },400);
     R.exOpen=exOpen;
   }
@@ -3521,7 +3538,7 @@ var TASK_RULES=
 '- Matching Headings: chọn khi bài có từ 4 đoạn thân bài trở lên và mỗi đoạn xoay quanh MỘT ý chính rõ ràng. Cho danh sách heading đánh số la mã i, ii, iii… nhiều hơn số đoạn cần nối 2 heading (heading thừa là nhiễu). Mỗi câu hỏi là một đoạn ("Paragraph B"), đáp án là số la mã. Chọn 4 đến 6 đoạn. Không nối đoạn đầu nếu đoạn đó chỉ là mở bài chung chung.\n'+
 '- Matching Information: chọn khi các đoạn chứa nhiều chi tiết cụ thể (ví dụ, lý do, so sánh, định nghĩa, số liệu) mà không có một ý chính duy nhất, hoặc khi ý chính các đoạn chồng lấn nhau, hoặc bài có ít hơn 4 đoạn. Mỗi câu là một thông tin cần tìm ("a description of…", "an example of…", "a reason why…"), đáp án là nhãn đoạn. Chọn 4 đến 6 câu; một đoạn có thể được chọn nhiều lần hoặc không lần nào.\n'+
 '- Nếu cả hai đều phù hợp thì chọn Matching Headings.\n\n'+
-'NHÃN ĐOẠN: các đoạn thân bài (KHÔNG tính tiêu đề, phụ đề, heading, ghi chú) được đánh nhãn A, B, C… theo thứ tự từ trên xuống, mỗi đoạn một chữ cái. Học viên sẽ thấy các nhãn này ngay trước mỗi đoạn trong bài. Nhóm 3 phải dùng đúng các nhãn đó.\n\n'+
+'NHÃN ĐOẠN: các đoạn thân bài (KHÔNG tính tiêu đề, phụ đề, heading, ghi chú) được đánh nhãn A, B, C… theo thứ tự từ trên xuống, mỗi đoạn một chữ cái. Học viên sẽ thấy các nhãn này ngay trước mỗi đoạn trong bài, nên TUYỆT ĐỐI KHÔNG tự thêm chữ cái (A., B.…) vào đầu đoạn trong khối ```text. Nếu bài gốc đã có sẵn chữ cái ở đầu đoạn thì giữ nguyên và dùng đúng các chữ đó. Nhóm 3 phải dùng đúng các nhãn đó.\n\n'+
 'ĐÁP ÁN (rất quan trọng)\n'+
 '- BẠN phải quyết định đáp án đúng cho MỌI câu và ghi vào [ĐA: …]. Không để trống, không viết "tuỳ".\n'+
 '- Trước khi chốt, tự kiểm tra từng câu: tìm đúng chỗ trong bài làm căn cứ; chắc chắn chỉ có MỘT đáp án đúng.\n'+
