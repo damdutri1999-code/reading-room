@@ -997,14 +997,14 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
 .rr-hs .sub{font:17px/1.6 var(--rr-ui);color:var(--rr-muted);margin:0;max-width:52ch}
 .rr-hs .rr-meta,.rr-hs .rr-roles{justify-content:center}
 .rr-hn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:40px;align-items:center;max-width:1080px;margin:0 auto}
-.rr-hn h1{font:400 clamp(56px,8vw,96px)/1.05 var(--rr-hand);color:var(--rr-ink);margin:10px 0 12px;clip-path:inset(0 100% 0 0);animation:rrWrite 1.8s steps(30,end) .3s forwards}
-@keyframes rrWrite{to{clip-path:inset(0 0 0 0)}}
+.rr-hn h1{font:400 clamp(56px,8vw,96px)/1.05 var(--rr-hand);color:var(--rr-ink);margin:10px 0 12px;clip-path:inset(-.3em 100% -.45em -.2em);animation:rrWrite 1.8s steps(30,end) .3s forwards}
+@keyframes rrWrite{to{clip-path:inset(-.3em -.3em -.45em -.2em)}}
 .rr-hn .sub{font:17px/36px var(--rr-ui);color:var(--rr-muted);margin:0 0 16px}
 .rr-hn .tips{display:flex;flex-direction:column;gap:18px}
 .rr-hn .tips .rr-stk{opacity:0;animation:rrDrop .6s cubic-bezier(.3,1.5,.5,1) forwards;animation-delay:var(--d)}
 @keyframes rrDrop{from{opacity:0;transform:rotate(var(--r)) translateY(-16px)}to{opacity:1;transform:rotate(var(--r))}}
 .rr-hc{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:24px;align-items:center;max-width:1180px;margin:0 auto}
-.rr-hc h1{font:400 clamp(56px,8vw,100px)/1.05 var(--rr-hand);color:#fff;margin:12px 0 12px;text-shadow:0 0 24px rgba(143,162,255,.55);clip-path:inset(0 100% 0 0);animation:rrWrite 1.8s steps(30,end) .3s forwards}
+.rr-hc h1{font:400 clamp(56px,8vw,100px)/1.05 var(--rr-hand);color:#fff;margin:12px 0 12px;text-shadow:0 0 24px rgba(143,162,255,.55);clip-path:inset(-.3em 100% -.45em -.2em);animation:rrWrite 1.8s steps(30,end) .3s forwards}
 .rr-hc .sub{font:17px/1.6 var(--rr-ui);color:var(--rr-muted);margin:0 0 16px;max-width:40ch}
 .rr-sky{position:relative;min-height:440px}
 .rr-sky svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
@@ -2210,15 +2210,15 @@ RR.init=function(opts){
     return '<div class="rr-roles'+(opts.teacher?'':' one')+'">'+s+t+'</div>';
   }
   function meta(){ var ls=lessons(), lv={}; ls.forEach(function(L){ if(L.level) lv[L.level]=1; }); var lvs=Object.keys(lv).sort(); return '<div class="rr-meta"><span>'+ls.length+' bài đọc</span>'+(lvs.length?'<span>'+esc(lvs.length>1?lvs[0]+' – '+lvs[lvs.length-1]:lvs[0])+'</span>':'')+'<span>Có câu hỏi dẫn dắt và ô ghi chú</span></div>'; }
-  var useVal=null;
+  var useVal=null, useN=null;
   function useHtml(){ return '<div class="rr-use" data-use'+(useVal==null?' hidden':'')+'>'+(useVal==null?'':useInner(useVal))+'</div>'; }
-  function useInner(p){ var C=2*Math.PI*15.9155, d=(Math.min(100,Math.max(0,p))/100*C).toFixed(2); return '<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="bg" cx="20" cy="20" r="15.9155"/><circle class="fg" cx="20" cy="20" r="15.9155" style="stroke-dasharray:'+d+' '+C.toFixed(2)+'"/></svg><span>Hiện tại kho tài liệu đang <b>'+(p<10&&p>0?p.toFixed(1).replace('.0',''):Math.round(p))+'%</b> đầy</span>'; }
+  function useInner(p){ var C=2*Math.PI*15.9155, d=(Math.min(100,Math.max(0,p))/100*C).toFixed(2); return '<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="bg" cx="20" cy="20" r="15.9155"/><circle class="fg" cx="20" cy="20" r="15.9155" style="stroke-dasharray:'+d+' '+C.toFixed(2)+'"/></svg><span>'+(useN!=null?'Hiện tại kho chung đang có <b>'+useN+'</b> bài đọc · <b>':'Hiện tại kho tài liệu đang <b>')+(p<10&&p>0?p.toFixed(1).replace('.0',''):Math.round(p))+'%</b> đầy</span>'; }
   function fillUse(){
     if(!opts.usage||view!=='home') return;
     var put=function(){ var el=main.querySelector('[data-use]'); if(el&&useVal!=null){ el.innerHTML=useInner(useVal); el.hidden=false; } };
     if(useVal!=null){ put(); return; }
     var p; try{ p=opts.usage(); }catch(e){ return; }
-    Promise.resolve(p).then(function(j){ if(j&&j.limit>0&&j.used>=0){ useVal=j.used/j.limit*100; put(); } }).catch(function(){});
+    Promise.resolve(p).then(function(j){ if(j&&j.limit>0&&j.used>=0){ useVal=j.used/j.limit*100; useN=(typeof j.lessons==='number')?j.lessons:null; put(); } }).catch(function(){});
   }
   function homeHtml(){
     var A=app();
