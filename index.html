@@ -3932,7 +3932,15 @@ function authStore(j,label){ AUTH={access:j.access_token,refresh:j.refresh_token
 function authLogin(u,p){
   var em=authEmail(u); if(!em) return Promise.reject(new Error('Hãy nhập tên đăng nhập.'));
   var label=String(u).trim().indexOf('@')>0?String(u).trim():String(u).trim();
-  return authRaw('token?grant_type=password',{email:em,password:p}).then(function(j){ authStore(j,label); var c=cl(); if(!c.id){ var s=em.split('@')[0].replace(/[^a-z0-9-]/g,'-'); if(s.length>=3) c.id=s; saveLib(); } },function(e){ throw new Error(authErr(e)); });
+  return authRaw('token?grant_type=password',{email:em,password:p}).then(function(j){
+    authStore(j,label);
+    return clCall('is_owner',{},j.access_token).then(function(ok){
+      if(ok===false){ authLogout(); throw new Error('Tài khoản này chưa được cấp quyền giáo viên. Chỉ chủ sở hữu mới vào được khu soạn bài.'); }
+    },function(err){
+      if(err&&err.status===404) return; /* chưa chạy SQL phân quyền: cho qua, máy chủ vẫn kiểm tra khi xuất bản */
+      authLogout(); throw new Error('Không kiểm tra được quyền: '+(err&&err.message||err));
+    }).then(function(){ var c=cl(); if(!c.id){ var s=em.split('@')[0].replace(/[^a-z0-9-]/g,'-'); if(s.length>=3) c.id=s; saveLib(); } });
+  },function(e){ throw new Error(authErr(e)); });
 }
 function authLogout(){ AUTH=null; authSave(); }
 function authToken(){
@@ -3948,6 +3956,7 @@ function clCall(fn,body,tok){
 }
 function clErr(e){
   var m=String(e&&e.message||e);
+  if(/not_admin/.test(m)) return 'Tài khoản này không có quyền xuất bản. Chỉ chủ sở hữu mới được xuất bản.';
   if(/reserved/.test(m)) return 'Mã kho “chung” dành riêng cho kho chung. Hãy chọn mã khác.';
   if(/not_owner|bad_code/.test(m)) return 'Mã kho này đã thuộc về giáo viên khác. Hãy chọn một mã kho khác.';
   if(/auth_none|auth_expired|not_signed_in/.test(m)) return 'Phiên đăng nhập đã hết. Hãy đăng xuất rồi đăng nhập lại.';
