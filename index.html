@@ -2800,7 +2800,7 @@ function syncShared(x){ x.shared=fl(x).some(underChung); }
 function addF(x,f){ if(!f) return; if(!hasF(x,f)) fl(x).push(f); syncShared(x); }
 function remF(x,f){ x.folders=fl(x).filter(function(i){ return i!==f; }); syncShared(x); }
 function setChung(x,on){ if(on){ delete x.noShare; if(!fl(x).some(underChung)) addF(x,CH); } else { x.noShare=true; x.folders=fl(x).filter(function(f){ return !underChung(f); }); } syncShared(x); }
-function autoShare(x){ if(!x.noShare&&!fl(x).some(underChung)) addF(x,CH); syncShared(x); }
+function autoShare(x){ syncShared(x); } /* Hoàn tất không tự ra kho nào: chủ sở hữu tự xếp ở Quản lý bài */
 function resyncAll(){ LIB.order.forEach(function(i){ if(LIB.lessons[i]) syncShared(LIB.lessons[i]); }); }
 function migrateLib(){
   ensureChung();
@@ -4094,7 +4094,7 @@ function paneLessons(){
 }
 function paneDrafts(){
   var ids=draftIds();
-  return paneHead('Soạn bài đọc',ids.length?ids.length+' bài đang soạn dở. Soạn xong thì bấm “Hoàn tất” để đưa vào kho bài đọc.':'Bài đang soạn dở sẽ nằm ở đây.','<button type="button" class="tw-btn solid" data-hub="new">'+svg('plus')+'Bài mới</button>')+
+  return paneHead('Soạn bài đọc',ids.length?ids.length+' bài đang soạn dở. Soạn xong thì bấm “Hoàn tất”: bài được lưu lên Supabase và chờ thầy xếp thư mục ở tab Quản lý bài.':'Bài đang soạn dở sẽ nằm ở đây.','<button type="button" class="tw-btn solid" data-hub="new">'+svg('plus')+'Bài mới</button>')+
     '<div class="tw-list" data-rows></div>';
 }
 function renderRows(){
@@ -4396,7 +4396,7 @@ rrRoot.addEventListener('click',function(e){
   if(act==='edit') openForEdit(id);
   else if(act==='view'){ openForEdit(id); setMode('preview'); }
   else if(act==='dl'){ var x=cleanLessonOf(LIB.lessons[id]===L?L:LIB.lessons[id]), n=RD.slug(x.title)+'.html'; Promise.resolve(RD.download(RD.buildDoc(x,{}),n)).then(function(res){ rrCtl.toast(res==='declined'?'Đã huỷ lưu file':'Đã tải “'+n+'”'); }); }
-  else if(act==='finish'||act==='undone'){ var xx=LIB.lessons[id]; if(!xx) return; if(act==='finish'){ xx.done=true; delete xx.hidden; autoShare(xx); } else delete xx.done; if(L.id===id){ L.done=xx.done; } saveLib(); syncDone(); hubRefresh(); autoPub(act==='finish'?'Đã hoàn tất, bài đã ra kho':'Đã chuyển về bản nháp, bài đã rút khỏi kho'); }
+  else if(act==='finish'||act==='undone'){ var xx=LIB.lessons[id]; if(!xx) return; if(act==='finish'){ xx.done=true; delete xx.hidden; autoShare(xx); } else delete xx.done; if(L.id===id){ L.done=xx.done; } saveLib(); syncDone(); hubRefresh(); autoPub(act==='finish'?'Đã hoàn tất, bài đã lưu lên Supabase':'Đã chuyển về bản nháp, bài đã rút khỏi kho'); }
   else if(act==='up'||act==='down') moveLesson(id,act==='up'?-1:1);
   else if(act==='dup'){ var src=id===L.id?Object.assign({},L,{html:cleanHTML()}):LIB.lessons[id]; var c=JSON.parse(JSON.stringify(src)); c.id=uid('L'); c.title=(c.title||'Bài đọc')+' (bản sao)'; delete c.done; c.updated=Date.now(); LIB.lessons[c.id]=c; LIB.order.splice(LIB.order.indexOf(id)+1,0,c.id); saveLib(); hubRefresh(); rrCtl.toast('Đã nhân bản bài'); }
   else if(act==='del'){
@@ -4490,10 +4490,10 @@ function loadUI(){
   applyStyleCss(); renderStyleMenu(); renderStylesPane();
   renderCodeUI(); renderCodesPane(); refresh(); if(typeof syncDone==='function') syncDone();
 }
-function syncDone(){ var b=$('#done-btn'); if(!b) return; var d=!!(L&&L.done); b.classList.toggle('on',d); b.setAttribute('aria-pressed',String(d)); b.querySelector('span').textContent=d?'Đã hoàn tất':'Hoàn tất'; b.setAttribute('data-tip',d?'Bài đã nằm trong kho bài đọc. Bấm để chuyển về bản nháp':'Soạn xong, đưa bài vào kho bài đọc'); }
+function syncDone(){ var b=$('#done-btn'); if(!b) return; var d=!!(L&&L.done); b.classList.toggle('on',d); b.setAttribute('aria-pressed',String(d)); b.querySelector('span').textContent=d?'Đã hoàn tất':'Hoàn tất'; b.setAttribute('data-tip',d?'Bài đã hoàn tất. Bấm để chuyển về bản nháp':'Soạn xong: lưu lên Supabase, chưa thuộc kho nào (thầy xếp ở Quản lý bài)'); }
 $('#done-btn').addEventListener('click',function(){
-  if(L.done){ delete L.done; saveDraft(); syncDone(); autoPub('Đã chuyển về bản nháp, bài đã rút khỏi kho'); return; }
-  L.done=true; delete L.hidden; autoShare(L); saveDraft(); syncDone(); autoPub('Đã hoàn tất, bài đã ra kho'); hubTab='lessons'; try{ localStorage.setItem('rls:hubtab','lessons'); }catch(e){} showHome('teacher'); setTimeout(function(){ if(rrCtl) rrCtl.toast('Đã đưa bài vào kho bài đọc'); },80);
+  if(L.done){ delete L.done; saveDraft(); syncDone(); autoPub('Đã chuyển về bản nháp'); return; }
+  L.done=true; delete L.hidden; autoShare(L); saveDraft(); syncDone(); autoPub('Đã hoàn tất, bài đã lưu lên Supabase. Chưa thuộc kho nào, thầy xếp ở Quản lý bài'); hubTab='lessons'; try{ localStorage.setItem('rls:hubtab','lessons'); }catch(e){} showHome('teacher'); setTimeout(function(){ if(rrCtl) rrCtl.toast('Đã đưa bài vào kho bài đọc'); },80);
 });
 /* ---------- Owner role + auto publish ---------- */
 var edPubT_=0;
@@ -4503,7 +4503,7 @@ function ownerName(){ return String(authName()||'Trí').split('@')[0]; }
 var apT=0, apBusy=false, apAgain=false, apMsg='', apQuiet=false;
 function autoPub(okMsg,quiet){
   if(!quiet) apMsg=okMsg||apMsg; else apQuiet=true;
-  if(!clReady()){ if(!quiet&&apMsg){ say(apMsg+'. Chưa đăng nhập hoặc chưa nối kho online nên bài chưa ra kho.',true); apMsg=''; } return; }
+  if(!clReady()){ if(!quiet&&apMsg){ say(apMsg+'. Chưa đăng nhập hoặc chưa nối kho online nên bài chưa được lưu lên Supabase.',true); apMsg=''; } return; }
   clearTimeout(apT); apT=setTimeout(runAutoPub,700);
 }
 function runAutoPub(){
@@ -4780,7 +4780,7 @@ function dvCommitRename(val,cancel){
 }
 function dvStar(items){ var all=items.every(function(it){ return it.o.starred; }); items.forEach(function(it){ if(all) delete it.o.starred; else it.o.starred=true; }); saveLib(); dvRefresh(); dvSnack(all?'Đã bỏ dấu sao':'Đã gắn dấu sao'); }
 function dvKho(items,which){
-  var ls=items.filter(function(it){ return it.k==='l'&&it.o.done; }); if(!ls.length){ dvSnack('Chỉ bài đã hoàn tất mới có thể đưa ra kho.'); return; }
+  var ls=items.filter(function(it){ return it.k==='l'&&it.o.done; }); if(!ls.length){ dvSnack('Chỉ bài đã hoàn tất mới có thể đưa vào Kho chung.'); return; }
   var on=!ls.every(function(it){ return it.o.shared; });
   ls.forEach(function(it){ setChung(it.o,on); });
   saveLib(); hubRefresh2(); autoPub((on?'Đã đưa ':'Đã rút ')+ls.length+' bài '+(on?'vào ':'khỏi ')+'kho chung (thư mục KHO TÀI LIỆU CHUNG)');
@@ -4788,7 +4788,7 @@ function dvKho(items,which){
 function dvFinish(items,undo){
   var ls=items.filter(function(it){ return it.k==='l'&&(undo?it.o.done:!it.o.done); }); if(!ls.length) return;
   ls.forEach(function(it){ if(undo) delete it.o.done; else { it.o.done=true; delete it.o.hidden; autoShare(it.o); } });
-  saveLib(); syncDone(); hubRefresh2(); autoPub(undo?'Đã chuyển bài về bản nháp và rút khỏi kho':'Đã hoàn tất và đưa '+ls.length+' bài ra kho');
+  saveLib(); syncDone(); hubRefresh2(); autoPub(undo?'Đã chuyển bài về bản nháp':'Đã hoàn tất '+ls.length+' bài và lưu lên Supabase (chưa thuộc kho nào)');
 }
 function dvShareLink(it){
   if(!it||it.k!=='l') return; var x=it.o;
@@ -4860,7 +4860,7 @@ function dvCtxItems(sel){
   L1.push({a:'star',t:sel.every(function(i){ return i.o.starred; })?'Bỏ dấu sao':'Gắn dấu sao',ic:'star',k:'S'});
   if(anyL.length){ L1.push('-');
     if(dn){ L1.push({a:'khochung',t:'Kho chung',chk:anyL.every(function(i){ return i.o.shared; })}); L1.push({a:'undone',t:'Chuyển về bản nháp',ic:'pen'}); }
-    else L1.push({a:'finish',t:'Hoàn tất và đưa ra kho',ic:'check'});
+    else L1.push({a:'finish',t:'Hoàn tất (lưu lên Supabase)',ic:'check'});
     if(l1) { L1.push({a:'share',t:'Copy link bài đọc',ic:'link',dis:!(l1.done&&l1.shared)}); L1.push({a:'dl',t:'Tải xuống (.html)',ic:'download'}); }
   }
   L1.push('-'); L1.push({a:'info',t:'Chi tiết',ic:'info',k:'Alt + Enter'}); if(!sel.some(function(i){ return i.k==='f'&&i.o.system; })) L1.push({a:'trash',t:'Chuyển vào thùng rác',ic:'trash',danger:true,k:'Delete'});
