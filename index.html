@@ -1166,6 +1166,16 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
 .rr-lgo{height:48px;border:0;border-radius:12px;background:var(--rr-accent);color:var(--rr-accent-fg);font:700 16px var(--rr-ui);cursor:pointer}
 .rr-lgo:disabled{opacity:.6;cursor:wait}
 .rr-who{display:flex;align-items:center;gap:10px;font:500 13px var(--rr-ui);color:var(--rr-muted)}
+
+.rr-use{display:flex;align-items:center;gap:12px;margin-top:22px;font:500 14px/1.3 var(--rr-ui);color:var(--rr-muted)}
+.rr-use[hidden]{display:none}
+.rr-use svg{width:38px;height:38px;flex:none;transform:rotate(-90deg)}
+.rr-use circle{fill:none;stroke-width:4.2}
+.rr-use .bg{stroke:var(--rr-line)}
+.rr-use .fg{stroke:var(--rr-accent);stroke-linecap:round;animation:rr-use-in 1.1s cubic-bezier(.2,.8,.2,1) both}
+.rr-use b{color:var(--rr-fg);font-weight:700}
+@keyframes rr-use-in{from{stroke-dasharray:0 100}}
+@media (prefers-reduced-motion:reduce){.rr-use .fg{animation:none}}
 </style>
 <style id="code-style"></style>
 <style id="style-css"></style>
@@ -2192,14 +2202,24 @@ RR.init=function(opts){
     return '<div class="rr-roles'+(opts.teacher?'':' one')+'">'+s+t+'</div>';
   }
   function meta(){ var ls=lessons(), lv={}; ls.forEach(function(L){ if(L.level) lv[L.level]=1; }); var lvs=Object.keys(lv).sort(); return '<div class="rr-meta"><span>'+ls.length+' bài đọc</span>'+(lvs.length?'<span>'+esc(lvs.length>1?lvs[0]+' – '+lvs[lvs.length-1]:lvs[0])+'</span>':'')+'<span>Có câu hỏi dẫn dắt và ô ghi chú</span></div>'; }
+  var useVal=null;
+  function useHtml(){ return '<div class="rr-use" data-use'+(useVal==null?' hidden':'')+'>'+(useVal==null?'':useInner(useVal))+'</div>'; }
+  function useInner(p){ var C=2*Math.PI*15.9155, d=(Math.min(100,Math.max(0,p))/100*C).toFixed(2); return '<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="bg" cx="20" cy="20" r="15.9155"/><circle class="fg" cx="20" cy="20" r="15.9155" style="stroke-dasharray:'+d+' '+C.toFixed(2)+'"/></svg><span>Hiện tại kho tài liệu đang <b>'+(p<10&&p>0?p.toFixed(1).replace('.0',''):Math.round(p))+'%</b> đầy</span>'; }
+  function fillUse(){
+    if(!opts.usage||view!=='home') return;
+    var put=function(){ var el=main.querySelector('[data-use]'); if(el&&useVal!=null){ el.innerHTML=useInner(useVal); el.hidden=false; } };
+    if(useVal!=null){ put(); return; }
+    var p; try{ p=opts.usage(); }catch(e){ return; }
+    Promise.resolve(p).then(function(j){ if(j&&j.limit>0&&j.used>=0){ useVal=j.used/j.limit*100; put(); } }).catch(function(){});
+  }
   function homeHtml(){
     var A=app();
-    if(th==='stage') return '<section class="rr-view rr-home rr-hs rr-gut"><span class="rr-kick">'+esc(A.klass)+'</span><h1>'+String(A.name).split(' ').map(function(w,i){ return '<span class="rr-w" style="--d:'+(200+i*200)+'ms">'+esc(w)+'</span>'; }).join(' ')+'</h1><p class="sub">'+esc(A.tagline)+'</p>'+meta()+roles()+'</section>';
+    if(th==='stage') return '<section class="rr-view rr-home rr-hs rr-gut"><span class="rr-kick">'+esc(A.klass)+'</span><h1>'+String(A.name).split(' ').map(function(w,i){ return '<span class="rr-w" style="--d:'+(200+i*200)+'ms">'+esc(w)+'</span>'; }).join(' ')+'</h1><p class="sub">'+esc(A.tagline)+'</p>'+meta()+roles()+useHtml()+'</section>';
     var TP=(A.tips||[]).filter(function(t){ return String(t||'').trim(); }); if(!TP.length) TP=TIPS; TP=TP.slice(0,3);
     var tips=TP.map(function(t,i){ return '<div class="rr-stk rr-n'+(i+1)+'" style="--r:'+['-3deg','2.5deg','-1.5deg'][i]+';--d:'+(900+i*220)+'ms"><small>Mẹo '+(i+1)+'</small>'+esc(t)+'</div>'; }).join('');
-    if(th==='notebook') return '<section class="rr-view rr-home rr-gut"><div class="rr-hn"><div><span class="rr-kick">'+esc(A.klass)+'</span><h1>'+esc(A.name)+'</h1><p class="sub">'+esc(A.tagline)+'</p>'+meta()+'<div style="margin-top:22px">'+roles()+'</div></div><div class="tips">'+tips+'</div></div></section>';
+    if(th==='notebook') return '<section class="rr-view rr-home rr-gut"><div class="rr-hn"><div><span class="rr-kick">'+esc(A.klass)+'</span><h1>'+esc(A.name)+'</h1><p class="sub">'+esc(A.tagline)+'</p>'+meta()+'<div style="margin-top:22px">'+roles()+'</div>'+useHtml()+'</div><div class="tips">'+tips+'</div></div></section>';
     var P=[[28,20],[74,42],[36,78]];
-    return '<section class="rr-view rr-home rr-gut"><div class="rr-hc"><div><span class="rr-kick">'+esc(A.klass)+'</span><h1>'+esc(A.name)+'</h1><p class="sub">'+esc(A.tagline)+'</p>'+meta()+'<div style="margin-top:22px">'+roles()+'</div></div><div class="rr-sky"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M28 20 L74 42 L36 78 L28 20" vector-effect="non-scaling-stroke"/></svg>'+TP.map(function(t,i){ return '<div class="rr-stk rr-n'+(i+1)+'" style="left:'+P[i][0]+'%;top:'+P[i][1]+'%;--r:'+['-3deg','2.5deg','-1.5deg'][i]+';--d:'+(700+i*260)+'ms;--t:'+(3+i)+'s"><small>Mẹo '+(i+1)+'</small>'+esc(t)+'</div>'; }).join('')+'</div></div></section>';
+    return '<section class="rr-view rr-home rr-gut"><div class="rr-hc"><div><span class="rr-kick">'+esc(A.klass)+'</span><h1>'+esc(A.name)+'</h1><p class="sub">'+esc(A.tagline)+'</p>'+meta()+'<div style="margin-top:22px">'+roles()+'</div>'+useHtml()+'</div><div class="rr-sky"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M28 20 L74 42 L36 78 L28 20" vector-effect="non-scaling-stroke"/></svg>'+TP.map(function(t,i){ return '<div class="rr-stk rr-n'+(i+1)+'" style="left:'+P[i][0]+'%;top:'+P[i][1]+'%;--r:'+['-3deg','2.5deg','-1.5deg'][i]+';--d:'+(700+i*260)+'ms;--t:'+(3+i)+'s"><small>Mẹo '+(i+1)+'</small>'+esc(t)+'</div>'; }).join('')+'</div></div></section>';
   }
   function header(title,extra,back,backLabel){ return '<header class="rr-vh rr-gut"><button type="button" class="rr-lbtn" data-go="'+(back||'home')+'">'+IC.back+esc(backLabel||'Trang chủ')+'</button><h2>'+esc(title)+'</h2>'+(extra||'')+'</header>'; }
   function libHtml(){
@@ -2244,6 +2264,7 @@ RR.init=function(opts){
       var vh=main.querySelector('.rr-vh'); root.style.setProperty('--rr-vh',(vh?vh.offsetHeight:64)+'px');
       reader=opts.openLesson(current,main.querySelector('[data-reader]'),ctl);
     }
+    fillUse();
     if(opts.onShow) opts.onShow(view);
   }
   var navLock=false;
@@ -3416,7 +3437,7 @@ function showHome(v){
   if(!$('#studio').hidden||!$('#preview').hidden){ if(!$('#preview').hidden) setMode('edit'); changed(true); }
   document.body.classList.add('rr-on');
   if(!rrCtl) rrCtl=RR.init({root:rrRoot, mode:'studio', app:function(){ return LIB.app; }, lessons:libLessons,
-    status:function(){ return {st:'new',p:0}; }, teacher:renderTeacherHub, gate:{ok:authOk,name:authName,login:authLogin,logout:authLogout}, onEdit:function(){ leaveHome(); }, onBack:function(){ document.body.classList.add('rr-on'); if($('#preview')&&!$('#preview').hidden) setMode('edit'); },
+    status:function(){ return {st:'new',p:0}; }, teacher:renderTeacherHub, usage:function(){ var c=cl(); if(!(c&&clUrl(c.url)&&c.key)) return Promise.resolve(null); return clCall('get_usage',{}); }, gate:{ok:authOk,name:authName,login:authLogin,logout:authLogout}, onEdit:function(){ leaveHome(); }, onBack:function(){ document.body.classList.add('rr-on'); if($('#preview')&&!$('#preview').hidden) setMode('edit'); },
     openLesson:function(x,host){ return RD.mount(host,x,{},{persist:false}); }});
   rrCtl.show(v||'home');
 }
@@ -3747,7 +3768,7 @@ function buildLibrary(preview){
    'var ctl=RR.init({root:document.getElementById("rr-root"),mode:"student",app:function(){return D.app;},lessons:function(){return D.lessons;},'+
    'status:function(L){var w=work(L);if(!w)return{st:"new",p:0};var I=RR.info(L),tot=I.questions+I.notes,done=0;Object.keys(w.answers||{}).forEach(function(k){if(String(w.answers[k]).trim())done++;});Object.keys(w.notes||{}).forEach(function(k){if(String(w.notes[k]).trim())done++;});'+
    'var p=tot?Math.min(100,Math.round(done/tot*100)):((w.comments||[]).length?50:0);return{st:w.submitted?"done":((done||(w.comments||[]).length)?"doing":"new"),p:w.submitted?100:p};},'+
-   'teacher:null,openLesson:function(L,host){return RD.mount(host,L,{},{persist:true});}});'+
+   'teacher:null,usage:function(){if(!D.cloud)return Promise.resolve(null);var C=D.cloud,ac=new AbortController();setTimeout(function(){ac.abort();},8000);return fetch(C.url+"/rest/v1/rpc/get_usage",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.ok?r.json():null;});},openLesson:function(L,host){return RD.mount(host,L,{},{persist:true});}});'+
    'if(D.cloud){var C=D.cloud,ac=new AbortController(),tm=setTimeout(function(){ac.abort();},8000);fetch(C.url+"/rest/v1/rpc/get_lib",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:JSON.stringify({p_id:C.id})}).then(function(r){return r.ok?r.json():null;}).then(function(j){clearTimeout(tm);var d=j&&j.data;if(!d||!d.lessons||!d.lessons.length)return;var cur=JSON.stringify(D.lessons);var nxt=JSON.stringify(d.lessons);if(cur===nxt&&JSON.stringify(D.app)===JSON.stringify(d.app))return;D.lessons=d.lessons;if(d.app)D.app=d.app;if(ctl.view()!=="read"){ctl.refresh();ctl.toast("Đã cập nhật bài mới");}else{ctl.toast("Có bài mới. Quay lại kho bài để xem.");}}).catch(function(){});}'+
    '})();<\/script></body></html>';
 }
