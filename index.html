@@ -4522,6 +4522,7 @@ try{ DV.view=localStorage.getItem('rls:dv:view')||'grid'; DV.cur=sessionStorage.
 if(DV.cur&&!LIB.folders[DV.cur]) DV.cur='';
 var newInFolder='';
 function dvKey(k,id){ return k+':'+id; }
+function dvLoose(x){ return !lsnTrashed(x)&&!fl(x).some(function(f){ return LIB.folders[f]; }); }
 function dvAll(){
   var out=[], q=DV.q.trim().toLowerCase();
   var F=Object.keys(LIB.folders).map(function(i){ return LIB.folders[i]; });
@@ -4539,6 +4540,8 @@ function dvAll(){
     } else if(DV.sec==='my'){
       vf.filter(function(f){ return (f.parent||'')===DV.cur; }).forEach(function(f){ out.push(fi(f)); });
       vl.filter(function(x){ return DV.cur===''?true:hasF(x,DV.cur); }).forEach(function(x){ out.push(li(x)); });
+    } else if(DV.sec==='loose'){
+      vl.filter(dvLoose).forEach(function(x){ out.push(li(x)); });
     } else if(DV.sec==='recent'){
       vl.forEach(function(x){ out.push(li(x)); });
       out.sort(function(a,b){ return b.t-a.t; }); return out.slice(0,40);
@@ -4562,6 +4565,7 @@ function dvSelItems(){ return DV.sel.map(dvGet).filter(Boolean); }
 var DVI_FOLDER='<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>';
 ICON.folder=DVI_FOLDER;
 var DVI={
+  inbox:'<path d="M4 13l2-7h12l2 7v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13h4l1 2h6l1-2h4"/>',
   folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   folderPlus:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13h6"/>',
   star:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
@@ -4580,7 +4584,8 @@ var DVI={
 function dvIc(n,cls){ return '<svg class="i'+(cls?' '+cls:'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(DVI[n]||ICON[n]||'')+'</svg>'; }
 function paneDrive(){
   var tr=0; Object.keys(LIB.folders).forEach(function(i){ if(LIB.folders[i].trashed) tr++; }); LIB.order.forEach(function(i){ if(LIB.lessons[i]&&LIB.lessons[i].trashed) tr++; });
-  var secs=[['my','folder','Của tôi'],['recent','clock','Gần đây'],['starred','star','Có gắn dấu sao'],['trash','trash','Thùng rác'+(tr?' ('+tr+')':'')]];
+  var nLoose=LIB.order.filter(function(i){ var x=LIB.lessons[i]; return x&&dvLoose(x); }).length;
+  var secs=[['my','folder','Tất cả bài đọc'],['loose','inbox','Bài chưa phân'+(nLoose?' ('+nLoose+')':'')],['recent','clock','Gần đây'],['starred','star','Có gắn dấu sao'],['trash','trash','Thùng rác'+(tr?' ('+tr+')':'')]];
   var bytes=0; try{ bytes=(localStorage.getItem(LKEY)||'').length*2; }catch(e){}
   var pct=Math.min(100,Math.round(bytes/(5*1024*1024)*100)), nF=Object.keys(LIB.folders).length;
   return '<div class="dv" data-dv tabindex="0" aria-label="Quản lý bài đọc">'+
@@ -4595,8 +4600,8 @@ function dvTop(){
   var crumbs='';
   if(DV.sec==='my'&&!DV.q){
     var p=folderPath(DV.cur);
-    crumbs='<nav class="dv-crumbs" aria-label="Đường dẫn"><button type="button" class="dv-cr'+(p.length?'':' cur')+'" data-dvcr="" data-dvdrop="">Của tôi</button>'+p.map(function(f,i){ return '<i>›</i><button type="button" class="dv-cr'+(i===p.length-1?' cur':'')+'" data-dvcr="'+esc(f.id)+'" data-dvdrop="'+esc(f.id)+'">'+esc(f.name||'Thư mục')+'</button>'; }).join('')+'</nav>';
-  } else crumbs='<div class="dv-crumbs"><b class="dv-sec">'+(DV.q?'Kết quả tìm “'+esc(DV.q)+'”':{recent:'Gần đây',starred:'Có gắn dấu sao',trash:'Thùng rác'}[DV.sec]||'')+'</b></div>';
+    crumbs='<nav class="dv-crumbs" aria-label="Đường dẫn"><button type="button" class="dv-cr'+(p.length?'':' cur')+'" data-dvcr="" data-dvdrop="">Tất cả bài đọc</button>'+p.map(function(f,i){ return '<i>›</i><button type="button" class="dv-cr'+(i===p.length-1?' cur':'')+'" data-dvcr="'+esc(f.id)+'" data-dvdrop="'+esc(f.id)+'">'+esc(f.name||'Thư mục')+'</button>'; }).join('')+'</nav>';
+  } else crumbs='<div class="dv-crumbs"><b class="dv-sec">'+(DV.q?'Kết quả tìm “'+esc(DV.q)+'”':{recent:'Gần đây',loose:'Bài chưa phân',starred:'Có gắn dấu sao',trash:'Thùng rác'}[DV.sec]||'')+'</b></div>';
   var sortLbl={name:'Tên',mod:'Sửa đổi',kind:'Trạng thái'}[DV.sort];
   el.innerHTML=crumbs+'<div class="dv-tools">'+
     '<label class="dv-search">'+svg('search')+'<input data-dvq placeholder="Tìm trong Quản lý bài  ( / )" value="'+esc(DV.q)+'" aria-label="Tìm"></label>'+
@@ -4617,8 +4622,8 @@ function dvBadges(it){
   return (x.done?(x.shared?'<i class="dv-b b2" title="Đang ở kho chung">Chung</i>':''):'<i class="dv-b b0">Bản nháp</i>');
 }
 function dvLoc(it){
-  if(it.k==='l'){ var fs=fl(it.o).filter(function(f){ return LIB.folders[f]; }); return fs.length?fs.map(function(f){ var p=folderPath(f); return p.map(function(q){ return q.name; }).join(' › '); }).join(' · '):'Của tôi'; }
-  var p=folderPath(it.o.parent); return p.length?p.map(function(q){ return q.name; }).join(' › '):'Của tôi';
+  if(it.k==='l'){ var fs=fl(it.o).filter(function(f){ return LIB.folders[f]; }); return fs.length?fs.map(function(f){ var p=folderPath(f); return p.map(function(q){ return q.name; }).join(' › '); }).join(' · '):'Tất cả bài đọc'; }
+  var p=folderPath(it.o.parent); return p.length?p.map(function(q){ return q.name; }).join(' › '):'Tất cả bài đọc';
 }
 function dvNameHtml(it){
   if(DV.ren===dvKey(it.k,it.id)) return '<input class="dv-ren" data-dvren value="'+esc(it.name)+'" maxlength="120" aria-label="Tên mới">';
@@ -4630,7 +4635,7 @@ function dvArea(){
   var list=DV.view==='list';
   var h='';
   if(!items.length){
-    var msg=DV.q?'Không tìm thấy mục nào khớp.':DV.sec==='trash'?'Thùng rác trống.':DV.sec==='starred'?'Chưa có mục nào gắn dấu sao. Bấm chuột phải vào một bài hoặc thư mục để gắn.':DV.sec==='recent'?'Chưa có bài nào.':'Thư mục này trống. Bấm chuột phải để tạo thư mục hoặc bài mới.';
+    var msg=DV.q?'Không tìm thấy mục nào khớp.':DV.sec==='trash'?'Thùng rác trống.':DV.sec==='starred'?'Chưa có mục nào gắn dấu sao. Bấm chuột phải vào một bài hoặc thư mục để gắn.':DV.sec==='loose'?'Không còn bài nào chưa phân. Bài hoàn tất mới sẽ hiện ở đây cho tới khi thầy xếp vào thư mục.':DV.sec==='recent'?'Chưa có bài nào.':'Thư mục này trống. Bấm chuột phải để tạo thư mục hoặc bài mới.';
     h='<div class="dv-empty">'+dvIc(DV.sec==='trash'?'trash':'folder')+'<p>'+msg+'</p></div>';
   } else if(list){
     h='<div class="dv-lh" aria-hidden="true"><span>Tên</span><span>Chủ sở hữu</span><span>'+(DV.sec==='trash'?'Vị trí cũ':'Sửa đổi')+'</span><span>Kho</span></div><div class="dv-list" role="listbox" aria-multiselectable="true">';
@@ -4673,7 +4678,7 @@ function dvInfo(){
         (x.done&&DV.sec!=='trash'?'<div class="dv-sws"><label class="tw-sw"><input type="checkbox" data-dvsw="chung"'+(x.shared?' checked':'')+'><i></i><span>Kho chung</span></label></div>':'');
     }
   } else if(s.length>1){ h='<h4>'+s.length+' mục đã chọn</h4><p class="dv-muted">Chọn một mục để xem chi tiết.</p>'; }
-  else { var p=folderPath(DV.cur), items=dvAll(); h='<div class="dv-ip"><span class="dv-fold big">'+dvIc('folder')+'</span></div><h4>'+esc(DV.sec==='my'?(p.length?p[p.length-1].name:'Của tôi'):({recent:'Gần đây',starred:'Có gắn dấu sao',trash:'Thùng rác'}[DV.sec]))+'</h4><dl><dt>Chủ sở hữu</dt><dd>'+esc(ownerName())+' · Owner</dd><dt>Số mục</dt><dd>'+items.length+'</dd></dl><p class="dv-muted">Chọn một bài hoặc thư mục để xem chi tiết.</p>'; }
+  else { var p=folderPath(DV.cur), items=dvAll(); h='<div class="dv-ip"><span class="dv-fold big">'+dvIc('folder')+'</span></div><h4>'+esc(DV.sec==='my'?(p.length?p[p.length-1].name:'Tất cả bài đọc'):({recent:'Gần đây',loose:'Bài chưa phân',starred:'Có gắn dấu sao',trash:'Thùng rác'}[DV.sec]))+'</h4><dl><dt>Chủ sở hữu</dt><dd>'+esc(ownerName())+' · Owner</dd><dt>Số mục</dt><dd>'+items.length+'</dd></dl><p class="dv-muted">Chọn một bài hoặc thư mục để xem chi tiết.</p>'; }
   el.innerHTML=h;
 }
 function renderDrive(){ var p=hubBox&&hubBox.querySelector('[data-pane]'); if(!p||hubTab!=='drive') return; p.innerHTML=paneDrive(); dvTop(); dvArea(); }
@@ -4703,7 +4708,7 @@ function dvMove(items,dest){
     dvTouch(it); moved.push(it);
   });
   if(!moved.length){ dvSnack('Không thể chuyển vào chính nó, thư mục con của nó, hoặc thư mục hệ thống.'); return; }
-  resyncAll(); saveLib(); var dn=dest?(LIB.folders[dest]||{}).name:'Của tôi';
+  resyncAll(); saveLib(); var dn=dest?(LIB.folders[dest]||{}).name:'Tất cả bài đọc';
   dvSnack((from===''?'Đã đưa ':'Đã chuyển ')+moved.length+' mục vào “'+dn+'”',function(){ prev.forEach(function(r){ if(r.it.k==='f') r.it.o.parent=r.p; else r.it.o.folders=r.pf; }); resyncAll(); });
   DV.sel=[]; hubRefresh2(); autoPub();
 }
@@ -4711,7 +4716,7 @@ function dvLink(items,dest){
   var ls=items.filter(function(it){ return it.k==='l'; }), skipped=items.length-ls.length, prev=[];
   if(!ls.length){ dvSnack('Chỉ bài đọc mới thêm được vào nhiều thư mục. Thư mục chỉ có một vị trí.'); return; }
   ls.forEach(function(it){ prev.push({it:it,pf:fl(it.o).slice()}); addF(it.o,dest); dvTouch(it); });
-  saveLib(); var dn=dest?(LIB.folders[dest]||{}).name:'Của tôi';
+  saveLib(); var dn=dest?(LIB.folders[dest]||{}).name:'Tất cả bài đọc';
   dvSnack('Đã thêm '+ls.length+' bài vào “'+dn+'” (không nhân bản, vẫn là cùng một bài)'+(skipped?'. Bỏ qua '+skipped+' thư mục.':''),function(){ prev.forEach(function(r){ r.it.o.folders=r.pf; syncShared(r.it.o); }); });
   hubRefresh2(); autoPub();
 }
@@ -4720,7 +4725,7 @@ function dvUnlink(items){
   var ls=items.filter(function(it){ return it.k==='l'&&hasF(it.o,cur); }), prev=[]; if(!ls.length) return;
   ls.forEach(function(it){ prev.push({it:it,pf:fl(it.o).slice()}); remF(it.o,cur); });
   saveLib(); DV.sel=[]; hubRefresh2(); autoPub();
-  dvSnack('Đã bỏ '+ls.length+' bài khỏi thư mục này. Bài vẫn còn ở nơi khác hoặc ở Của tôi.',function(){ prev.forEach(function(r){ r.it.o.folders=r.pf; syncShared(r.it.o); }); });
+  dvSnack('Đã bỏ '+ls.length+' bài khỏi thư mục này. Bài vẫn còn ở nơi khác hoặc ở Tất cả bài đọc.',function(){ prev.forEach(function(r){ r.it.o.folders=r.pf; syncShared(r.it.o); }); });
 }
 function dvTrash(items){
   var ts=Date.now(), had=items.some(function(it){ return it.k==='l'&&it.o.done; });
@@ -4814,7 +4819,7 @@ function dvConfirm(title,msg,okLabel,onOk){
 function dvPicker(items,mode){
   var pick='', link=mode==='link';
   var m=document.createElement('div'); m.className='dv-modal';
-  function tree(){ var h='<button type="button" class="dv-pk'+(pick===''?' on':'')+'" data-pk="">'+dvIc('folder')+'Của tôi</button>';
+  function tree(){ var h='<button type="button" class="dv-pk'+(pick===''?' on':'')+'" data-pk="">'+dvIc('folder')+'Tất cả bài đọc</button>';
     (function walk(par,dep){ Object.keys(LIB.folders).map(function(i){ return LIB.folders[i]; }).filter(function(f){ return (f.parent||'')===par&&!f.trashed; }).sort(function(a,b){ return String(a.name).localeCompare(String(b.name),'vi'); }).forEach(function(f){
       var bad=items.some(function(it){ return it.k==='f'&&(it.id===f.id||isUnder(f.id,it.id)); });
       h+='<button type="button" class="dv-pk'+(pick===f.id?' on':'')+'" data-pk="'+esc(f.id)+'" style="padding-left:'+(14+dep*18)+'px"'+((bad&&!link)?' disabled':'')+'>'+dvIc('folder')+esc(f.name||'Thư mục')+'</button>'; walk(f.id,dep+1); }); })('',1);
