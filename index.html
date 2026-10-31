@@ -976,8 +976,14 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .rd-qc .rd-cl .n{flex:none;font:700 10.5px/1 var(--rd-ui);color:var(--rd-accent);background:var(--rd-accent-soft);border-radius:999px;padding:3px 7px}
 .rd-qc .rd-cl .t{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rd-qc.done .rd-cl .n::after{content:" ✓"}
-.rd-qc:not(.open):hover .rd-box,.rd-qc:not(.open):focus-within .rd-box{z-index:12;border-color:var(--rd-accent);box-shadow:0 14px 30px -14px color-mix(in srgb,var(--rd-accent) 60%,transparent)}
-.rd-qc:not(.open):hover .rd-cl .t,.rd-qc:not(.open):focus-within .rd-cl .t{white-space:normal;overflow:visible;text-overflow:clip}
+.rd-qc:not(.open):has(textarea:focus) .rd-box,.rd-qc:not(.open):not(.shut):has(.rd-cl:focus-visible) .rd-box{z-index:12;border-color:var(--rd-accent);box-shadow:0 14px 30px -14px color-mix(in srgb,var(--rd-accent) 60%,transparent)}
+.rd-qc:not(.open):has(textarea:focus) .rd-cl .t,.rd-qc:not(.open):not(.shut):has(.rd-cl:focus-visible) .rd-cl .t{white-space:normal;overflow:visible;text-overflow:clip}
+.rd-qc:not(.open):has(textarea:focus) .rd-more,.rd-qc:not(.open):not(.shut):has(.rd-cl:focus-visible) .rd-more{display:block;margin-top:4px}
+@media (hover:hover){
+.rd-qc:not(.open):not(.shut):hover .rd-box{z-index:12;border-color:var(--rd-accent);box-shadow:0 14px 30px -14px color-mix(in srgb,var(--rd-accent) 60%,transparent)}
+.rd-qc:not(.open):not(.shut):hover .rd-cl .t{white-space:normal;overflow:visible;text-overflow:clip}
+.rd-qc:not(.open):not(.shut):hover .rd-more{display:block;margin-top:4px}
+}
 .rd-qc .rd-more{display:none}
 .rd-qc.open{height:auto;margin-bottom:12px}
 .rd-qc.open .rd-box{position:static;padding:10px 12px 8px;border-color:var(--rd-accent)}
@@ -1827,7 +1833,9 @@ RD.mount = function(root, lesson, init, opts){
     if(hb) on(hb,'click',function(){ var hint=c.querySelector('.rd-hint'); var o=!hint.classList.contains('open'); hint.classList.toggle('open',o); hb.setAttribute('aria-expanded',String(o)); hb.textContent=o?'Ẩn gợi ý':'Xem gợi ý'; });
     on(c,'mouseenter',function(){ anchors.forEach(function(a){ a.classList.add('hot'); }); linkShow('el:'+id,anchors,c,'var(--rd-accent)'); });
     on(c,'mouseleave',function(){ anchors.forEach(function(a){ a.classList.remove('hot'); }); linkHide(); });
-    on(clb,'click',function(){ var o=!c.classList.contains('open'); setOpen(o); if(o) anchors.forEach(function(a,i){ setTimeout(function(){ flash([a]); },reduce?0:i*420); }); });
+    on(clb,'click',function(){ var o=!c.classList.contains('open'); setOpen(o); c.classList.toggle('shut',!o); if(o) anchors.forEach(function(a,i){ setTimeout(function(){ flash([a]); },reduce?0:i*420); }); });
+    on(c,'mouseenter',function(){ if(!c.classList.contains('open')) grow(ta); });
+    on(c,'mouseleave',function(){ c.classList.remove('shut'); });
     anchors.forEach(function(a){
       a.setAttribute('tabindex','0'); a.setAttribute('role','button'); a.setAttribute('aria-label','Mở câu hỏi Q'+n);
       on(a,'mouseenter',function(){ c.classList.add('hot'); anchors.forEach(function(x){ x.classList.add('hot'); }); linkShow('el:'+id,anchors,c,'var(--rd-accent)'); });
