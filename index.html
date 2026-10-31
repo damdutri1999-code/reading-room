@@ -559,6 +559,8 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .tw-lv{font:600 10.5px/1 var(--rr-ui);font-style:normal;padding:4px 7px;border-radius:999px;background:var(--rr-soft);color:var(--rr-fg)}
 .tw-cur{font:600 10.5px/1 var(--rr-ui);font-style:normal;padding:3px 7px;border-radius:999px;background:var(--rr-accent);color:var(--rr-accent-fg);vertical-align:3px;margin-left:4px}
 .tw-sw{display:inline-flex;align-items:center;gap:8px;font:500 12.5px/1 var(--rr-ui);color:var(--rr-muted);cursor:pointer;user-select:none}
+.tw-sws{display:inline-flex;align-items:center;gap:16px;flex-wrap:wrap}
+.tw-kho-s{flex:1 1 100%;font:600 12px/1.4 var(--rr-ui);color:var(--rr-muted);margin-top:6px}
 .tw-sw input{position:absolute;opacity:0;width:1px;height:1px}
 .tw-sw i{position:relative;width:36px;height:21px;border-radius:999px;background:color-mix(in srgb,var(--rr-fg) 18%,transparent);transition:background .2s;flex:none}
 .tw-sw i::after{content:"";position:absolute;top:3px;left:3px;width:15px;height:15px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
@@ -658,7 +660,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
   .tw-row{flex-wrap:wrap;padding-left:10px}
   .tw-grip{display:none}
   .tw-ri{flex:1 1 calc(100% - 110px)}
-  .tw-sw{margin-left:78px}
+  .tw-sws{margin-left:78px;gap:10px}
   .tw-sw span{display:none}
   .tw-row > .tw-btn{margin-left:auto}
   .tw-code{flex-wrap:wrap}.tw-code span{flex:1 1 100%;order:3}
@@ -2398,10 +2400,11 @@ var khoId=(/[?&]kho=([a-z0-9-]{3,40})/i.exec(location.search)||[])[1];
 function khoBoot(id){
   khoId=id; khoMsg('Đang mở kho bài…','');
   var ac=new AbortController(), tm=setTimeout(function(){ ac.abort(); },12000);
-  fetch(CLOUD_DEF.url+'/rest/v1/rpc/get_lib',{method:'POST',signal:ac.signal,headers:{'apikey':CLOUD_DEF.key,'Authorization':'Bearer '+CLOUD_DEF.key,'Content-Type':'application/json'},body:JSON.stringify({p_id:id.toLowerCase()})})
+  var isShared=id.toLowerCase()==='chung';
+  fetch(CLOUD_DEF.url+'/rest/v1/rpc/'+(isShared?'get_shared':'get_lib'),{method:'POST',signal:ac.signal,headers:{'apikey':CLOUD_DEF.key,'Authorization':'Bearer '+CLOUD_DEF.key,'Content-Type':'application/json'},body:JSON.stringify(isShared?{}:{p_id:id.toLowerCase()})})
   .then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); })
   .then(function(j){ clearTimeout(tm);
-    var d=j&&j.data; if(!d||!Array.isArray(d.lessons)){ khoMsg('Không tìm thấy kho “'+id+'”','Hãy kiểm tra lại đường dẫn mà thầy cô gửi.'); return; }
+    var d=isShared?{app:{name:'Kho chung',klass:'Bài đọc do các giáo viên chia sẻ',tagline:'Chọn một bài và bắt đầu đọc.',theme:'stage'},lessons:(j&&j.lessons)||[]}:(j&&j.data); if(!d||!Array.isArray(d.lessons)){ khoMsg('Không tìm thấy kho “'+id+'”','Hãy kiểm tra lại đường dẫn mà thầy cô gửi.'); return; }
     var th=(d.app&&d.app.theme)||'stage';
     var data={app:d.app||{name:'Reading Room',klass:'',tagline:''},theme:th,lessons:d.lessons,cloud:{url:CLOUD_DEF.url,key:CLOUD_DEF.key,id:id.toLowerCase()}};
     var html=studentDoc(data); document.open(); document.write(html); document.close();
@@ -3741,6 +3744,7 @@ var TH_NAME={stage:'Sân khấu',notebook:'Vở ghi',constellation:'Chòm sao'};
 function doneIds(){ return LIB.order.filter(function(id){ return LIB.lessons[id]&&LIB.lessons[id].done; }); }
 function draftIds(){ return LIB.order.filter(function(id){ return LIB.lessons[id]&&!LIB.lessons[id].done; }); }
 function pubIds(){ return doneIds().filter(function(id){ return !LIB.lessons[id].hidden; }); }
+function sharedIds(){ return doneIds().filter(function(id){ return LIB.lessons[id].shared; }); }
 function backupDue(){ if(!LIB.order.length) return false; return !LIB.lastBackup||(Date.now()-LIB.lastBackup)>=7*864e5; }
 function exportTheme(){ return LIB.app.theme||(rrCtl&&rrCtl.theme())||curTheme(); }
 function libFileName(){ return RD.slug(LIB.app.file||((LIB.app.name||'reading-room')+'-kho-bai'))+'.html'; }
@@ -3774,11 +3778,12 @@ function hubTools(ids){
     (lvs.length>1?'<span class="tw-chips" role="group" aria-label="Lọc trình độ">'+['all'].concat(lvs).map(function(l){ return '<button type="button" data-hlv="'+esc(l)+'" aria-pressed="'+(hubLv===l)+'">'+(l==='all'?'Tất cả':esc(l))+'</button>'; }).join('')+'</span>':'')+
     '<span class="tw-chips" role="group" aria-label="Lọc loại bài">'+[['all','Mọi loại'],['ielts','IELTS Cam'],['content','Kiến thức'],['exam','Có đề bài']].map(function(c){ return '<button type="button" data-hcat="'+c[0]+'" aria-pressed="'+(hubCat===c[0])+'">'+c[1]+'</button>'; }).join('')+'</span></div>';
 }
+function paneLessonsSub(){ var n=doneIds().length; return n?n+' bài đã soạn xong · '+pubIds().length+' trong kho lớp · '+sharedIds().length+' trong kho chung':'Kho bài đã soạn xong của thầy'; }
 function paneLessons(){
   var ids=doneIds(), pub=pubIds().length;
-  return paneHead('Bài đọc của thầy',ids.length?ids.length+' bài đã soạn xong · '+pub+' bài đang hiện trong kho lớp':'Kho bài đã soạn xong của thầy')+
+  return paneHead('Bài đọc của thầy',paneLessonsSub())+
     (ids.length>3?hubTools(ids):'')+
-    (ids.length>1?'<p class="tw-hint">Kéo <span class="tw-grip-i">'+svg('grip')+'</span> để sắp thứ tự bài. Tắt “Kho lớp” để ẩn bài khỏi file xuất cho học viên.</p>':'')+
+    (ids.length>1?'<p class="tw-hint">Kéo <span class="tw-grip-i">'+svg('grip')+'</span> để sắp thứ tự bài. <b>Kho lớp</b>: bài hiện trong kho riêng của lớp thầy cô. <b>Kho chung</b>: chia sẻ bài vào kho chung; bài nào thầy cô muốn giữ riêng thì để tắt.</p>':'')+
     '<div class="tw-list" data-rows></div>';
 }
 function paneDrafts(){
@@ -3798,7 +3803,7 @@ function renderRows(){
     return '<div class="tw-row'+(x.hidden&&!drafts?' off':'')+(drafts?' draft':'')+'" data-id="'+esc(id)+'"'+(filtered||drafts?'':' draggable="true"')+'>'+
       (drafts?'':'<span class="tw-grip" aria-hidden="true">'+svg('grip')+'</span><span class="tw-no">'+(pos>=0?pos+1:'–')+'</span>')+RR.thumb(x,'width:52px;flex:none')+
       '<div class="tw-ri"><b>'+esc(x.title||'Bài chưa đặt tên')+(drafts&&id===L.id?' <i class="tw-cur">Đang mở</i>':'')+'</b><span>'+meta+'</span></div>'+
-      (drafts?'':'<label class="tw-sw" title="Hiện trong kho lớp"><input type="checkbox" data-pub'+(x.hidden?'':' checked')+'><i></i><span>Kho lớp</span></label>')+
+      (drafts?'':'<span class="tw-sws"><label class="tw-sw" title="Hiện trong kho của lớp thầy cô"><input type="checkbox" data-pub'+(x.hidden?'':' checked')+'><i></i><span>Kho lớp</span></label><label class="tw-sw" title="Chia sẻ bài này vào kho chung cho mọi người"><input type="checkbox" data-share'+(x.shared?' checked':'')+'><i></i><span>Kho chung</span></label></span>')+
       (drafts?'<button type="button" class="tw-btn" data-act2="finish">'+svg('check')+'Hoàn tất</button><button type="button" class="tw-btn solid" data-act2="edit">'+svg('pen')+'Soạn tiếp</button>':'<button type="button" class="tw-btn" data-act2="edit">Soạn lại</button>')+
       '<span class="tw-more"><button type="button" class="tw-ib" data-more aria-label="Thêm thao tác" aria-haspopup="menu">'+svg('more')+'</button>'+
       '<span class="tw-menu" role="menu"><button type="button" role="menuitem" data-act2="view">'+svg('eye')+'Xem như học viên</button>'+(drafts?'':'<button type="button" role="menuitem" data-act2="dl">'+svg('download')+'Tải bài lẻ (.html)</button>')+'<button type="button" role="menuitem" data-act2="dup">'+svg('copy')+'Nhân bản</button>'+
@@ -3876,6 +3881,7 @@ function clCall(fn,body,tok){
 }
 function clErr(e){
   var m=String(e&&e.message||e);
+  if(/reserved/.test(m)) return 'Mã kho “chung” dành riêng cho kho chung. Hãy chọn mã khác.';
   if(/not_owner|bad_code/.test(m)) return 'Mã kho này đã thuộc về giáo viên khác. Hãy chọn một mã kho khác.';
   if(/auth_none|auth_expired|not_signed_in/.test(m)) return 'Phiên đăng nhập đã hết. Hãy đăng xuất rồi đăng nhập lại.';
   if(/too_big/.test(m)) return 'Kho quá lớn để xuất bản (trên 5MB).';
@@ -3885,20 +3891,21 @@ function clErr(e){
   if(/404|Could not find the function/i.test(m)) return 'Chưa tạo các hàm trên Supabase. Hãy chạy file SQL trong SQL Editor.';
   return 'Lỗi: '+m;
 }
-function clPayload(){ changed(true); return {app:Object.assign({},LIB.app,{theme:exportTheme()}), lessons:libLessons(), at:Date.now()}; }
+function sharedLessons(){ var by=authName(); return sharedIds().map(function(id){ var x=id===L.id?cleanLessonOf(L):cleanLessonOf(LIB.lessons[id]); if(x) x.by=by; return x; }).filter(Boolean); }
+function clPayload(){ changed(true); return {app:Object.assign({},LIB.app,{theme:exportTheme()}), lessons:libLessons(), shared:sharedLessons(), at:Date.now()}; }
 function clPublish(){
   var c=cl(); if(!clReady()) return Promise.reject(new Error('Chưa nhập đủ thông tin kết nối. Cần mã kho và đăng nhập.'));
   return authToken().then(function(tok){ return clCall('publish_lib_owner',{p_id:c.id,p_data:clPayload()},tok); }).then(function(){ c.at=Date.now(); saveLib(); });
 }
-function khoLink(){ var c=cl(); if(!c.id) return ''; return location.href.split(/[?#]/)[0]+'?kho='+c.id; }
+function khoLink(id){ var c=cl(); id=id||c.id; if(!id) return ''; return location.href.split(/[?#]/)[0]+'?kho='+id; }
 function khoLinkHtml(){
   var c=cl(), u=khoLink(); if(!u) return '';
   var warn=/^file:|^blob:|^about:/.test(u)?'<small class="tw-hint">Link này chỉ chạy khi trang web đã đưa lên mạng (Netlify). Hãy mở Studio từ địa chỉ web của thầy cô rồi lấy link.</small>':'';
-  return '<div class="tw-kho"><span>Link cho học viên'+(c.at?'':' <em>(chưa xuất bản)</em>')+'</span><input readonly value="'+esc(u)+'" aria-label="Link học viên" onfocus="this.select()"><button type="button" class="tw-btn" data-cl="copylink">'+svg('copy')+'Sao chép</button><a class="tw-btn" href="'+esc(u)+'" target="_blank" rel="noopener">'+svg('eye')+'Mở thử</a>'+warn+'</div>';
+  return '<div class="tw-kho"><span>Link cho học viên'+(c.at?'':' <em>(chưa xuất bản)</em>')+'</span><input readonly value="'+esc(u)+'" aria-label="Link học viên" onfocus="this.select()"><button type="button" class="tw-btn" data-cl="copylink">'+svg('copy')+'Sao chép</button><a class="tw-btn" href="'+esc(u)+'" target="_blank" rel="noopener">'+svg('eye')+'Mở thử</a>'+warn+'<span class="tw-kho-s">Kho chung (mọi giáo viên cùng góp, '+sharedIds().length+' bài của thầy cô đang bật)</span><input readonly value="'+esc(khoLink('chung'))+'" aria-label="Link kho chung" onfocus="this.select()"><button type="button" class="tw-btn" data-cl="copyshared">'+svg('copy')+'Sao chép</button><a class="tw-btn" href="'+esc(khoLink('chung'))+'" target="_blank" rel="noopener">'+svg('eye')+'Mở thử</a></div>';
 }
 function cloudHtml(){
   var c=cl(), ok=clReady(), st=c.at?'Xuất bản gần nhất: <b>'+fmtDate(c.at)+'</b>':'Chưa xuất bản lần nào.';
-  return '<section class="tw-cloud"><div class="tw-cloud-h"><div><h4>Kho online <i class="tw-beta">Dùng chung</i></h4><p>Xuất bản một lần là học viên mở lại file kho bài sẽ thấy bài mới nhất, không cần gửi lại file.</p></div>'+(ok?'<span class="tw-cl-on">Đã kết nối</span>':'')+'</div>'+
+  return '<section class="tw-cloud"><div class="tw-cloud-h"><div><h4>Kho online <i class="tw-beta">Online</i></h4><p>Xuất bản một lần là học viên mở lại file kho bài sẽ thấy bài mới nhất, không cần gửi lại file.</p></div>'+(ok?'<span class="tw-cl-on">Đã kết nối</span>':'')+'</div>'+
     '<div class="tw-cl-grid">'+
       '<label>Địa chỉ dự án Supabase<input data-cl-f="url" value="'+esc(c.url)+'" placeholder="https://abcdxyz.supabase.co" autocomplete="off" spellcheck="false"></label>'+
       '<label>Khoá công khai (anon key)<input data-cl-f="key" value="'+esc(c.key)+'" placeholder="eyJhbGciOi…" autocomplete="off" spellcheck="false"></label>'+
@@ -4013,6 +4020,7 @@ rrRoot.addEventListener('click',function(e){
   if(t.closest('[data-go-home]')){ try{ if(LIB.app.theme) localStorage.setItem('rr:theme',LIB.app.theme); }catch(err){} rrCtl.go('home'); return; }
   if(t.closest('[data-go-lib]')){ rrCtl.go('lib'); return; }
   var clb=t.closest('[data-cl]'); if(clb){ var ka=clb.getAttribute('data-cl'), stEl=rrRoot.querySelector('[data-cl-st]');
+    if(ka==='copyshared'){ RD.copy(khoLink('chung')).then(function(ok){ rrCtl.toast(ok?'Đã sao chép link kho chung':'Hãy bấm Ctrl+C để chép'); }); return; }
     if(ka==='copylink'){ var ul=khoLink(); RD.copy(ul).then(function(ok){ rrCtl.toast(ok?'Đã sao chép link học viên':'Hãy bấm Ctrl+C để chép'); }); return; }
     if(!clb.dataset.busy){ clb.dataset.busy='1'; clb.disabled=true;
       if(ka==='test'){ stEl.textContent='Đang kiểm tra…'; clCall('get_lib',{p_id:cl().id||'kiem-tra'}).then(function(j){ stEl.textContent=j?'Kết nối tốt. Kho “'+cl().id+'” đã có dữ liệu.':'Kết nối tốt. Kho chưa có dữ liệu, hãy xuất bản.'; }).catch(function(e){ stEl.textContent=clErr(e); }).then(function(){ delete clb.dataset.busy; clb.disabled=false; }); }
@@ -4044,11 +4052,16 @@ rrRoot.addEventListener('click',function(e){
 });
 rrRoot.addEventListener('change',function(e){
   if(e.target.id==='bk-file'){ var f=e.target.files[0]; if(f) readBackup(f); e.target.value=''; return; }
+  if(e.target.hasAttribute('data-share')){
+    var sid=e.target.closest('[data-id]').getAttribute('data-id'), sx=LIB.lessons[sid]; if(!sx) return;
+    if(e.target.checked) sx.shared=true; else delete sx.shared; if(L.id===sid) L.shared=sx.shared; saveLib();
+    var hp2=rrRoot.querySelector('.tw-head p'); if(hp2) hp2.textContent=paneLessonsSub();
+    rrCtl.toast(e.target.checked?'Đã đưa bài vào kho chung. Bấm “Xuất bản lên kho online” để mọi người thấy.':'Bài này giờ chỉ còn là bài riêng của thầy cô'); return; }
   if(!e.target.hasAttribute('data-pub')) return;
   var id=e.target.closest('[data-id]').getAttribute('data-id'), x=LIB.lessons[id]; if(!x) return;
   if(e.target.checked) delete x.hidden; else x.hidden=true; saveLib(); renderRows();
   var em=rrRoot.querySelector('[data-tab="export"] em'); if(em) em.textContent=pubIds().length;
-  var hp=rrRoot.querySelector('.tw-head p'); if(hp) hp.textContent=doneIds().length+' bài đã soạn xong · '+pubIds().length+' bài đang hiện trong kho lớp';
+  var hp=rrRoot.querySelector('.tw-head p'); if(hp) hp.textContent=paneLessonsSub();
   rrCtl.toast(e.target.checked?'Đã đưa bài vào kho lớp':'Đã ẩn bài khỏi kho lớp');
 });
 rrRoot.addEventListener('input',function(e){
@@ -4090,7 +4103,7 @@ function studentDoc(data){
    'status:function(L){var w=work(L);if(!w)return{st:"new",p:0};var I=RR.info(L),tot=I.questions+I.notes,done=0;Object.keys(w.answers||{}).forEach(function(k){if(String(w.answers[k]).trim())done++;});Object.keys(w.notes||{}).forEach(function(k){if(String(w.notes[k]).trim())done++;});'+
    'var p=tot?Math.min(100,Math.round(done/tot*100)):((w.comments||[]).length?50:0);return{st:w.submitted?"done":((done||(w.comments||[]).length)?"doing":"new"),p:w.submitted?100:p};},'+
    'teacher:null,usage:function(){if(!D.cloud)return Promise.resolve(null);var C=D.cloud,ac=new AbortController();setTimeout(function(){ac.abort();},8000);return fetch(C.url+"/rest/v1/rpc/get_usage",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.ok?r.json():null;});},openLesson:function(L,host){return RD.mount(host,L,{},{persist:true});}});'+
-   'if(D.cloud){var C=D.cloud,ac=new AbortController(),tm=setTimeout(function(){ac.abort();},8000);fetch(C.url+"/rest/v1/rpc/get_lib",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:JSON.stringify({p_id:C.id})}).then(function(r){return r.ok?r.json():null;}).then(function(j){clearTimeout(tm);var d=j&&j.data;if(!d||!d.lessons||!d.lessons.length)return;var cur=JSON.stringify(D.lessons);var nxt=JSON.stringify(d.lessons);if(cur===nxt&&JSON.stringify(D.app)===JSON.stringify(d.app))return;D.lessons=d.lessons;if(d.app)D.app=d.app;if(ctl.view()!=="read"){ctl.refresh();ctl.toast("Đã cập nhật bài mới");}else{ctl.toast("Có bài mới. Quay lại kho bài để xem.");}}).catch(function(){});}'+
+   'if(D.cloud){var C=D.cloud,ac=new AbortController(),tm=setTimeout(function(){ac.abort();},8000);var SH=C.id==="chung";fetch(C.url+"/rest/v1/rpc/"+(SH?"get_shared":"get_lib"),{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:JSON.stringify(SH?{}:{p_id:C.id})}).then(function(r){return r.ok?r.json():null;}).then(function(j){clearTimeout(tm);var d=SH?(j&&{lessons:j.lessons}):(j&&j.data);if(!d||!d.lessons||!d.lessons.length)return;var cur=JSON.stringify(D.lessons);var nxt=JSON.stringify(d.lessons);if(cur===nxt&&JSON.stringify(D.app)===JSON.stringify(d.app))return;D.lessons=d.lessons;if(d.app)D.app=d.app;if(ctl.view()!=="read"){ctl.refresh();ctl.toast("Đã cập nhật bài mới");}else{ctl.toast("Có bài mới. Quay lại kho bài để xem.");}}).catch(function(){});}'+
    '})();<\/script></body></html>';
 }
 function exportLibrary(){
@@ -4136,4 +4149,3 @@ var seenHelp=false; try{ seenHelp=!!localStorage.getItem(HKEY); }catch(e){}
 saveLib(); showHome('home');
 })();
 </script>
-</html>
