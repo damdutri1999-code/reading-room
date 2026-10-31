@@ -1226,6 +1226,12 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
 .rr-use b{color:var(--rr-fg);font-weight:700}
 @keyframes rr-use-in{from{stroke-dasharray:0 100}}
 @media (prefers-reduced-motion:reduce){.rr-use .fg{animation:none}}
+.rr-skw{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;grid-column:1/-1}
+.rr-sk{border-radius:16px;padding:12px;background:color-mix(in srgb,var(--rr-fg,#fff) 7%,transparent);display:grid;gap:10px;animation:rrsk 1.3s ease-in-out infinite;animation-delay:calc(var(--i)*90ms)}
+.rr-sk i{display:block;aspect-ratio:4/3;border-radius:10px;background:color-mix(in srgb,var(--rr-fg,#fff) 10%,transparent)}
+.rr-sk b{display:block;height:14px;border-radius:7px;background:color-mix(in srgb,var(--rr-fg,#fff) 12%,transparent)}.rr-sk b.s{width:55%}
+@keyframes rrsk{0%,100%{opacity:.55}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.rr-sk{animation:none}}
 </style>
 <style id="code-style"></style>
 <style id="style-css"></style>
@@ -2304,6 +2310,7 @@ RR.init=function(opts){
     var list=all.filter(function(L){ return (libLv==='all'||L.level===libLv)&&(libCat==='all'||(libCat==='exam'?!!(L.exam&&L.exam.count):L.cat===libCat))&&(!q||String(L.title||'').toLowerCase().indexOf(q)>=0); });
     box.className='rr-lib '+libMode;
     var n=main.querySelector('[data-n]'); if(n) n.textContent=list.length+' bài';
+    if(!all.length&&opts.loading&&opts.loading()){ box.className='rr-lib grid'; box.innerHTML='<div class="rr-skw" role="status" aria-label="Đang tải bài đọc">'+[0,1,2,3,4,5].map(function(i){ return '<div class="rr-sk" style="--i:'+i+'"><i></i><b></b><b class="s"></b></div>'; }).join('')+'</div>'; if(n) n.textContent='Đang tải…'; return; }
     if(!all.length){ box.innerHTML='<div class="rr-empty">Chưa có bài đọc nào.'+(opts.teacher?'<br>Vào trang Giáo viên để nạp bài đầu tiên.':'')+'</div>'; return; }
     box.innerHTML=list.length?list.map(function(L,i){
       var I=RR.info(L), s=opts.status?opts.status(L):{st:'new',p:0}, k=hashN(L.id||L.title), rot=((k%5)-2)*0.5;
@@ -2400,16 +2407,15 @@ function khoMsg(t,sub,retry){
 }
 var khoId=(/[?&]kho=([a-z0-9-]{3,40})/i.exec(location.search)||[])[1];
 function khoBoot(id){
-  khoId=id; khoMsg('Đang mở kho bài…','');
-  var tm, isShared=id.toLowerCase()==='chung', kp=window.__kp; window.__kp=null;
-  var pr=(kp&&kp.id===id.toLowerCase())?kp.p:fetch(CLOUD_DEF.url+'/rest/v1/rpc/'+(isShared?'get_shared':'get_lib'),{method:'POST',headers:{'apikey':CLOUD_DEF.key,'Authorization':'Bearer '+CLOUD_DEF.key,'Content-Type':'application/json'},body:JSON.stringify(isShared?{}:{p_id:id.toLowerCase()})}).then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); });
-  Promise.race([pr,new Promise(function(_,rej){ tm=setTimeout(function(){ rej(new Error('timeout')); },15000); })])
-  .then(function(j){ clearTimeout(tm);
-    var d=isShared?{app:{name:'Kho chung',klass:'Bài đọc do các giáo viên chia sẻ',tagline:'Chọn một bài và bắt đầu đọc.',theme:'stage'},lessons:(j&&j.lessons)||[]}:(j&&j.data); if(!d||!Array.isArray(d.lessons)){ khoMsg('Không tìm thấy kho “'+id+'”','Hãy kiểm tra lại đường dẫn mà thầy cô gửi.'); return; }
-    var th=(d.app&&d.app.theme)||'stage';
-    var data={app:d.app||{name:'Reading Room',klass:'',tagline:''},theme:th,lessons:d.lessons,cloud:{url:CLOUD_DEF.url,key:CLOUD_DEF.key,id:id.toLowerCase(),fresh:true}};
-    var html=studentDoc(data); document.open(); document.write(html); document.close();
-  }).catch(function(){ clearTimeout(tm); khoMsg('Chưa mở được kho bài','Có thể mạng đang chậm. Hãy thử lại sau ít giây.',true); });
+  khoId=id; var lid=id.toLowerCase(), isShared=lid==='chung', kp=window.__kp; window.__kp=null;
+  var pr=(kp&&kp.id===lid)?kp.p:fetch(CLOUD_DEF.url+'/rest/v1/rpc/'+(isShared?'get_shared':'get_lib'),{method:'POST',headers:{'apikey':CLOUD_DEF.key,'Authorization':'Bearer '+CLOUD_DEF.key,'Content-Type':'application/json'},body:JSON.stringify(isShared?{}:{p_id:lid})}).then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); });
+  window.__kq=pr;
+  var cache=null; try{ cache=JSON.parse(localStorage.getItem('rr:kho:'+lid)||'null'); }catch(e){}
+  var has=!!(cache&&cache.lessons&&cache.lessons.length);
+  var app=isShared?{name:'Kho chung',klass:'Bài đọc do các giáo viên chia sẻ',tagline:'Chọn một bài và bắt đầu đọc.',theme:'stage'}:((cache&&cache.app)||{name:'Reading Room',klass:'',tagline:'',theme:'stage'});
+  var data={app:app,theme:app.theme||'stage',lessons:has?cache.lessons:[],loading:!has,start:'lib',cloud:{url:CLOUD_DEF.url,key:CLOUD_DEF.key,id:lid}};
+  var go=function(){ var html=studentDoc(data); document.open(); document.write(html); document.close(); };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
 }
 if(khoId){ khoBoot(khoId); return; }
 
@@ -4103,8 +4109,9 @@ function studentDoc(data){
    'var ctl=RR.init({root:document.getElementById("rr-root"),mode:"student",app:function(){return D.app;},lessons:function(){return D.lessons;},'+
    'status:function(L){var w=work(L);if(!w)return{st:"new",p:0};var I=RR.info(L),tot=I.questions+I.notes,done=0;Object.keys(w.answers||{}).forEach(function(k){if(String(w.answers[k]).trim())done++;});Object.keys(w.notes||{}).forEach(function(k){if(String(w.notes[k]).trim())done++;});'+
    'var p=tot?Math.min(100,Math.round(done/tot*100)):((w.comments||[]).length?50:0);return{st:w.submitted?"done":((done||(w.comments||[]).length)?"doing":"new"),p:w.submitted?100:p};},'+
-   'teacher:null,usage:function(){if(!D.cloud)return Promise.resolve(null);var C=D.cloud,ac=new AbortController();setTimeout(function(){ac.abort();},8000);return fetch(C.url+"/rest/v1/rpc/get_usage",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.ok?r.json():null;});},openLesson:function(L,host){return RD.mount(host,L,{},{persist:true});}});'+
-   'if(D.cloud&&!D.cloud.fresh){var C=D.cloud,ac=new AbortController(),tm=setTimeout(function(){ac.abort();},8000);var SH=C.id==="chung";fetch(C.url+"/rest/v1/rpc/"+(SH?"get_shared":"get_lib"),{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:JSON.stringify(SH?{}:{p_id:C.id})}).then(function(r){return r.ok?r.json():null;}).then(function(j){clearTimeout(tm);var d=SH?(j&&{lessons:j.lessons}):(j&&j.data);if(!d||!d.lessons||!d.lessons.length)return;var cur=JSON.stringify(D.lessons);var nxt=JSON.stringify(d.lessons);if(cur===nxt&&JSON.stringify(D.app)===JSON.stringify(d.app))return;D.lessons=d.lessons;if(d.app)D.app=d.app;if(ctl.view()!=="read"){ctl.refresh();ctl.toast("Đã cập nhật bài mới");}else{ctl.toast("Có bài mới. Quay lại kho bài để xem.");}}).catch(function(){});}'+
+   'teacher:null,loading:function(){return D.loading;},usage:function(){if(!D.cloud)return Promise.resolve(null);var C=D.cloud,ac=new AbortController();setTimeout(function(){ac.abort();},8000);return fetch(C.url+"/rest/v1/rpc/get_usage",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.ok?r.json():null;});},openLesson:function(L,host){return RD.mount(host,L,{},{persist:true});}});'+
+   'if(D.start==="lib")ctl.go("lib");'+
+   'if(D.cloud){var C=D.cloud,SH=C.id==="chung",KC="rr:kho:"+C.id,ac=new AbortController(),tm=setTimeout(function(){ac.abort();},15000);var pr=window.__kq||fetch(C.url+"/rest/v1/rpc/"+(SH?"get_shared":"get_lib"),{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:JSON.stringify(SH?{}:{p_id:C.id})}).then(function(r){return r.ok?r.json():null;});pr.then(function(j){clearTimeout(tm);var d=SH?(j&&{lessons:j.lessons}):(j&&j.data);var had=D.loading;D.loading=false;if(!d||!d.lessons){if(had)ctl.refresh();return;}try{localStorage.setItem(KC,JSON.stringify({app:d.app||null,lessons:d.lessons}));}catch(e){}var cur=JSON.stringify(D.lessons),nxt=JSON.stringify(d.lessons);if(cur===nxt&&(!d.app||JSON.stringify(D.app)===JSON.stringify(d.app))){if(had)ctl.refresh();return;}D.lessons=d.lessons;if(d.app)D.app=d.app;if(ctl.view()!=="read"){ctl.refresh();if(!had)ctl.toast("Đã cập nhật bài mới");}else{ctl.toast("Có bài mới. Quay lại kho bài để xem.");}}).catch(function(){D.loading=false;if(ctl.view()!=="read")ctl.refresh();});}'+
    '})();<\/script></body></html>';
 }
 function exportLibrary(){
