@@ -1409,6 +1409,12 @@ html.rr-fs-on{overflow:hidden}
 .rr-crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:2px;margin:6px 0 4px;font:600 14px var(--rr-ui)}
 .rr-crumbs i{opacity:.5;font-style:normal;padding:0 2px}
 .rr-crumbs button{border:0;background:none;color:var(--rr-fg);font:inherit;padding:6px 10px;border-radius:8px;cursor:pointer;opacity:.75}.rr-crumbs button:hover{background:color-mix(in srgb,var(--rr-fg) 8%,transparent);opacity:1}.rr-crumbs button[aria-current]{opacity:1}
+
+.rr-fth{display:inline-flex;gap:2px;padding-right:6px;margin-right:2px;border-right:1px solid var(--rr-line)}
+.rr-fth button{display:inline-flex;align-items:center;gap:6px;font-weight:500}
+.rr-fth button svg{width:16px;height:16px}
+.rr-fth button[aria-checked="true"]{background:var(--rr-accent);color:var(--rr-accent-fg)}
+@media (max-width:760px){.rr-fth button span{display:none}}
 </style>
 <style id="code-style"></style>
 <style id="style-css"></style>
@@ -2595,7 +2601,7 @@ RR.init=function(opts){
   function fsEnter(){
     var sec=fsSec(); if(!sec||fsOn()) return;
     sec.classList.add('rr-fs'); document.documentElement.classList.add('rr-fs-on');
-    var bar=document.createElement('div'); bar.className='rr-fsbar'; bar.innerHTML='<button type="button" data-fsx class="x" aria-label="Thoát toàn màn hình" title="Thoát (Esc)">✕ Thoát</button>';
+    var bar=document.createElement('div'); bar.className='rr-fsbar'; bar.innerHTML='<span class="rr-fth" role="radiogroup" aria-label="Chọn theme">'+[['stage','Sân khấu',IC.stage],['notebook','Vở ghi',IC.nb],['constellation','Chòm sao',IC.star]].map(function(t){ return '<button type="button" role="radio" data-fth="'+t[0]+'" aria-checked="'+(th===t[0])+'" title="'+t[1]+'">'+t[2]+'<span>'+t[1]+'</span></button>'; }).join('')+'</span><button type="button" data-fsx class="x" aria-label="Thoát toàn màn hình" title="Thoát (Esc)">✕ Thoát</button>';
     sec.appendChild(bar); fsApply();
     try{ var r=sec.requestFullscreen&&sec.requestFullscreen(); if(r&&r.catch) r.catch(function(){}); }catch(err){}
   }
@@ -2614,6 +2620,7 @@ RR.init=function(opts){
   main.addEventListener('click',function(e){
     if(e.target.closest('[data-fs]')){ fsEnter(); return; }
     if(e.target.closest('[data-fsx]')){ fsExit(); return; }
+    var ft=e.target.closest('[data-fth]'); if(ft){ th=ft.getAttribute('data-fth'); try{ localStorage.setItem('rr:theme',th); }catch(err){} html.setAttribute('data-th',th); main.querySelectorAll('[data-fth]').forEach(function(x){ x.setAttribute('aria-checked',String(x===ft)); }); root.querySelectorAll('.rr-themes button').forEach(function(x){ x.setAttribute('aria-checked',String(x.getAttribute('data-th')===th)); }); return; }
     var zb=e.target.closest('[data-fsz]'); if(zb){ fsZ=Math.max(.9,Math.min(2.2,+(fsZ+(+zb.getAttribute('data-fsz'))*.1).toFixed(2))); fsApply(); return; }
   });
   main.addEventListener('click',function(e){
