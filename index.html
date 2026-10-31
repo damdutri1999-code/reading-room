@@ -1058,6 +1058,23 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .rd-ex-fb.ok{color:#14704b;font-weight:600}
 .rd-ex-q.bad{animation:rdShake .35s}
 @keyframes rdShake{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+/* Matching headings: kéo thả */
+.rd-ex-list.drag{position:sticky;top:0;z-index:3;box-shadow:0 8px 14px -10px rgba(40,20,120,.35)}
+.rd-ex-hd{cursor:grab;user-select:none;-webkit-user-select:none;padding:6px 8px;margin:0 -8px;border-radius:8px;border:1.5px solid transparent;transition:background .15s,border-color .15s,opacity .15s}
+.rd-ex-hd:hover{background:var(--ex-soft)}
+.rd-ex-hd.pick{background:var(--ex-soft);border-color:var(--ex)}
+.rd-ex-hd.used{opacity:.45}
+.rd-ex-hd.drag{opacity:.4}
+.rd-ex-drop{margin-top:10px;min-height:48px;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:2px dashed var(--ex-line);background:var(--ex-soft);color:var(--ex-ink);font:500 13.5px/1.35 var(--rd-ui);cursor:pointer;transition:background .15s,border-color .15s}
+.rd-ex-drop em{font-style:normal;color:#8a80b8;flex:1;text-align:center}
+.rd-ex-drop.over,.rd-ex-drop.wait:hover{border-color:var(--ex);background:#e6defe}
+.rd-ex-drop.has{border-style:solid;border-color:var(--ex);background:#fff}
+.rd-ex-drop i{flex:none;font:700 12px/1 var(--rd-ui);font-style:normal;min-width:26px;height:24px;padding:0 6px;display:grid;place-items:center;border-radius:6px;background:var(--ex);color:#fff}
+.rd-ex-drop span{flex:1}
+.rd-ex-dx{flex:none;border:0;background:transparent;color:#6b6296;font-size:15px;cursor:pointer;width:26px;height:26px;border-radius:50%}
+.rd-ex-dx:hover{background:rgba(0,0,0,.07)}
+.rd-ex-drop.ok{border-color:#1f9d6a;background:#f1fbf6}.rd-ex-drop.ok i{background:#1f9d6a}
+.rd-ex-drop.bad{border-color:#d6393f;background:#fff5f5}.rd-ex-drop.bad i{background:#d6393f}
 /* Paragraph letters for matching tasks */
 .rd-blk[data-pl]::before{content:attr(data-pl);display:inline-grid;place-items:center;width:1.5em;height:1.5em;margin-right:.6em;border-radius:6px;background:var(--ex);color:#fff;font:700 .68em/1 var(--rd-ui);vertical-align:.18em;float:none}
 /* Panel task: cột phải ≥1280px (nội dung dịch sang trái); dưới 1280px là khay dưới, bài đọc vẫn nhìn thấy ở trên */
@@ -1424,7 +1441,10 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
 .rr-read.rr-fs [data-reader]{max-width:none;margin:0 auto}
 .rr-read.rr-fs .rd-wrap{zoom:var(--fsz,1.2)}
 .rr-read.rr-fs .rd-wrap{max-width:min(1700px,100%)!important;margin-right:auto!important}
-.rr-read.rr-fs .rd-progress{top:0!important}
+/* Toàn màn hình: dải nền đặc ở đầu để thanh nút và thanh tiến độ không đè lên chữ khi cuộn */
+.rr-read.rr-fs::before{content:"";position:fixed;top:0;left:0;right:0;height:56px;background:var(--rr-bg);z-index:1090;pointer-events:none}
+.rr-read.rr-fs .rd-progress{position:fixed!important;top:56px!important;left:0;right:0;width:auto;z-index:1095}
+.rr-read.rr-fs .rr-fsbar{z-index:1100}
 html.rr-fs-on .rr-themes,html.rr-fs-on .rr-theme-bar{display:none!important}
 html.rr-fs-on{overflow:hidden}
 .rr-fsbar{position:fixed;top:10px;right:14px;z-index:1100;display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:999px;border:1px solid var(--rr-line);background:color-mix(in srgb,var(--rr-bg) 88%,transparent);backdrop-filter:blur(8px);box-shadow:0 4px 18px rgba(0,0,0,.25);font:600 13px var(--rr-ui);color:var(--rr-fg)}
@@ -1438,6 +1458,7 @@ html.rr-fs-on{overflow:hidden}
   html.rd-ex-open .rr-main .rd.qopen .rd-wrap{margin-right:auto;max-width:100%}
   html.rd-ex-open .rr-read.rr-fs .rd-wrap{margin-right:calc(424px / var(--fsz,1.2))!important}
   html.rd-ex-open .rr-fsbar{right:calc(410px + 14px)}
+  html.rd-ex-open .rr-read.rr-fs::before,html.rd-ex-open .rr-read.rr-fs .rd-progress{right:410px}
 }
 
 .rr-fh{font:600 12px var(--rr-ui);letter-spacing:.05em;text-transform:uppercase;color:var(--rr-muted);margin:18px 2px 10px}
@@ -2306,6 +2327,7 @@ RD.mount = function(root, lesson, init, opts){
     var exP=$('.rd-exam'), exBody=$('.rd-ex-body'), exFoot=$('.rd-ex-foot'), exProg=$('.rd-ex-prog'), exBtn=$('.rd-exam-btn');
     var TF={tfng:['TRUE','FALSE','NOT GIVEN'], ynng:['YES','NO','NOT GIVEN']};
     var canCheck = EX.keyed>0 && lesson.examCheck!==false;
+    var pickK='';
     function exAns(it){ return st.exam['q'+it.n]||''; }
     function exDone(){ var n=0; EX.groups.forEach(function(G){ G.items.forEach(function(I){ if(String(exAns(I)).trim()) n++; }); }); return n; }
     function exCls(G,I){ if(!canCheck||!I.ans||!String(exAns(I)).trim()) return ''; return RD.examOk(G.type,exAns(I),I.ans)?' ok':' bad'; }
@@ -2315,6 +2337,9 @@ RD.mount = function(root, lesson, init, opts){
         ctl='<div class="rd-ex-opts row">'+TF[G.type].map(function(v){ var on=RD.examNorm(a,G.type)===RD.examNorm(v,G.type); return '<button type="button" class="rd-ex-o'+(on?' on'+c:'')+'" data-q="'+I.n+'" data-v="'+v+'">'+v+'</button>'; }).join('')+'</div>';
       } else if(G.type==='mc'){
         ctl='<div class="rd-ex-opts col">'+I.opts.map(function(o){ return '<button type="button" class="rd-ex-o'+(a===o.k?' on'+c:'')+'" data-q="'+I.n+'" data-v="'+esc(o.k)+'"><i>'+esc(o.k)+'</i><span>'+esc(o.t)+'</span></button>'; }).join('')+'</div>';
+      } else if(G.type==='match'&&!G.auto){
+        var ho=G.opts.filter(function(o){ return o.k===a; })[0];
+        ctl='<div class="rd-ex-drop'+(a?' has':'')+c+(pickK&&!a?' wait':'')+'" data-q="'+I.n+'" data-drop tabindex="0" role="button" aria-label="Ô đáp án câu '+I.n+'">'+(a?'<i>'+esc(a)+'</i><span>'+esc(ho?ho.t:'')+'</span><button type="button" class="rd-ex-dx" data-q="'+I.n+'" aria-label="Bỏ lựa chọn">✕</button>':'<em>'+(pickK?'Bấm để đặt heading vào đây':'Kéo heading vào đây')+'</em>')+'</div>';
       } else if(G.type==='match'){
         ctl='<select class="rd-ex-sel" data-q="'+I.n+'" aria-label="Đáp án câu '+I.n+'"><option value="">Chọn…</option>'+G.opts.map(function(o){ return '<option value="'+esc(o.k)+'"'+(a===o.k?' selected':'')+'>'+esc(o.k)+'</option>'; }).join('')+'</select>';
       } else {
@@ -2327,7 +2352,7 @@ RD.mount = function(root, lesson, init, opts){
       var f=document.activeElement, fq=f&&f.getAttribute&&f.getAttribute('data-q'), pos=f&&f.selectionStart;
       exBody.innerHTML=EX.groups.map(function(G){
         return '<section class="rd-ex-g"><h3>'+esc(G.title||'Câu hỏi')+'</h3>'+(G.instr?'<p class="rd-ex-ins">'+esc(G.instr)+'</p>':'')+
-          (G.type==='match'&&!G.auto?'<ul class="rd-ex-list">'+G.opts.map(function(o){ return '<li><i>'+esc(o.k)+'</i><span>'+esc(o.t)+'</span></li>'; }).join('')+'</ul>':'')+
+          (G.type==='match'&&!G.auto?'<ul class="rd-ex-list drag">'+G.opts.map(function(o){ var used=G.items.some(function(I){ return RD.examNorm(exAns(I),'x')===RD.examNorm(o.k,'x'); }); return '<li draggable="true" class="rd-ex-hd'+(used?' used':'')+(pickK===o.k?' pick':'')+'" data-k="'+esc(o.k)+'" data-g="'+esc(G.id)+'" role="button" tabindex="0"><i>'+esc(o.k)+'</i><span>'+esc(o.t)+'</span></li>'; }).join('')+'</ul>':'')+
           G.items.map(function(I){ return exItem(G,I); }).join('')+'</section>'; }).join('');
       var done=exDone(); exProg.textContent=done+'/'+EX.count+' câu';
       var score='', ok=0, tot=0, ans=0;
@@ -2348,7 +2373,23 @@ RD.mount = function(root, lesson, init, opts){
     on($('.rd-mode-read'),'click',function(){ exOpen(false); });
     on($('.rd-ex-x'),'click',function(){ exOpen(false); var rb=$('.rd-mode-read'); if(rb) rb.focus(); });
     on(R,'keydown',function(e){ if(e.key==='Escape'&&exP.classList.contains('open')) exOpen(false); });
+    function exFind(n){ var r=null; EX.groups.forEach(function(G){ G.items.forEach(function(I){ if(I.n===+n) r={G:G,I:I}; }); }); return r; }
+    function exPut(n,k){
+      var f=exFind(n); if(!f) return;
+      if(k) f.G.items.forEach(function(I){ if(I.n!==f.I.n&&RD.examNorm(exAns(I),'x')===RD.examNorm(k,'x')) st.exam['q'+I.n]=''; });
+      st.exam['q'+n]=k; pickK=''; save(); exRender();
+    }
+    var dragK='';
+    on(exP,'dragstart',function(e){ var li=e.target.closest&&e.target.closest('.rd-ex-hd'); if(!li) return; dragK=li.getAttribute('data-k'); try{ e.dataTransfer.setData('text/plain',dragK); e.dataTransfer.effectAllowed='move'; }catch(x){} li.classList.add('drag'); });
+    on(exP,'dragend',function(){ dragK=''; exP.querySelectorAll('.drag,.over').forEach(function(x){ x.classList.remove('over'); if(x.classList.contains('rd-ex-hd')) x.classList.remove('drag'); }); });
+    on(exP,'dragover',function(e){ var d=e.target.closest&&e.target.closest('.rd-ex-drop'); if(!d||!dragK) return; e.preventDefault(); d.classList.add('over'); });
+    on(exP,'dragleave',function(e){ var d=e.target.closest&&e.target.closest('.rd-ex-drop'); if(d) d.classList.remove('over'); });
+    on(exP,'drop',function(e){ var d=e.target.closest&&e.target.closest('.rd-ex-drop'); if(!d) return; e.preventDefault(); var k=dragK; try{ k=e.dataTransfer.getData('text/plain')||k; }catch(x){} dragK=''; if(k) exPut(d.getAttribute('data-q'),k); });
+    on(exP,'keydown',function(e){ if((e.key==='Enter'||e.key===' ')&&e.target.closest){ var li=e.target.closest('.rd-ex-hd'); if(li){ e.preventDefault(); li.click(); return; } var d=e.target.closest('.rd-ex-drop'); if(d&&e.target===d){ e.preventDefault(); d.click(); } } });
     on(exP,'click',function(e){
+      var dx=e.target.closest('.rd-ex-dx'); if(dx){ exPut(dx.getAttribute('data-q'),''); return; }
+      var hd=e.target.closest('.rd-ex-hd'); if(hd){ var kk=hd.getAttribute('data-k'); pickK=(pickK===kk)?'':kk; exRender(); return; }
+      var dr=e.target.closest('.rd-ex-drop'); if(dr){ if(pickK) exPut(dr.getAttribute('data-q'),pickK); return; }
       var o=e.target.closest('.rd-ex-o'); if(o){ var q='q'+o.getAttribute('data-q'), v=o.getAttribute('data-v'); st.exam[q]=(st.exam[q]===v)?'':v; save(); exRender(); return; }
       var b=e.target.closest('[data-act]'); if(!b) return; var a=b.getAttribute('data-act');
       if(a==='clear'){ if(!b.dataset.arm){ b.dataset.arm='1'; b.textContent='Bấm lần nữa để làm lại'; setTimeout(function(){ if(b.isConnected){ delete b.dataset.arm; b.textContent='Làm lại từ đầu'; } },2600); return; } st.exam={}; save(); exRender(); }
