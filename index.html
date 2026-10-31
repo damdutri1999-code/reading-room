@@ -3709,7 +3709,7 @@ function renderPane(){
   else if(hubTab==='cover'){ p.innerHTML=paneCover(); coverPreview(true); }
   else if(hubTab==='export') p.innerHTML=paneExport();
   else if(hubTab==='backup') p.innerHTML=paneBackup();
-  else if(hubTab==='ai'){ p.innerHTML=paneAI(); p.querySelector('#tw-prompt').value=aiPrompt(); }
+  else if(hubTab==='ai'){ p.innerHTML=paneAI(); p.querySelector('#tw-prompt').value=aiPromptOf(aiKind); }
   else p.innerHTML=paneGuide();
   if(hubTab==='lessons'||hubTab==='drafts') renderRows();
 }
@@ -3861,9 +3861,15 @@ function paneExport(){
       '<p class="tw-hint">Cần gửi riêng một bài? Mở menu ⋯ của bài đó và chọn “Tải bài lẻ”.</p></div></div>'+cloudHtml();
 }
 /* Tab 4 — AI prompt */
+var aiKind='all';
+var AI_KINDS=[['all','Tô màu + elicit','Một lần cho cả hai: AI phân tích bài, tô màu, rồi đặt câu hỏi elicit dạng JSON theo tiêu chí.'],['el','Chỉ elicit','Bài đã tô màu rồi, chỉ cần AI đặt câu hỏi elicit dạng JSON.'],['color','Chỉ tô màu','AI chỉ tô màu và gắn thẻ, không đặt câu hỏi elicit riêng.'],['exam','Chuyển đề bài','AI chuyển đề IELTS (PDF, ảnh chụp) sang dạng web đọc được.']];
+function aiPromptOf(k){ return k==='el'?aiElicitPrompt():k==='color'?aiPrompt():k==='exam'?aiExamPrompt():aiAllPrompt(); }
 function paneAI(){
-  return paneHead('Câu lệnh nhờ AI tô màu','Chép câu lệnh vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng bài đọc. AI trả về bài đã gắn mã màu, câu hỏi và ô ghi chú.')+
-    '<ol class="tw-steps"><li><b>Sao chép câu lệnh</b><span>Bấm nút bên dưới.</span></li><li><b>Dán vào AI kèm bài đọc</b><span>Thay dòng “&lt;dán bài đọc vào đây&gt;”.</span></li><li><b>Dán kết quả vào Studio</b><span>Bấm “Bài mới” rồi dán. Màu và câu hỏi tự hiện.</span></li></ol>'+
+  var cur=AI_KINDS.filter(function(k){ return k[0]===aiKind; })[0]||AI_KINDS[0];
+  return paneHead('Câu lệnh nhờ AI','Sao chép câu lệnh vào ChatGPT, Claude hay Gemini của thầy cô. Câu lệnh đã có đủ quy tắc, thầy cô chỉ điền số câu và dán bài đọc.')+
+    '<div class="tw-chips tw-ai-k" role="group" aria-label="Loại câu lệnh">'+AI_KINDS.map(function(k){ return '<button type="button" data-ai-kind="'+k[0]+'" aria-pressed="'+(k[0]===aiKind)+'">'+k[1]+'</button>'; }).join('')+'</div>'+
+    '<p class="tw-hint" id="tw-ai-d">'+esc(cur[2])+'</p>'+
+    '<ol class="tw-steps"><li><b>Sao chép câu lệnh</b><span>Bấm nút bên dưới.</span></li><li><b>Dán vào AI kèm bài đọc</b><span>Điền số câu và thay dòng “&lt;dán bài đọc vào đây&gt;”.</span></li><li><b>Dán kết quả vào Studio</b><span>Bấm “Bài mới” rồi dán cả câu trả lời của AI. Màu và câu hỏi tự hiện.</span></li></ol>'+
     '<div class="tw-ai"><textarea id="tw-prompt" rows="16" readonly aria-label="Câu lệnh mẫu"></textarea><div class="tw-ai-a"><button type="button" class="tw-btn solid" data-copy-prompt>'+svg('copy')+'Sao chép câu lệnh</button><button type="button" class="tw-btn" data-hub="new">'+svg('upload')+'Dán kết quả vào bài mới</button></div></div>';
 }
 /* Tab 5 — guide */
@@ -3957,6 +3963,7 @@ rrRoot.addEventListener('click',function(e){
     else if(k2==='cancel'){ bkPending=null; renderPane(); }
     else if(k2==='apply'){ var md=rrRoot.querySelector('input[name="bk-mode"]:checked'); var go=function(){ applyBackup(md?md.value:'merge'); }; if(md&&md.value==='replace'&&!bk.dataset.arm){ bk.dataset.arm='1'; bk.textContent='Bấm lần nữa để thay toàn bộ'; setTimeout(function(){ if(bk.isConnected){ delete bk.dataset.arm; bk.textContent='Khôi phục'; } },3000); return; } go(); }
     return; }
+  var ak=t.closest('[data-ai-kind]'); if(ak){ aiKind=ak.getAttribute('data-ai-kind'); renderPane(); return; }
   if(t.closest('[data-copy-prompt]')){ var ta=rrRoot.querySelector('#tw-prompt'); RD.copy(ta.value).then(function(ok){ if(!ok){ ta.focus(); ta.select(); } rrCtl.toast(ok?'Đã sao chép câu lệnh':'Hãy bấm Ctrl+C để chép'); }); return; }
   var b=t.closest('[data-act2]'); if(!b) return;
   var row=b.closest('[data-id]'), id=row&&row.getAttribute('data-id'), act=b.getAttribute('data-act2'); if(!id) return;
