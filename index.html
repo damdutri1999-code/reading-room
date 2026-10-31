@@ -967,6 +967,30 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .rd-terms span{opacity:.7}
 .rd-terms a{padding:3px 9px;border-radius:999px;border:1px solid var(--rd-line);color:var(--rd-accent);text-decoration:none}
 .rd-terms a:hover{background:var(--rd-accent-soft)}
+
+/* Elicit: one-line cards. Hover shows the full question, click opens the answer box. */
+.rd-qc{position:relative;padding:0;border:0;background:none;margin:0 0 8px;height:36px;border-radius:10px;box-shadow:none}
+.rd-qc .rd-box{position:absolute;left:0;right:0;top:0;min-height:36px;background:var(--rd-paper);border:1px solid var(--rd-line);border-radius:10px;padding:7px 10px;transition:border-color .2s,box-shadow .2s}
+.rd-qc .rd-cl{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;background:none;border:0;padding:0;margin:0;cursor:pointer;font:500 12.5px/1.45 var(--rd-ui);color:var(--rd-ink)}
+.rd-qc .rd-cl:focus-visible{outline:2px solid var(--rd-accent);outline-offset:3px;border-radius:6px}
+.rd-qc .rd-cl .n{flex:none;font:700 10.5px/1 var(--rd-ui);color:var(--rd-accent);background:var(--rd-accent-soft);border-radius:999px;padding:3px 7px}
+.rd-qc .rd-cl .t{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rd-qc.done .rd-cl .n::after{content:" ✓"}
+.rd-qc:not(.open):hover .rd-box,.rd-qc:not(.open):focus-within .rd-box{z-index:12;border-color:var(--rd-accent);box-shadow:0 14px 30px -14px color-mix(in srgb,var(--rd-accent) 60%,transparent)}
+.rd-qc:not(.open):hover .rd-cl .t,.rd-qc:not(.open):focus-within .rd-cl .t{white-space:normal;overflow:visible;text-overflow:clip}
+.rd-qc .rd-more{display:none}
+.rd-qc.open{height:auto;margin-bottom:12px}
+.rd-qc.open .rd-box{position:static;padding:10px 12px 8px;border-color:var(--rd-accent)}
+.rd-qc.open .rd-more{display:block;margin-top:4px}
+.rd-qc.open .rd-cl .t{white-space:normal;overflow:visible}
+.rd-qc .rd-ta{font-size:14px;margin-top:6px}
+.rd-qc .rd-link{font-size:12px}
+.rd-qc.hot .rd-box{border-color:var(--rd-accent)}
+.rd-qc.hot{box-shadow:none}
+.rd-qc.locked .rd-cl .t{filter:blur(4px);-webkit-user-select:none;user-select:none}
+.rd-qc.locked::after{display:none}
+.rd-qc.locked .rd-cl{cursor:not-allowed}
+.rd-qc.locked .rd-more{display:none}
 </style><style id="rr-css">
 /* Reading Room shell: home, library, teacher hub and themed reading. Everything is scoped under .rr and uses --rr-* tokens so it never touches the Studio editor */
 :root{--rr-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--rr-read:'Literata',Georgia,'Times New Roman',serif;--rr-hand:'Patrick Hand','Pangolin','Be Vietnam Pro',system-ui,sans-serif;--mx:50%;--my:35%}
@@ -1783,27 +1807,32 @@ RD.mount = function(root, lesson, init, opts){
     var def = elicits[id]||{}, n = i+1, anchors = seen[id];
     anchors[anchors.length-1].setAttribute('data-n','Q'+n);
     var blk = anchors[0].closest('.rd-blk'); if(!blk) return;
-    var c = h('div','rd-card'); c.setAttribute('data-el',id);
+    var c = h('div','rd-card rd-qc'); c.setAttribute('data-el',id);
     var TL={yn:'Yes/No',wh:'WH',research:'Tra cứu'};
     var chips=(def.type&&TL[def.type]?'<span class="rd-chip t-'+def.type+'">'+TL[def.type]+'</span>':'')+(def.group?'<span class="rd-chip">'+esc(def.group)+'</span>':'');
     var terms=(def.terms&&def.terms.length)?'<div class="rd-terms"><span>Tra cứu:</span>'+def.terms.map(function(t){ return '<a href="https://www.google.com/search?q='+encodeURIComponent(t)+'" target="_blank" rel="noopener noreferrer">'+esc(t)+'</a>'; }).join('')+'</div>':'';
-    c.innerHTML = '<div class="rd-card-tag">Elicit · Q'+n+'</div>'+(chips?'<div class="rd-chips">'+chips+'</div>':'')+'<p class="rd-card-q">'+esc(def.q||'')+'</p>'+terms+
+    c.innerHTML = '<div class="rd-box"><button type="button" class="rd-cl" aria-expanded="false" aria-label="Câu hỏi Q'+n+'"><span class="n">Q'+n+'</span><span class="t">'+esc(def.q||'')+'</span></button>'+
+      '<div class="rd-more">'+(chips?'<div class="rd-chips">'+chips+'</div>':'')+terms+
       (def.hint?'<button type="button" class="rd-link rd-hint-btn" aria-expanded="false">Xem gợi ý</button><div class="rd-hint"><div><p>'+esc(def.hint)+'</p></div></div>':'')+
-      '<textarea class="rd-ta" rows="2" placeholder="Câu trả lời của em…" aria-label="Trả lời Q'+n+'"></textarea><span class="rd-saved">Đã lưu</span>';
+      '<textarea class="rd-ta" rows="2" placeholder="Câu trả lời của em…" aria-label="Trả lời Q'+n+'"></textarea><span class="rd-saved">Đã lưu</span></div></div>';
     blk.parentNode.insertBefore(c, blk); rowSpan(blk.parentNode);
     cards[id] = {el:c, n:n, q:def.q||'', anchors:anchors};
     var ta = c.querySelector('textarea'); ta.value = st.answers[id]||''; tas.push(ta);
-    on(ta,'input',function(){ st.answers[id]=ta.value; grow(ta); save(c); });
+    function mark(){ c.classList.toggle('done',!!(ta.value||'').trim()); } mark();
+    var clb=c.querySelector('.rd-cl');
+    function setOpen(o){ if(o&&c.classList.contains('locked')) return; if(o){ order.forEach(function(k2){ var o2=cards[k2]; if(o2&&o2.el!==c&&o2.el.classList.contains('open')) o2.el.classList.remove('open'); var b2=o2&&o2.el.querySelector('.rd-cl'); if(b2&&o2.el!==c) b2.setAttribute('aria-expanded','false'); }); } c.classList.toggle('open',!!o); clb.setAttribute('aria-expanded',String(!!o)); if(o){ grow(ta); } }
+    c._open=setOpen;
+    on(ta,'input',function(){ st.answers[id]=ta.value; grow(ta); mark(); save(c); });
     var hb = c.querySelector('.rd-hint-btn');
     if(hb) on(hb,'click',function(){ var hint=c.querySelector('.rd-hint'); var o=!hint.classList.contains('open'); hint.classList.toggle('open',o); hb.setAttribute('aria-expanded',String(o)); hb.textContent=o?'Ẩn gợi ý':'Xem gợi ý'; });
     on(c,'mouseenter',function(){ anchors.forEach(function(a){ a.classList.add('hot'); }); linkShow('el:'+id,anchors,c,'var(--rd-accent)'); });
     on(c,'mouseleave',function(){ anchors.forEach(function(a){ a.classList.remove('hot'); }); linkHide(); });
-    on(c,'click',function(e){ if(e.target.closest('textarea,button,a')) return; anchors.forEach(function(a,i){ setTimeout(function(){ flash([a]); },reduce?0:i*420); }); });
+    on(clb,'click',function(){ var o=!c.classList.contains('open'); setOpen(o); if(o) anchors.forEach(function(a,i){ setTimeout(function(){ flash([a]); },reduce?0:i*420); }); });
     anchors.forEach(function(a){
       a.setAttribute('tabindex','0'); a.setAttribute('role','button'); a.setAttribute('aria-label','Mở câu hỏi Q'+n);
       on(a,'mouseenter',function(){ c.classList.add('hot'); anchors.forEach(function(x){ x.classList.add('hot'); }); linkShow('el:'+id,anchors,c,'var(--rd-accent)'); });
       on(a,'mouseleave',function(){ c.classList.remove('hot'); anchors.forEach(function(x){ x.classList.remove('hot'); }); linkHide(); });
-      function go(){ flash([c]); if(innerWidth<1080) c.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); ta.focus({preventScroll:true}); }
+      function go(){ setOpen(true); flash([c]); if(innerWidth<1080) c.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); ta.focus({preventScroll:true}); }
       on(a,'click',function(e){ var s=getSelection(); if(s && !s.isCollapsed) return; if(e&&e.target&&e.target.closest&&e.target.closest('.el')!==a) return; go(); });
       on(a,'keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
     });
@@ -2176,7 +2205,7 @@ RD.mount = function(root, lesson, init, opts){
       R.querySelectorAll('.rd-spot').forEach(function(e){ e.remove(); });
       Object.keys(map||{}).forEach(function(id){ var c=cards[id], s=map[id]; if(!c||!s) return;
         var d=h('div','rd-spot'); d.innerHTML='<div class="rd-spot-h"></div><p></p>';
-        d.firstChild.textContent='Câu trả lời được chọn · '+(s.name||'Học viên'); d.lastChild.textContent=s.text||''; c.el.appendChild(d); });
+        d.firstChild.textContent='Câu trả lời được chọn · '+(s.name||'Học viên'); d.lastChild.textContent=s.text||''; (c.el.querySelector('.rd-more')||c.el).appendChild(d); if(c.el._open) c.el._open(true); });
     },
     elicitBlocks:function(){ var o={}; order.forEach(function(id){ var c=cards[id]; if(!c) return; var b=c.anchors[0].closest('.rd-blk'); o[id]=b?+b.getAttribute('data-b'):0; }); return o; },
     elicitList:function(){ return order.map(function(id){ return {id:id, n:cards[id]?cards[id].n:0, q:cards[id]?cards[id].q:''}; }); },
