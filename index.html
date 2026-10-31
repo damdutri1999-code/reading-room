@@ -669,6 +669,18 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .tw-row.draft .tw-ri{flex:1}
 #done-btn.on{background:#d6f3e6;border-color:#9fdcbf;color:#0b6b4a}
 #done-btn.on svg{color:#0b6b4a}
+
+.el-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+#eli-text{width:100%;box-sizing:border-box;min-height:180px;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+.eli-report{display:flex;flex-direction:column;gap:6px;font:13px/1.45 var(--ui)}
+.eli-sum{padding:10px 12px;border-radius:10px;background:var(--soft,rgba(127,127,127,.12))}
+.eli-warn{color:#c2410c;font-weight:600}
+.eli-bad{padding:8px 12px;border-radius:10px;background:rgba(229,72,77,.1);color:#b42318}
+.eli-note{padding:8px 12px;border-radius:10px;background:rgba(255,170,60,.14);color:#7a4a00}
+.eli-mode{display:flex;flex-direction:column;gap:6px;font:13px var(--ui)}
+.eli-mode label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.el-chip{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font:600 10.5px/1.4 var(--ui);background:rgba(127,127,127,.15);color:inherit;vertical-align:middle}
+.el-chip.t-yn{background:#dbeafe;color:#1d4ed8}.el-chip.t-wh{background:#fde68a;color:#7a4a00}.el-chip.t-research{background:#ede9fe;color:#5b34d6}
 </style>
 <style id="rd-css">
 :root{--rd-bg:#f4f6f8;--rd-paper:#ffffff;--rd-ink:#182132;--rd-muted:#5d6779;--rd-line:#dde2ea;--rd-accent:#2a49d6;--rd-accent-soft:#e6eaff;--rd-note:#fff7d6;--rd-note-ink:#5a4500;--rd-student:#0e9f6e;--rd-student-soft:#e3f6ee;--rd-read:'Literata',Georgia,'Times New Roman',serif;--rd-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -930,6 +942,14 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 @media (max-width:1079px){.rd-exam{width:min(440px,100vw)}}
 
 @media (prefers-reduced-motion:reduce){.rd *,.rd *::before,.rd *::after{animation:none!important;transition:none!important}}
+
+.rd-chips{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0 0}
+.rd-chip{font:600 10.5px/1 var(--rd-ui);padding:4px 8px;border-radius:999px;background:color-mix(in srgb,var(--rd-ink,#222) 9%,transparent);color:var(--rd-ink,inherit)}
+.rd-chip.t-yn{background:#dbeafe;color:#1d4ed8}.rd-chip.t-wh{background:#fde68a;color:#7a4a00}.rd-chip.t-research{background:#ede9fe;color:#5b34d6}
+.rd-terms{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 2px;font:12px var(--rd-ui)}
+.rd-terms span{opacity:.7}
+.rd-terms a{padding:3px 9px;border-radius:999px;border:1px solid var(--rd-line);color:var(--rd-accent);text-decoration:none}
+.rd-terms a:hover{background:var(--rd-accent-soft)}
 </style><style id="rr-css">
 /* Reading Room shell: home, library, teacher hub and themed reading. Everything is scoped under .rr and uses --rr-* tokens so it never touches the Studio editor */
 :root{--rr-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--rr-read:'Literata',Georgia,'Times New Roman',serif;--rr-hand:'Patrick Hand','Pangolin','Be Vietnam Pro',system-ui,sans-serif;--mx:50%;--my:35%}
@@ -1253,6 +1273,7 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
     </div>
     <div class="pbody">
       <div class="ppane" data-p="el">
+        <div class="el-tools"><button type="button" class="btn sm" id="el-ai-open"><i data-i="upload"></i>Nạp từ AI</button><button type="button" class="btn sm ghost" data-prompt-el><i data-i="sparkle"></i>Câu lệnh</button></div>
         <div class="empty" id="el-empty"><span class="eic"><i data-i="question"></i></span><span>Chưa có câu hỏi elicit.<br>Bôi đen một từ trong bài, rồi bấm <b>Câu hỏi</b>.</span></div>
         <div id="el-list" class="ppane"></div>
       </div>
@@ -1383,6 +1404,17 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
       <button type="button" class="btn solid" id="ex-dl"><i data-i="download"></i>Tải file</button>
     </div>
     <p class="fine" id="ex-msg">Bấm Tải file, trình duyệt hoặc Claude sẽ hỏi bạn xác nhận lưu file.</p>
+  </div>
+</div>
+
+<!-- Elicit from AI -->
+<div class="modal" id="el-import" hidden>
+  <div class="msheet" role="dialog" aria-modal="true" aria-labelledby="eli-h" style="max-width:640px">
+    <div class="mh"><span class="ic"><i data-i="question"></i></span><div><h2 id="eli-h">Nạp câu hỏi elicit từ AI</h2><p>Dán khối JSON AI trả về. Web tự tìm từng đoạn “căn cứ” trong bài rồi gắn câu hỏi vào đó.</p></div></div>
+    <textarea id="eli-text" rows="9" spellcheck="false" placeholder='{"elicits":[ { "n":1, "type":"yn", "q":"…", "evidence":["…"], "answer":"…" } ]}' aria-label="JSON câu hỏi elicit"></textarea>
+    <div id="eli-report" class="eli-report" aria-live="polite"></div>
+    <div class="eli-mode" id="eli-mode" hidden><label><input type="radio" name="eli-m" value="add" checked><span>Thêm vào các câu hỏi đang có</span></label><label><input type="radio" name="eli-m" value="replace"><span>Thay toàn bộ câu hỏi đang có</span></label></div>
+    <div class="mrow"><button type="button" class="btn ghost" id="eli-close">Đóng</button><span class="sp"></span><button type="button" class="btn solid" id="eli-go" disabled>Nạp vào bài</button></div>
   </div>
 </div>
 
@@ -1728,7 +1760,10 @@ RD.mount = function(root, lesson, init, opts){
     anchors[anchors.length-1].setAttribute('data-n','Q'+n);
     var blk = anchors[0].closest('.rd-blk'); if(!blk) return;
     var c = h('div','rd-card'); c.setAttribute('data-el',id);
-    c.innerHTML = '<div class="rd-card-tag">Elicit · Q'+n+'</div><p class="rd-card-q">'+esc(def.q||'')+'</p>'+
+    var TL={yn:'Yes/No',wh:'WH',research:'Tra cứu'};
+    var chips=(def.type&&TL[def.type]?'<span class="rd-chip t-'+def.type+'">'+TL[def.type]+'</span>':'')+(def.group?'<span class="rd-chip">'+esc(def.group)+'</span>':'');
+    var terms=(def.terms&&def.terms.length)?'<div class="rd-terms"><span>Tra cứu:</span>'+def.terms.map(function(t){ return '<a href="https://www.google.com/search?q='+encodeURIComponent(t)+'" target="_blank" rel="noopener noreferrer">'+esc(t)+'</a>'; }).join('')+'</div>':'';
+    c.innerHTML = '<div class="rd-card-tag">Elicit · Q'+n+'</div>'+(chips?'<div class="rd-chips">'+chips+'</div>':'')+'<p class="rd-card-q">'+esc(def.q||'')+'</p>'+terms+
       (def.hint?'<button type="button" class="rd-link rd-hint-btn" aria-expanded="false">Xem gợi ý</button><div class="rd-hint"><div><p>'+esc(def.hint)+'</p></div></div>':'')+
       '<textarea class="rd-ta" rows="2" placeholder="Câu trả lời của em…" aria-label="Trả lời Q'+n+'"></textarea><span class="rd-saved">Đã lưu</span>';
     blk.parentNode.insertBefore(c, blk); rowSpan(blk.parentNode);
@@ -1739,13 +1774,13 @@ RD.mount = function(root, lesson, init, opts){
     if(hb) on(hb,'click',function(){ var hint=c.querySelector('.rd-hint'); var o=!hint.classList.contains('open'); hint.classList.toggle('open',o); hb.setAttribute('aria-expanded',String(o)); hb.textContent=o?'Ẩn gợi ý':'Xem gợi ý'; });
     on(c,'mouseenter',function(){ anchors.forEach(function(a){ a.classList.add('hot'); }); linkShow('el:'+id,anchors,c,'var(--rd-accent)'); });
     on(c,'mouseleave',function(){ anchors.forEach(function(a){ a.classList.remove('hot'); }); linkHide(); });
-    on(c,'click',function(e){ if(e.target.closest('textarea,button')) return; flash(anchors); });
+    on(c,'click',function(e){ if(e.target.closest('textarea,button,a')) return; anchors.forEach(function(a,i){ setTimeout(function(){ flash([a]); },reduce?0:i*420); }); });
     anchors.forEach(function(a){
       a.setAttribute('tabindex','0'); a.setAttribute('role','button'); a.setAttribute('aria-label','Mở câu hỏi Q'+n);
       on(a,'mouseenter',function(){ c.classList.add('hot'); anchors.forEach(function(x){ x.classList.add('hot'); }); linkShow('el:'+id,anchors,c,'var(--rd-accent)'); });
       on(a,'mouseleave',function(){ c.classList.remove('hot'); anchors.forEach(function(x){ x.classList.remove('hot'); }); linkHide(); });
       function go(){ flash([c]); if(innerWidth<1080) c.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); ta.focus({preventScroll:true}); }
-      on(a,'click',function(){ var s=getSelection(); if(s && !s.isCollapsed) return; go(); });
+      on(a,'click',function(e){ var s=getSelection(); if(s && !s.isCollapsed) return; if(e&&e.target&&e.target.closest&&e.target.closest('.el')!==a) return; go(); });
       on(a,'keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
     });
   });
@@ -2446,7 +2481,7 @@ function saveDraft(){
 function cleanLessonOf(x){
   if(x===L) return exportLesson();
   var tmp=document.createElement('div'); tmp.innerHTML=x.html||''; var els={}, nts={};
-  tmp.querySelectorAll('.el').forEach(function(a){ var id=a.getAttribute('data-el'), d=(x.elicits||{})[id]||{}; els[id]={q:d.q||'',hint:d.hint||''}; });
+  tmp.querySelectorAll('.el').forEach(function(a){ var id=a.getAttribute('data-el'), d=(x.elicits||{})[id]||{}; els[id]=elDef(d); });
   tmp.querySelectorAll('.nb').forEach(function(n){ var id=n.getAttribute('data-nb'), p=n.querySelector('.nb-p'); nts[id]={prompt:(p&&p.textContent.trim())||((x.notes||{})[id]||{}).prompt||''}; });
   return {v:1,id:x.id,title:x.title||'Bài đọc',subtitle:x.subtitle||'',level:x.level||'',cat:x.cat||'',examOn:!!x.examOn,examText:x.examText||'',examOpen:!!x.examOpen,examCheck:x.examCheck!==false,exam:(x.examOn?RD.parseExam(x.examText):null),codes:x.codes||clone(CODES),styles:RD.styles(x.styles),html:x.html||'',elicits:els,notes:nts};
 }
@@ -2595,6 +2630,7 @@ $('#tc-custom').addEventListener('change',function(e){ restoreSel(); setTc(e.tar
 
 /* ---------- Elicit questions ---------- */
 var elMode=null;
+function elDef(d){ d=d||{}; var o={q:d.q||'',hint:d.hint||''}; if(d.type) o.type=d.type; if(d.group) o.group=d.group; if(d.terms&&d.terms.length) o.terms=d.terms.slice(0,6); return o; }
 function anchorsOf(id){ return $$('.el[data-el="'+id+'"]',ed); }
 function anchorText(id){ return anchorsOf(id).map(function(a){ return a.textContent; }).join(' ').replace(/\s+/g,' ').trim(); }
 function short(s,n){ s=s.replace(/\s+/g,' ').trim(); return s.length>n?s.slice(0,n)+'…':s; }
@@ -2631,7 +2667,7 @@ function saveEl(){
   var q=$('#pel-q').value.trim(), hint=$('#pel-hint').value.trim();
   if(!q){ $('#pel-q').focus(); toast('Nhập câu hỏi trước đã',true); return; }
   if(!elMode) return;
-  if(elMode.mode==='edit'){ L.elicits[elMode.id]={q:q,hint:hint}; var id0=elMode.id; closeEl(); lastElSig=null; changed(true); flashItem('el',id0); toast('Đã lưu câu hỏi'); return; }
+  if(elMode.mode==='edit'){ var od=L.elicits[elMode.id]||{}; L.elicits[elMode.id]=Object.assign({},od,{q:q,hint:hint}); var id0=elMode.id; closeEl(); lastElSig=null; changed(true); flashItem('el',id0); toast('Đã lưu câu hỏi'); return; }
   var nodes=splitNodes(elMode.range);
   if(!nodes.length){ toast('Không tìm thấy chữ đã chọn, hãy bôi đen lại',true); return; }
   var id=uid('e');
@@ -3038,6 +3074,135 @@ function aiPrompt(){
   'BÀI ĐỌC:\n<dán bài đọc vào đây>';
 }
 
+/* ---------- Elicit từ AI (JSON) ---------- */
+var EL_TYPES={yn:'Yes/No',wh:'WH',research:'Tra cứu'};
+function elChips(d){ d=d||{}; return (d.type&&EL_TYPES[d.type]?'<span class="el-chip t-'+d.type+'">'+EL_TYPES[d.type]+'</span>':'')+(d.group?'<span class="el-chip">'+esc(d.group)+'</span>':''); }
+function aiElicitPrompt(){
+  return 'Bạn là trợ lý soạn bài Reading comprehension. Hãy soạn bộ câu hỏi elicit cho bài đọc ở cuối và trả kết quả dưới dạng JSON.\n\n'+
+  'QUY TẮC:\n'+
+  '1. Chỉ trả MỘT khối code (```json … ```), không thêm lời giải thích nào ngoài khối code.\n'+
+  '2. Không chép lại, không sửa bài đọc. Chỉ trả danh sách câu hỏi.\n'+
+  '3. Mỗi câu hỏi có các trường: n (số thứ tự), group (tên nhóm), type, q (câu hỏi), evidence (căn cứ), answer (gợi ý trả lời). Riêng type "research" có thêm terms (từ khoá tra cứu).\n'+
+  '4. type chỉ được là một trong: "yn" (Yes/No), "wh" (câu hỏi WH), "research" (câu tra cứu thêm ngoài bài).\n'+
+  '5. evidence là MẢNG các đoạn chữ chép NGUYÊN VĂN từ bài đọc: đúng từng chữ, chữ hoa/thường và dấu câu. Mỗi đoạn tối đa một câu. KHÔNG dùng dấu “…”, không viết lại, không dịch. Nếu căn cứ nằm ở hai chỗ thì ghi thành hai mục.\n'+
+  '6. Nhiều câu hỏi có thể dùng chung một đoạn evidence.\n'+
+  '7. answer là gợi ý trả lời ngắn. Học viên chỉ thấy khi bấm “Xem gợi ý”.\n'+
+  '8. Nếu tôi đã đưa sẵn danh sách câu hỏi: chuyển đổi NGUYÊN VĂN từng câu sang JSON, không sáng tác thêm, không bỏ câu nào. Nếu chưa có thì tự soạn theo yêu cầu ở dưới.\n\n'+
+  'MẪU ĐỊNH DẠNG:\n```json\n{"elicits":[\n'+
+  '  {"n":1,"group":"Dòng lập luận","type":"yn","q":"Theo bài, sau một ngày bận rộn chúng ta có thể cảm thấy mệt không?","evidence":["After a busy day, we may feel tired."],"answer":"Có. Sau một ngày bận rộn, chúng ta có thể cảm thấy mệt."},\n'+
+  '  {"n":2,"group":"Coherence","type":"wh","q":"“These simple activities” nhắc lại những hoạt động nào?","evidence":["We can take a short walk, listen to music, or sit quietly.","These simple activities help us feel calm."],"answer":"Đi bộ ngắn, nghe nhạc hoặc ngồi yên."},\n'+
+  '  {"n":3,"group":"Kiến thức","type":"research","q":"Nghỉ ngơi liên quan thế nào đến sức khỏe?","evidence":["it can help our bodies and minds."],"terms":["rest and health","sleep and health"],"answer":"Tìm một nguồn đáng tin cậy rồi chia sẻ một thông tin."}\n'+
+  ']}\n```\n\n'+
+  'YÊU CẦU / DANH SÁCH CÂU HỎI:\n<dán danh sách câu hỏi của bạn, hoặc nêu số câu và các nhóm muốn có>\n\n'+
+  'BÀI ĐỌC:\n<dán bài đọc vào đây>';
+}
+function elType(t){ var s=String(t||'').toLowerCase(); if(/research|tra\s*c|\*/.test(s)) return 'research'; if(/^(yn|y\/n|yes|no|tf)|yes\s*\/?\s*no|có\s*\/?\s*không/.test(s)) return 'yn'; return 'wh'; }
+function elParse(raw){
+  var s=String(raw||'').trim(); if(!s) return {err:'Hãy dán khối JSON mà AI trả về.'};
+  var i=s.search(/[\{\[]/); if(i<0) return {err:'Không thấy dữ liệu JSON. Khối AI trả về phải bắt đầu bằng { hoặc [.'};
+  s=s.slice(i); var j=Math.max(s.lastIndexOf('}'),s.lastIndexOf(']')); if(j<0) return {err:'Dữ liệu JSON bị cụt. Hãy chép đủ đến dấu } cuối cùng.'}; s=s.slice(0,j+1);
+  var o=null, e1=null;
+  try{ o=JSON.parse(s); }catch(e){ e1=e; try{ o=JSON.parse(s.replace(/,\s*([}\]])/g,'$1')); }catch(e2){ o=null; } }
+  if(o==null) return {err:'Không đọc được JSON ('+String(e1&&e1.message||'').replace(/^JSON\.parse:\s*/,'').slice(0,90)+'). Thường do AI thêm chữ thừa hoặc thiếu dấu ngoặc. Hãy nhờ AI “trả lại đúng một khối JSON hợp lệ”.'};
+  var arr=Array.isArray(o)?o:(o.elicits||o.questions||o.items); if(!Array.isArray(arr)||!arr.length) return {err:'Không thấy danh sách câu hỏi. Dữ liệu cần có trường "elicits" là một mảng.'};
+  var items=[], skip=0;
+  arr.forEach(function(x,k){
+    if(!x||typeof x!=='object'){ skip++; return; }
+    var q=String(x.q||x.question||x.cauhoi||'').trim(); if(!q){ skip++; return; }
+    var ev=x.evidence||x.evidences||x.can_cu||x['căn cứ']||[]; if(typeof ev==='string') ev=[ev]; if(!Array.isArray(ev)) ev=[];
+    ev=ev.map(function(t){ return String(t==null?'':t); }).filter(function(t){ return t.trim(); });
+    var tm=x.terms||x.keywords||[]; if(typeof tm==='string') tm=tm.split(/[,;]/); if(!Array.isArray(tm)) tm=[];
+    items.push({n:x.n!=null?x.n:k+1,q:q,type:elType(x.type),group:String(x.group||x.nhom||'').trim(),evidence:ev,hint:String(x.answer||x.hint||x.goiy||'').trim(),terms:tm.map(function(t){ return String(t).trim(); }).filter(Boolean)});
+  });
+  if(!items.length) return {err:'Mọi câu hỏi đều thiếu trường "q" (nội dung câu hỏi).'};
+  return {items:items,skip:skip};
+}
+function elNormCh(c){ c=c.toLowerCase(); if(c==='\u00a0'||c==='\t'||c==='\n'||c==='\r'||c==='\u200b') return ' '; if('“”„‟«»'.indexOf(c)>=0) return '"'; if('‘’‚‛′`´'.indexOf(c)>=0) return "'"; if(c==='–'||c==='—'||c==='‑') return '-'; return c; }
+function elNormStr(s){ var o=[], sp=true; for(var i=0;i<s.length;i++){ var c=elNormCh(s[i]); if(c===' '){ if(sp) continue; sp=true; o.push(' '); } else { sp=false; o.push(c); } } return o.join('').replace(/\s+$/,''); }
+function elHay(){
+  var w=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT), n, out=[], map=[], sp=true, lastB=null;
+  while((n=w.nextNode())){
+    if(closestOf(n,'.nb')) continue;
+    var b=closestOf(n,'p,h1,h2,h3,h4,li,div')||ed;
+    if(b!==lastB){ if(lastB!==null){ out.push('\n'); map.push(null); sp=true; } lastB=b; }
+    var v=n.nodeValue;
+    for(var i=0;i<v.length;i++){ var c=elNormCh(v[i]); if(c===' '){ if(sp) continue; sp=true; } else sp=false; out.push(c); map.push({n:n,o:i}); }
+  }
+  return {s:out.join(''),map:map};
+}
+function elFind(H,ev){
+  var s=elNormStr(ev).replace(/^["'\s]+|["'\s]+$/g,''); if(!s) return null;
+  var tries=[s], t2=s.replace(/[\s.…]+$/,'').replace(/^[\s.…]+/,''); if(t2&&t2!==s) tries.push(t2);
+  for(var k=0;k<tries.length;k++){
+    var q=tries[k], i=H.s.indexOf(q); if(i<0) continue;
+    var dup=H.s.indexOf(q,i+1)>=0;
+    return {a:i,b:i+q.length-1,note:dup?'dup':'',H:H};
+  }
+  var wd=s.replace(/[.…]+$/,'').split(' '); if(wd.length>=6){
+    var head=wd.slice(0,4).join(' '), tail=wd.slice(-4).join(' '), hi=H.s.indexOf(head);
+    if(hi>=0){ var ti=H.s.indexOf(tail,hi); if(ti>=0&&ti+tail.length-hi<=s.length*1.6+20) return {a:hi,b:ti+tail.length-1,note:'fuzzy',H:H}; }
+  }
+  return null;
+}
+function elRange(m){
+  var A=m.H.map[m.a], B=m.H.map[m.b]; if(!A||!B) return null;
+  var r=document.createRange(); r.setStart(A.n,A.o); r.setEnd(B.n,B.o+1); return r;
+}
+function elPlan(items){
+  var H=elHay(), rep={q:items.length,ev:0,found:0,qOk:0,lost:[],fuzzy:[],dup:[],noEv:[]};
+  items.forEach(function(it){
+    if(!it.evidence.length){ rep.noEv.push(it.n); return; }
+    var ok=0;
+    it.evidence.forEach(function(e){ rep.ev++; var m=elFind(H,e); if(!m) rep.lost.push({n:it.n,t:e}); else { rep.found++; ok++; if(m.note==='fuzzy') rep.fuzzy.push({n:it.n,t:e}); if(m.note==='dup') rep.dup.push({n:it.n,t:e}); } });
+    if(ok) rep.qOk++;
+  });
+  return rep;
+}
+function elApply(items,mode){
+  if(mode==='replace'){ $$('.el',ed).forEach(unwrap); L.elicits={}; }
+  var added=0;
+  items.forEach(function(it){
+    var id=uid('e'), n=0;
+    it.evidence.forEach(function(e){
+      var m=elFind(elHay(),e); if(!m) return; var r=elRange(m); if(!r) return;
+      splitNodes(r).forEach(function(t){ var s=document.createElement('span'); s.className='el'; s.setAttribute('data-el',id); wrap(t,s); n++; });
+    });
+    if(!n) return;
+    var d={q:it.q,hint:it.hint}; if(it.type) d.type=it.type; if(it.group) d.group=it.group; if(it.terms.length) d.terms=it.terms;
+    L.elicits[id]=d; added++;
+  });
+  lastElSig=null; changed(true); showTab('el',true);
+  return added;
+}
+var eliItems=null;
+function eliReport(){
+  var box=$('#eli-report'), go=$('#eli-go'), raw=$('#eli-text').value;
+  eliItems=null; go.disabled=true;
+  if(!raw.trim()){ box.innerHTML=''; return; }
+  var p=elParse(raw); if(p.err){ box.innerHTML='<div class="eli-bad">'+esc(p.err)+'</div>'; return; }
+  var r=elPlan(p.items); eliItems=p.items;
+  var lines=['<div class="eli-sum"><b>'+p.items.length+' câu hỏi</b> · '+r.ev+' căn cứ · <b>'+r.found+' tìm thấy trong bài</b>'+(r.lost.length?' · <span class="eli-warn">'+r.lost.length+' không thấy</span>':'')+'</div>'];
+  r.lost.slice(0,8).forEach(function(x){ lines.push('<div class="eli-bad">Câu '+esc(x.n)+': không tìm thấy “'+esc(short(x.t,70))+'”</div>'); });
+  if(r.lost.length>8) lines.push('<div class="eli-bad">… và '+(r.lost.length-8)+' căn cứ khác.</div>');
+  if(r.noEv.length) lines.push('<div class="eli-bad">Câu '+esc(r.noEv.slice(0,12).join(', '))+' không có căn cứ nên sẽ bị bỏ qua.</div>');
+  if(r.fuzzy.length) lines.push('<div class="eli-note">'+r.fuzzy.length+' căn cứ khớp gần đúng (AI chép lệch vài chữ), web dùng đoạn gần nhất trong bài.</div>');
+  if(r.dup.length) lines.push('<div class="eli-note">'+r.dup.length+' căn cứ xuất hiện nhiều chỗ trong bài, web gắn vào chỗ đầu tiên.</div>');
+  if(p.skip) lines.push('<div class="eli-note">Bỏ qua '+p.skip+' mục thiếu nội dung câu hỏi.</div>');
+  var cur=$$('.el',ed).length; $('#eli-mode').hidden=!cur;
+  box.innerHTML=lines.join('');
+  go.disabled=!r.qOk; go.textContent=r.qOk?'Nạp '+r.qOk+' câu vào bài':'Không có câu nào nạp được';
+}
+function openEli(){ closePops(); $('#eli-text').value=''; $('#eli-report').innerHTML=''; $('#eli-go').disabled=true; $('#eli-go').textContent='Nạp vào bài'; $('#eli-mode').hidden=true; var ad=$('#eli-mode input[value="add"]'); if(ad) ad.checked=true; $('#el-import').hidden=false; setTimeout(function(){ $('#eli-text').focus(); },50); }
+function closeEli(){ $('#el-import').hidden=true; }
+$('#el-ai-open').addEventListener('click',openEli);
+$('#eli-close').addEventListener('click',closeEli);
+$('#el-import').addEventListener('click',function(e){ if(e.target===$('#el-import')) closeEli(); });
+var eliT; $('#eli-text').addEventListener('input',function(){ clearTimeout(eliT); eliT=setTimeout(eliReport,250); });
+$('#eli-go').addEventListener('click',function(){
+  if(!eliItems) return; var md=$('#eli-mode input:checked'), mode=(!$('#eli-mode').hidden&&md)?md.value:'add';
+  var n=elApply(eliItems,mode); closeEli(); toast('Đã nạp '+n+' câu hỏi elicit vào bài.');
+});
+
 /* ---------- Import raw text ---------- */
 var impBlocks=[], impFromDocx=false;
 var CYCLE=['normal','title','subtitle','h1','h2','h3'];
@@ -3242,12 +3407,12 @@ function blocksHtml(bl){
 }
 /* Prompt for AI */
 function openPrompt(btn){
-  var ex=btn.hasAttribute('data-prompt-ex'), p=$('#pop-prompt'); $('#pp-text').value=ex?aiExamPrompt():aiPrompt(); $('#pp-h').textContent=ex?'Câu lệnh nhờ AI chuyển đề bài':'Câu lệnh nhờ AI tô màu'; $('#pp-lede').textContent=ex?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng đề gốc (có thể dán từ PDF). Chép kết quả và dán vào ô đề bài.':'Chép câu lệnh này vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng bài đọc của bạn. Khi AI trả lời, chép nguyên khối code và dán vào Studio: màu, câu hỏi và ô ghi chú tự hiện ra.';
+  var el=btn.hasAttribute('data-prompt-el'), ex=btn.hasAttribute('data-prompt-ex'), p=$('#pop-prompt'); $('#pp-text').value=el?aiElicitPrompt():ex?aiExamPrompt():aiPrompt(); $('#pp-h').textContent=el?'Câu lệnh nhờ AI tạo câu hỏi elicit':ex?'Câu lệnh nhờ AI chuyển đề bài':'Câu lệnh nhờ AI tô màu'; $('#pp-lede').textContent=el?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, rồi dán bài đọc (và danh sách câu hỏi nếu thầy cô đã có). Chép khối JSON AI trả về và dán vào “Nạp từ AI”.':ex?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng đề gốc (có thể dán từ PDF). Chép kết quả và dán vào ô đề bài.':'Chép câu lệnh này vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng bài đọc của bạn. Khi AI trả lời, chép nguyên khối code và dán vào Studio: màu, câu hỏi và ô ghi chú tự hiện ra.';
   p.hidden=false; var r=btn.getBoundingClientRect();
   p.style.left=Math.max(12,Math.min(innerWidth-p.offsetWidth-12,r.left))+'px';
   var top=r.top-p.offsetHeight-10; if(top<12) top=r.bottom+10; p.style.top=top+'px';
 }
-document.addEventListener('click',function(e){ var b=e.target.closest('[data-prompt],[data-prompt-ex]'); if(b){ openPrompt(b); return; } var p=$('#pop-prompt'); if(!p.hidden&&!p.contains(e.target)) p.hidden=true; });
+document.addEventListener('click',function(e){ var b=e.target.closest('[data-prompt],[data-prompt-ex],[data-prompt-el]'); if(b){ openPrompt(b); return; } var p=$('#pop-prompt'); if(!p.hidden&&!p.contains(e.target)) p.hidden=true; });
 $('#pp-x').addEventListener('click',function(){ $('#pop-prompt').hidden=true; });
 $('#pp-copy').addEventListener('click',function(){ var t=$('#pp-text'); RD.copy(t.value).then(function(ok){ if(!ok){ t.focus(); t.select(); } toast(ok?'Đã sao chép câu lệnh. Dán vào ChatGPT, Claude… kèm bài đọc.':'Hãy bấm Ctrl+C để chép'); }); });
 
@@ -3292,7 +3457,7 @@ function refresh(){
   var list=$('#el-list'), sig=ids.join(',');
   if(sig!==lastElSig){
     lastElSig=sig;
-    list.innerHTML=ids.map(function(id,i){ return '<div class="item" data-id="'+id+'"><div class="item-top"><span class="qbadge">Q'+(i+1)+'</span><button type="button" class="item-anchor" data-loc title="Tìm trong bài"></button><button type="button" class="ib sm" data-loc data-tip="Tìm trong bài" aria-label="Tìm trong bài">'+svg('locate')+'</button><button type="button" class="ib sm" data-del data-tip="Xoá" aria-label="Xoá câu hỏi">'+svg('trash')+'</button></div><textarea rows="2" data-f="q" placeholder="Câu hỏi…" aria-label="Câu hỏi Q'+(i+1)+'"></textarea><textarea rows="1" class="auto" data-f="hint" placeholder="Gợi ý (tuỳ chọn)" aria-label="Gợi ý Q'+(i+1)+'"></textarea></div>'; }).join('');
+    list.innerHTML=ids.map(function(id,i){ return '<div class="item" data-id="'+id+'"><div class="item-top"><span class="qbadge">Q'+(i+1)+'</span>'+elChips(L.elicits[id])+'<button type="button" class="item-anchor" data-loc title="Tìm trong bài"></button><button type="button" class="ib sm" data-loc data-tip="Tìm trong bài" aria-label="Tìm trong bài">'+svg('locate')+'</button><button type="button" class="ib sm" data-del data-tip="Xoá" aria-label="Xoá câu hỏi">'+svg('trash')+'</button></div><textarea rows="2" data-f="q" placeholder="Câu hỏi…" aria-label="Câu hỏi Q'+(i+1)+'"></textarea><textarea rows="1" class="auto" data-f="hint" placeholder="Gợi ý (tuỳ chọn)" aria-label="Gợi ý Q'+(i+1)+'"></textarea></div>'; }).join('');
     ids.forEach(function(id){ var it=list.querySelector('[data-id="'+id+'"]'); it.querySelector('[data-f="q"]').value=L.elicits[id].q||''; it.querySelector('[data-f="hint"]').value=L.elicits[id].hint||''; }); requestAnimationFrame(autoAll);
   }
   ids.forEach(function(id){ var a=list.querySelector('[data-id="'+id+'"] .item-anchor'); if(a) a.textContent='“'+map[id].map(function(x){ return x.textContent; }).join(' ').replace(/\s+/g,' ').trim()+'”'; });
@@ -3413,7 +3578,7 @@ $('#ph-x').addEventListener('click',function(){ $('#pop-help').hidden=true; });
 function exportLesson(){
   var html=cleanHTML(), tmp=document.createElement('div'); tmp.innerHTML=html;
   var els={}, nts={};
-  tmp.querySelectorAll('.el').forEach(function(a){ var id=a.getAttribute('data-el'), d=L.elicits[id]||{}; els[id]={q:d.q||'',hint:d.hint||''}; });
+  tmp.querySelectorAll('.el').forEach(function(a){ var id=a.getAttribute('data-el'), d=L.elicits[id]||{}; els[id]=elDef(d); });
   tmp.querySelectorAll('.nb').forEach(function(n){ var id=n.getAttribute('data-nb'), p=n.querySelector('.nb-p'); nts[id]={prompt:(p&&p.textContent.trim())||(L.notes[id]&&L.notes[id].prompt)||''}; });
   return {v:1,id:L.id,title:L.title||'Bài đọc',subtitle:L.subtitle||'',level:L.level||'',cat:L.cat||'',examOn:!!L.examOn,examText:L.examText||'',examOpen:!!L.examOpen,examCheck:L.examCheck!==false,exam:(L.examOn?RD.parseExam(L.examText):null),codes:L.codes,styles:L.styles,html:html,elicits:els,notes:nts};
 }
