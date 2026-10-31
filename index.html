@@ -4683,12 +4683,12 @@ function dvCtxItems(sel){
 }
 function dvBlankMenu(){
   if(DV.sec==='trash') return [{a:'emptytrash',t:'Dọn sạch thùng rác',ic:'trash',danger:true}];
-  var l=[{a:'newfolder',t:'Thư mục mới',ic:'folderPlus',k:'Ctrl + Shift + N'},{a:'newlesson',t:'Bài đọc mới',ic:'plus'},'-',{a:'paste',t:'Dán',ic:'paste',k:'Ctrl + V',dis:!DV.clip},{a:'selectall',t:'Chọn tất cả',k:'Ctrl + A'},'-',
+  var l=[{a:'newfolder',t:'Thư mục mới',ic:'folderPlus',k:'Ctrl + Shift + N'},{a:'newlesson',t:'Bài đọc mới',ic:'plus'},{a:'upload',t:'Tải tệp lên',ic:'upload'},'-',{a:'paste',t:'Dán',ic:'paste',k:'Ctrl + V',dis:!DV.clip},{a:'selectall',t:'Chọn tất cả',k:'Ctrl + A'},'-',
     {a:'vgrid',t:'Xem dạng lưới',ic:'grid',chk:DV.view==='grid'},{a:'vlist',t:'Xem dạng danh sách',ic:'rows',chk:DV.view==='list'},'-',{a:'info',t:'Chi tiết thư mục',ic:'info'}];
   return l;
 }
 function dvSortMenu(x,y){ dvMenu(x,y,[{a:'sort:name',t:'Tên',chk:DV.sort==='name'},{a:'sort:mod',t:'Ngày sửa đổi',chk:DV.sort==='mod'},{a:'sort:kind',t:'Trạng thái (nháp / hoàn tất)',chk:DV.sort==='kind'},'-',{a:'dir',t:DV.dir>0?'Đảo thứ tự (Z → A)':'Đảo thứ tự (A → Z)',ic:'up'}]); }
-function dvNewMenu(x,y){ dvMenu(x,y,[{a:'newfolder',t:'Thư mục mới',ic:'folderPlus',k:'Ctrl + Shift + N'},{a:'newlesson',t:'Bài đọc mới',ic:'plus'}]); }
+function dvNewMenu(x,y){ dvMenu(x,y,[{a:'newfolder',t:'Thư mục mới',ic:'folderPlus',k:'Ctrl + Shift + N'},'-',{a:'newlesson',t:'Bài đọc mới (soạn từ đầu)',ic:'plus'},{a:'upload',t:'Tải tệp lên (.txt, .md, .docx)',ic:'upload'}]); }
 function dvDo(a,sel){
   var s=sel||dvSelItems();
   switch(a){
@@ -4714,6 +4714,7 @@ function dvDo(a,sel){
     case 'delforever': if(s.length) dvConfirm('Xóa vĩnh viễn?','Xóa '+s.length+' mục vĩnh viễn. Thao tác này không thể hoàn tác.','Xóa vĩnh viễn',function(){ dvDelForever(s); }); break;
     case 'emptytrash': var all=dvAll(); if(!all.length){ dvSnack('Thùng rác đang trống.'); break; } dvConfirm('Dọn sạch thùng rác?','Xóa vĩnh viễn '+all.length+' mục trong thùng rác. Thao tác này không thể hoàn tác.','Dọn sạch',function(){ dvDelForever(all); }); break;
     case 'newfolder': dvNewFolder(); break;
+    case 'upload': newInFolder=DV.sec==='my'?DV.cur:''; leaveHome(); showStart(); setTimeout(function(){ var f=$('#imp-file'); if(f) f.click(); },150); break;
     case 'newlesson': newInFolder=DV.sec==='my'?DV.cur:''; leaveHome(); showStart(); break;
     case 'selectall': var ks=dvAll().map(function(i){ return dvKey(i.k,i.id); }); dvSetSel(ks,ks[0]||null); break;
     case 'vgrid': case 'vlist': DV.view=a==='vgrid'?'grid':'list'; try{ localStorage.setItem('rls:dv:view',DV.view); }catch(e){} dvTop(); dvArea(); break;
@@ -4809,7 +4810,7 @@ rrRoot.addEventListener('drop',function(e){
   if(!tg){ DV.drag=null; return; } e.preventDefault(); var dest=tg.getAttribute('data-dvdrop'), items=DV.drag.map(dvGet).filter(Boolean); DV.drag=null; dvMove(items,dest);
 });
 rrRoot.addEventListener('dragend',function(){ DV.drag=null; rrRoot.querySelectorAll('.dv-it.drag,.dv-over').forEach(function(x){ x.classList.remove('drag','dv-over'); }); });
-document.addEventListener('click',function(e){ if(!e.target.closest('.dv-menu')) dvMenuClose(); });
+document.addEventListener('click',function(e){ if(!e.target.closest('.dv-menu,[data-dva=newmenu],[data-dva=sortmenu]')) dvMenuClose(); });
 rrRoot.addEventListener('focusout',function(e){ if(e.target.hasAttribute&&e.target.hasAttribute('data-dvren')&&DV.ren){ var v=e.target.value; setTimeout(function(){ if(DV.ren) dvCommitRename(v,false); },0); } });
 
 loadUI(); topH();
