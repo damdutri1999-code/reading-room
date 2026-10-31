@@ -2262,7 +2262,7 @@ RR.init=function(opts){
   function app(){ return opts.app(); }
   function lessons(){ return opts.lessons()||[]; }
   function roles(){
-    var s='<button type="button" class="rr-role s" data-go="lib"><span class="ri">'+IC.book+'</span><b>Học viên '+IC.arr+'</b><small>Vào kho bài đọc của lớp</small></button>';
+    var s='<button type="button" class="rr-role s" data-go="lib"><span class="ri">'+IC.book+'</span><b>Học viên '+IC.arr+'</b><small>'+(opts.studentHref?'Vào kho chung':'Vào kho bài đọc của lớp')+'</small></button>';
     var t=opts.teacher?'<button type="button" class="rr-role t" data-go="teacher"><span class="ri">'+IC.pen+'</span><b>Giáo viên '+IC.arr+'</b><small>Nạp bài mới, chỉnh bài</small></button>':'';
     return '<div class="rr-roles'+(opts.teacher?'':' one')+'">'+s+t+'</div>';
   }
@@ -2354,7 +2354,7 @@ RR.init=function(opts){
   });
   main.addEventListener('click',function(e){
     var t=e.target.closest('[data-go],[data-mode],[data-lv],[data-cat],[data-open]'); if(!t||!main.contains(t)) return;
-    if(t.hasAttribute('data-go')) go(t.getAttribute('data-go'));
+    if(t.hasAttribute('data-go')){ var gv=t.getAttribute('data-go'); if(gv==='lib'&&opts.studentHref&&view==='home'){ var sh=opts.studentHref(); if(sh){ location.assign(sh); return; } } go(gv); }
     else if(t.hasAttribute('data-mode')){ libMode=t.getAttribute('data-mode'); try{ localStorage.setItem('rr:lib',libMode); }catch(err){} main.querySelectorAll('[data-mode]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===t)); }); renderLib(); }
     else if(t.hasAttribute('data-cat')){ libCat=t.getAttribute('data-cat'); main.querySelectorAll('[data-cat]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===t)); }); renderLib(); }
     else if(t.hasAttribute('data-lv')){ libLv=t.getAttribute('data-lv'); main.querySelectorAll('[data-lv]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===t)); }); renderLib(); }
@@ -3731,7 +3731,7 @@ function showHome(v){
   closePops(); if(pen) setPen(null);
   if(!$('#studio').hidden||!$('#preview').hidden){ if(!$('#preview').hidden) setMode('edit'); changed(true); }
   document.body.classList.add('rr-on');
-  if(!rrCtl) rrCtl=RR.init({root:rrRoot, mode:'studio', app:function(){ return LIB.app; }, lessons:libLessons,
+  if(!rrCtl) rrCtl=RR.init({root:rrRoot, mode:'studio', studentHref:function(){ return khoLink('chung'); }, app:function(){ return LIB.app; }, lessons:libLessons,
     status:function(){ return {st:'new',p:0}; }, teacher:renderTeacherHub, usage:function(){ var c=cl(); if(!(c&&clUrl(c.url)&&c.key)) return Promise.resolve(null); return clCall('get_usage',{}); }, gate:{ok:authOk,name:authName,login:authLogin,logout:authLogout}, onEdit:function(){ leaveHome(); }, onBack:function(){ document.body.classList.add('rr-on'); if($('#preview')&&!$('#preview').hidden) setMode('edit'); },
     openLesson:function(x,host){ return RD.mount(host,x,{},{persist:false}); }});
   rrCtl.show(v||'home');
