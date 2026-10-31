@@ -3067,17 +3067,30 @@ function aiExamPrompt(){
   '- Điền từ: chỗ trống viết ______ ; nhiều đáp án chấp nhận thì ngăn bằng dấu /.\n- Nếu đề không có đáp án thì bỏ phần [ĐA: …].\n\nĐỀ GỐC:\n<dán đề vào đây>';
 }
 /* Prompt to hand to an AI */
+var CODE_RULE={
+  main:'Câu chủ đề / luận điểm / câu tóm ý của một đoạn (thường là câu đầu hoặc câu cuối đoạn). Tô NGUYÊN CÂU. Mỗi đoạn thường 1 câu, tối đa 2.',
+  key:'Từ khoá hoặc thuật ngữ mang chủ đề của đoạn. Chỉ tô từ hoặc cụm ngắn (1 đến 4 chữ), khoảng 2 đến 5 chỗ mỗi đoạn; không tô từ thông dụng như "the", "people".',
+  signal:'Từ nối, signpost, liên từ chuyển ý (First of all, Another reason, Also, However, For example, For instance, Then, In conclusion…). CHỈ tô chính từ/cụm đó, không tô cả câu.',
+  evidence:'Câu hoặc cụm nêu ví dụ, chi tiết, số liệu, lời giải thích dùng để chứng minh hoặc làm rõ ý chính. Tô nguyên câu/cụm; không trùng với câu đã tô main.'
+};
+function promptColor(){
+  var codes=L.codes.map(function(c){ return '['+c.id+']…[/'+c.id+']  =  '+c.label+'. '+(CODE_RULE[c.id]||CODE_HINT[c.id]||''); }).join('\n');
+  return 'THẺ MÀU (tên thẻ viết thường, mở bằng [tên], đóng bằng [/tên]):\n'+codes+'\n\n'+
+  'QUY TẮC TÔ MÀU\n'+
+  '- Giữ nguyên 100% chữ gốc: không sửa, không thêm, không bớt, không dịch, không đổi dấu câu. Chỉ chèn thẻ.\n'+
+  '- Phân tích bài trước khi tô: tìm chủ đề, ý chính từng đoạn, từ khoá, signpost, ví dụ và dẫn chứng.\n'+
+  '- Mỗi thẻ mở phải có thẻ đóng cùng tên. Thẻ không được bắc qua ranh giới giữa hai đoạn (mỗi đoạn tự đóng đủ thẻ của mình).\n'+
+  '- Có thể lồng thẻ nhỏ vào thẻ lớn, ví dụ signal hoặc key nằm trong main hoặc evidence. Không lồng hai thẻ cùng loại; đóng thẻ theo thứ tự ngược với thứ tự mở.\n'+
+  '- Không tô màu cho tiêu đề. Không tô cả đoạn bằng một thẻ duy nhất nếu đoạn có nhiều ý.\n'+
+  '- Mỗi đoạn văn cách nhau MỘT dòng trống. Giữ đúng số đoạn và thứ tự đoạn của bài gốc.\n'+
+  '- Tiêu đề và heading đặt đầu dòng: "# Tiêu đề bài", "> Phụ đề" (nếu bài có), "## Heading 1", "### Heading 2". Có thể dùng **đậm**, *nghiêng* nếu bài gốc có.\n\n'+
+  'VÍ DỤ ĐOẠN ĐÃ TÔ:\n'+
+  '[main]Rest helps our bodies feel better.[/main] After a busy day, we may feel [key]tired[/key]. [signal]For example[/signal], [evidence]a student who rests after studying may have more energy later.[/evidence]\n';
+}
 function aiPrompt(){
-  var codes=L.codes.map(function(c){ return '['+c.id+']…[/'+c.id+'] = '+c.label+(CODE_HINT[c.id]?': '+CODE_HINT[c.id]:''); }).join('\n');
-  return 'Bạn là trợ lý soạn bài Reading comprehension. Hãy tô màu bài đọc ở cuối bằng các thẻ dưới đây.\n'+
-  'Giữ nguyên 100% chữ gốc, không sửa, không thêm lời giải thích. Trả kết quả trong MỘT khối code (```text … ```) để tôi chép nguyên văn.\n\n'+
-  'MÃ MÀU (bọc quanh từ hoặc cụm từ):\n'+codes+'\n\n'+
-  'CÂU HỎI DẪN DẮT (elicit) — bọc quanh đúng cụm chữ mà câu hỏi nhắm tới, 1 câu hỏi cho mỗi đoạn là đủ:\n[q: Câu hỏi bằng tiếng Anh | Gợi ý ngắn]cụm chữ[/q]\n\n'+
-  'Ô GHI CHÚ cho học viên — đặt trên một dòng riêng, ngay sau đoạn văn cần ghi chú:\n[note: Đề bài ghi chú]\n\n'+
-  'TIÊU ĐỀ VÀ HEADING (đầu dòng):\n# Tiêu đề bài\n> Phụ đề hoặc hướng dẫn (nếu có)\n## Heading 1\n### Heading 2\n#### Heading 3\n\n'+
-  'Có thể dùng thêm: **đậm**, *nghiêng*, [color=#e03131]màu chữ[/color].\n'+
-  'Các thẻ được lồng nhau, ví dụ: [q: What does this word signal? | Look at paragraph 1][signal]However[/signal][/q]\n'+
-  'Mỗi đoạn văn cách nhau một dòng trống.\n\n'+
+  return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh. Công cụ của giáo viên đọc kết quả của bạn bằng chương trình, nên phải đúng định dạng dưới đây.\n\n'+
+  'NHIỆM VỤ: tô màu bài đọc ở cuối bằng các thẻ.\n\n'+promptColor()+'\n'+
+  'ĐỊNH DẠNG TRẢ LỜI: chỉ một khối code ```text … ``` chứa bài đã tô màu. Không thêm lời dẫn, giải thích hay chú thích ngoài khối code.\n\n'+
   'BÀI ĐỌC:\n<dán bài đọc vào đây>';
 }
 
@@ -3086,7 +3099,7 @@ var EL_TYPES={yn:'Yes/No',wh:'WH',research:'Tra cứu'};
 function elChips(d){ d=d||{}; return (d.type&&EL_TYPES[d.type]?'<span class="el-chip t-'+d.type+'">'+EL_TYPES[d.type]+'</span>':'')+(d.group?'<span class="el-chip">'+esc(d.group)+'</span>':''); }
 var EL_CRITERIA=
 'MỤC TIÊU CỦA BỘ CÂU HỎI ELICIT\n'+
-'Tạo bộ câu hỏi gợi mở bằng tiếng Việt, bám sát chính xác nội dung bài đọc. Câu hỏi giúp học viên hiểu chủ đề, theo dõi lập luận và nhận ra cách các ý trong bài liên kết với nhau. Hãy tạo đủ nhiều câu hỏi hữu ích để giáo viên xem lại và xoá bớt. Số lượng cụ thể do giáo viên cho biết ở phần “THÔNG TIN GIÁO VIÊN CUNG CẤP”; nếu chưa ghi thì tạo khoảng 15 đến 20 câu.\n\n'+
+'Tạo bộ câu hỏi gợi mở bằng tiếng Việt, bám sát chính xác nội dung bài đọc. Câu hỏi giúp học viên hiểu chủ đề, theo dõi lập luận và nhận ra cách các ý trong bài liên kết với nhau. Hãy tạo đủ nhiều câu hỏi hữu ích để giáo viên xem lại và xoá bớt. Số lượng cụ thể nằm ở mục SO_CAU_ELICIT trong phần DỮ LIỆU ĐẦU VÀO; nếu chưa có thì tạo khoảng 15 đến 20 câu.\n\n'+
 'QUY TẮC CHUNG\n'+
 '1. Mỗi câu hỏi phải dựa trên một câu, cụm từ hoặc chi tiết thực sự có trong bài đọc.\n'+
 '2. Với mỗi câu hỏi, trích nguyên văn phần làm căn cứ vào trường "evidence". Không tự sửa câu trích dẫn.\n'+
@@ -3116,18 +3129,31 @@ var EL_CRITERIA=
 '- type chỉ là "yn", "wh" hoặc "research".\n'+
 '- "evidence" là MẢNG các đoạn chữ chép NGUYÊN VĂN từ bài (đúng từng chữ, chữ hoa/thường, dấu câu), mỗi đoạn tối đa một câu, KHÔNG dùng dấu “…”, không dịch, không viết lại. Căn cứ nằm ở hai chỗ thì ghi thành hai mục. Nhiều câu hỏi được dùng chung một đoạn evidence.\n'+
 '- Đảm bảo JSON hợp lệ: dấu ngoặc kép và dấu phẩy đúng chuẩn, không có dấu phẩy thừa cuối danh sách.\n';
-var EL_INPUT='THÔNG TIN GIÁO VIÊN CUNG CẤP (điền hoặc xoá dòng không dùng)\n- Số lượng câu hỏi elicit: <điền số, ví dụ 20>\n- Câu hỏi IELTS Reading có sẵn (nếu có, dán vào đây): <…>\n- Dạng Multiple Choice về ý đồ/hàm ý tác giả (nếu có, dán vào đây): <…>\n\nBÀI ĐỌC:\n<dán bài đọc vào đây>';
+var EL_INPUT=
+'=== DỮ LIỆU ĐẦU VÀO ===\n'+
+'SO_CAU_ELICIT: <điền số câu>\n'+
+'CAU_HOI_IELTS_READING: <dán câu hỏi IELTS Reading nếu có>\n'+
+'CAU_HOI_Y_DO_TAC_GIA: <dán dạng Multiple Choice về ý đồ/hàm ý tác giả nếu có>\n'+
+'BAI_DOC:\n<dán bài đọc vào đây>\n\n'+
+'Quy ước: mục nào còn nguyên dấu < > nghĩa là giáo viên không cung cấp. Khi đó: SO_CAU_ELICIT mặc định 15 đến 20 câu; bỏ qua hoàn toàn nhóm "Thông tin sẽ cần" và nhóm "Ý đồ tác giả"; vẫn tạo các nhóm "Dòng lập luận", "Coherence", "Kiến thức".';
+var EL_CHECK='TỰ KIỂM TRA TRƯỚC KHI TRẢ LỜI\n'+
+'1. Mọi chuỗi trong "evidence" đều xuất hiện NGUYÊN VĂN, đúng từng chữ và dấu câu, trong bài đọc gốc (không kèm thẻ màu).\n'+
+'2. JSON hợp lệ (ngoặc, dấu phẩy, dấu nháy kép); không có trường ngoài danh sách cho phép; "terms" chỉ có ở type "research".\n'+
+'3. Số câu đúng SO_CAU_ELICIT (nếu có); tỷ lệ "yn"/"wh" xấp xỉ 60/40; câu research đứng ngay sau câu về chi tiết liên quan.\n'+
+'4. Nhóm "Thông tin sẽ cần" và "Ý đồ tác giả" chỉ xuất hiện khi giáo viên đã cung cấp dữ liệu tương ứng.\n';
+var EL_WHY='Công cụ của giáo viên xử lý kết quả của bạn như sau: nó tìm từng chuỗi trong "evidence" trong bài đọc rồi gắn câu hỏi vào đúng chỗ đó; học viên đọc bài và thấy câu hỏi hiện bên cạnh đoạn văn. Vì vậy "evidence" phải khớp chữ trong bài tuyệt đối; nếu không khớp, câu hỏi sẽ bị mất.\n\n';
 function aiElicitPrompt(){
-  return 'Bạn là trợ lý soạn bài Reading comprehension. Hãy đọc bài đọc ở cuối rồi soạn bộ câu hỏi elicit theo các tiêu chí dưới đây.\nChỉ trả MỘT khối code ```json … ``` chứa JSON hợp lệ, không thêm lời dẫn, lời kết hay chú thích. Không chép lại bài đọc.\n\n'+EL_CRITERIA+'\n'+EL_INPUT;
+  return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh.\n\nNHIỆM VỤ: đọc bài đọc ở cuối và soạn bộ câu hỏi elicit theo các tiêu chí dưới đây.\n\n'+EL_WHY+EL_CRITERIA+'\n'+EL_CHECK+'\n'+
+  'ĐỊNH DẠNG TRẢ LỜI: chỉ một khối code ```json … ``` chứa JSON hợp lệ. Không thêm lời dẫn, lời kết hay chú thích; không chép lại bài đọc.\n\n'+EL_INPUT;
 }
 function aiAllPrompt(){
-  var codes=L.codes.map(function(c){ return '['+c.id+']…[/'+c.id+'] = '+c.label+(CODE_HINT[c.id]?': '+CODE_HINT[c.id]:''); }).join('\n');
-  return 'Bạn là trợ lý soạn bài Reading comprehension. Hãy làm ba bước với bài đọc ở cuối.\n\n'+
-  'BƯỚC 1. PHÂN TÍCH (làm trong đầu, không cần viết ra): xác định chủ đề, ý chính của từng đoạn, từ khoá, từ nối/signpost, ví dụ và dẫn chứng, cách các ý nối với nhau.\n\n'+
-  'BƯỚC 2. TÔ MÀU bài đọc bằng các thẻ sau. Giữ nguyên 100% chữ gốc, không sửa, không thêm, không bớt.\n'+codes+'\n'+
-  'Tiêu đề và heading đặt đầu dòng: # Tiêu đề bài, > Phụ đề (nếu có), ## Heading 1, ### Heading 2. Có thể dùng **đậm**, *nghiêng*. Các thẻ được lồng nhau. Mỗi đoạn văn cách nhau một dòng trống. Không dùng thẻ [q: …] trong bước này, câu hỏi elicit nằm ở bước 3.\n\n'+
-  'BƯỚC 3. ĐẶT CÂU HỎI ELICIT dưới dạng JSON theo các tiêu chí sau.\n\n'+EL_CRITERIA+'\n'+
-  'ĐỊNH DẠNG TRẢ LỜI: đúng HAI khối code, theo thứ tự, không thêm lời dẫn hay chú thích:\n1) khối ```text chứa bài đọc đã tô màu (bước 2);\n2) khối ```json chứa JSON elicit (bước 3). Evidence trong JSON phải chép từ bài GỐC, không kèm thẻ màu.\n\n'+EL_INPUT;
+  return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh.\n\nNHIỆM VỤ: với bài đọc ở cuối, hãy (1) phân tích bài, (2) tô màu bài bằng thẻ, (3) soạn câu hỏi elicit dạng JSON. Công cụ của giáo viên đọc kết quả của bạn bằng chương trình nên phải đúng định dạng. Bước phân tích làm âm thầm, không cần viết ra.\n\n'+
+  '########## PHẦN 1: TÔ MÀU ##########\n'+promptColor()+'\n'+
+  '########## PHẦN 2: CÂU HỎI ELICIT ##########\n'+EL_WHY+EL_CRITERIA+'\n'+EL_CHECK+'\n'+
+  '########## ĐỊNH DẠNG TRẢ LỜI ##########\n'+
+  'Trả lời đúng HAI khối code, theo thứ tự, không có lời dẫn, lời kết hay chú thích nào ngoài hai khối:\n'+
+  '1) Khối ```text chứa bài đọc đã tô màu (Phần 1).\n'+
+  '2) Khối ```json chứa JSON elicit (Phần 2). "evidence" chép từ bài GỐC, không kèm thẻ màu.\n\n'+EL_INPUT;
 }
 function elType(t){ var s=String(t||'').toLowerCase(); if(/research|tra\s*c|\*/.test(s)) return 'research'; if(/^(yn|y\/n|yes|no|tf)|yes\s*\/?\s*no|có\s*\/?\s*không/.test(s)) return 'yn'; return 'wh'; }
 function elParse(raw){
