@@ -758,7 +758,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .dv-b{font:600 10.5px/1 var(--rr-ui);font-style:normal;padding:4px 7px;border-radius:999px;background:color-mix(in srgb,var(--rr-fg) 10%,transparent)}
 .dv-b.b1{background:color-mix(in srgb,#2e9e5b 25%,transparent)}.dv-b.b2{background:color-mix(in srgb,#3b82f6 25%,transparent)}.dv-b.b0{background:color-mix(in srgb,#f59e0b 25%,transparent)}
 .dv-ren{width:100%;font:inherit;color:var(--rr-fg);background:var(--rr-bg);border:2px solid var(--rr-accent);border-radius:6px;padding:3px 6px;outline:0}
-.dv-lh,.dv-row{display:grid;grid-template-columns:minmax(0,1fr) 100px 110px 130px 110px;gap:10px;align-items:center;padding:0 12px}
+.dv-lh,.dv-row{display:grid;grid-template-columns:minmax(0,1fr) 100px 110px 70px 120px 100px;gap:10px;align-items:center;padding:0 12px}
 .dv-lh{font:600 12px var(--rr-ui);opacity:.65;height:32px;border-bottom:1px solid var(--rr-line)}
 .dv-row{height:46px;border-radius:8px;border:1px solid transparent;font:13.5px var(--rr-ui);cursor:default;user-select:none}
 .dv-row:hover{background:color-mix(in srgb,var(--rr-fg) 5%,transparent)}
@@ -1554,7 +1554,7 @@ html.rr-fs-on{overflow:hidden}
     </div>
 
     <article class="sheet">
-      <div class="eyebrow-row"><span class="eyebrow">Reading comprehension</span><label class="lvl"><span>Loại bài</span><select id="i-cat" aria-label="Loại bài"><option value="">Chọn loại bài</option><option value="ielts">IELTS Cam</option><option value="content">Kiến thức</option></select></label><label class="lvl"><span>Trình độ</span><select id="i-level" aria-label="Trình độ"><option value="">Chưa chọn</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option><option>IELTS</option></select></label><label class="lvl lvl-topic"><span>Topic</span><input id="i-topic" list="topic-list" maxlength="40" placeholder="Chủ đề, vd: Family" autocomplete="off" aria-label="Topic (chủ đề)"><datalist id="topic-list"></datalist></label></div>
+      <div class="eyebrow-row"><span class="eyebrow">Reading comprehension</span><label class="lvl"><span>Loại bài</span><select id="i-cat" aria-label="Loại bài"><option value="">Chọn loại bài</option><option value="ielts">IELTS Cam</option><option value="content">Kiến thức</option></select></label><label class="lvl"><span>Trình độ</span><select id="i-level" aria-label="Trình độ CEFR"><option value="">Chưa chọn</option><option>A1</option><option>A1-A2</option><option>A2</option><option>A2-B1</option><option>B1</option><option>B1-B2</option><option>B2</option><option>B2-C1</option><option>C1</option><option>C1-C2</option><option>C2</option><option>IELTS</option></select></label><label class="lvl lvl-topic"><span>Topic</span><input id="i-topic" list="topic-list" maxlength="40" placeholder="Chủ đề, vd: Family" autocomplete="off" aria-label="Topic (chủ đề)"><datalist id="topic-list"></datalist></label></div>
       <textarea id="i-title" class="title-in" rows="1" placeholder="Tiêu đề bài đọc" aria-label="Tiêu đề bài đọc"></textarea>
       <textarea id="i-sub" class="sub-in" rows="1" placeholder="Hướng dẫn cho học viên (tuỳ chọn)" aria-label="Hướng dẫn cho học viên"></textarea>
       <div class="legend" id="legend"></div>
@@ -4825,7 +4825,7 @@ function dvBadges(it,noTopic){
   if(it.k==='f') return '';
   var x=it.o;
   if(DV.sec==='trash') return '';
-  return (x.topic&&!noTopic?'<i class="dv-b bt" title="Topic">'+esc(x.topic)+'</i>':'')+(x.done?(x.shared?'<i class="dv-b b2" title="Đang ở kho chung">Chung</i>':''):'<i class="dv-b b0">Bản nháp</i>');
+  return (x.level&&!noTopic?'<i class="dv-b b2" title="Level CEFR">'+esc(x.level)+'</i>':'')+(x.topic&&!noTopic?'<i class="dv-b bt" title="Topic">'+esc(x.topic)+'</i>':'')+(x.done?(x.shared?'<i class="dv-b b2" title="Đang ở kho chung">Chung</i>':''):'<i class="dv-b b0">Bản nháp</i>');
 }
 function dvLoc(it){
   if(it.k==='l'){ var fs=fl(it.o).filter(function(f){ return LIB.folders[f]; }); return fs.length?fs.map(function(f){ var p=folderPath(f); return p.map(function(q){ return q.name; }).join(' › '); }).join(' · '):'Tất cả bài đọc'; }
@@ -4844,11 +4844,11 @@ function dvArea(){
     var msg=DV.q?'Không tìm thấy mục nào khớp.':DV.sec==='trash'?'Thùng rác trống.':DV.sec==='starred'?'Chưa có mục nào gắn dấu sao. Bấm chuột phải vào một bài hoặc thư mục để gắn.':DV.sec==='loose'?'Không còn bài nào chưa phân. Bài hoàn tất mới sẽ hiện ở đây cho tới khi thầy xếp vào thư mục.':DV.sec==='recent'?'Chưa có bài nào.':'Thư mục này trống. Bấm chuột phải để tạo thư mục hoặc bài mới.';
     h='<div class="dv-empty">'+dvIc(DV.sec==='trash'?'trash':'folder')+'<p>'+msg+'</p></div>';
   } else if(list){
-    h='<div class="dv-lh" aria-hidden="true"><span>Tên</span><span>Chủ sở hữu</span><span>'+(DV.sec==='trash'?'Vị trí cũ':'Sửa đổi')+'</span><span>Chủ đề</span><span>Trạng thái</span></div><div class="dv-list" role="listbox" aria-multiselectable="true">';
+    h='<div class="dv-lh" aria-hidden="true"><span>Tên</span><span>Chủ sở hữu</span><span>'+(DV.sec==='trash'?'Vị trí cũ':'Sửa đổi')+'</span><span>Level</span><span>Chủ đề</span><span>Trạng thái</span></div><div class="dv-list" role="listbox" aria-multiselectable="true">';
     items.forEach(function(it){ var key=dvKey(it.k,it.id), s=DV.sel.indexOf(key)>=0;
       h+='<div class="dv-it dv-row'+(s?' sel':'')+'" role="option" aria-selected="'+s+'" data-dvk="'+key+'" draggable="'+(DV.sec==='trash'||DV.ren===key?'false':'true')+'"'+(it.k==='f'&&DV.sec!=='trash'?' data-dvdrop="'+esc(it.id)+'"':'')+'>'+
         '<span class="dv-c1">'+(it.k==='f'?dvIc('folder','fi'):'<span class="dv-mini">'+RR.thumb(it.o,'width:100%;height:100%')+'</span>')+dvNameHtml(it)+(it.o.starred?dvIc('star','st'):'')+'</span>'+
-        '<span class="dv-c2">'+esc(ownerName())+'</span><span class="dv-c3">'+(DV.sec==='trash'?esc(dvLoc(it)):(it.t?fmtDate(it.t):'–'))+'</span><span class="dv-c5">'+(it.k==='l'&&it.o.topic&&DV.sec!=='trash'?'<i class="dv-b bt" title="Topic">'+esc(it.o.topic)+'</i>':'')+'</span><span class="dv-c4">'+dvBadges(it,true)+'</span></div>'; });
+        '<span class="dv-c2">'+esc(ownerName())+'</span><span class="dv-c3">'+(DV.sec==='trash'?esc(dvLoc(it)):(it.t?fmtDate(it.t):'–'))+'</span><span class="dv-c5">'+(it.k==='l'&&it.o.level&&DV.sec!=='trash'?'<i class="dv-b b2" title="Level CEFR">'+esc(it.o.level)+'</i>':'')+'</span><span class="dv-c5">'+(it.k==='l'&&it.o.topic&&DV.sec!=='trash'?'<i class="dv-b bt" title="Topic">'+esc(it.o.topic)+'</i>':'')+'</span><span class="dv-c4">'+dvBadges(it,true)+'</span></div>'; });
     h+='</div>';
   } else {
     var fo=items.filter(function(i){ return i.k==='f'; }), fl=items.filter(function(i){ return i.k==='l'; });
@@ -5042,6 +5042,19 @@ function dvPicker(items,mode){
   });
   m.addEventListener('keydown',function(e){ if(e.key==='Escape'){ e.stopPropagation(); m.remove(); } });
 }
+var CEFR=['A1','A1-A2','A2','A2-B1','B1','B1-B2','B2','B2-C1','C1','C1-C2','C2','IELTS'];
+function dvLevel(items){
+  var ls=items.filter(function(it){ return it.k==='l'; }); if(!ls.length) return;
+  var cur=ls.map(function(it){ return it.o.level||''; }), same=cur.every(function(v){ return v===cur[0]; });
+  var m=document.createElement('div'); m.className='dv-modal';
+  m.innerHTML='<div class="dv-dlg" role="dialog" aria-modal="true" aria-label="Đặt level"><h4>Level CEFR cho '+(ls.length>1?ls.length+' bài':'bài đọc')+'</h4><div class="dv-tchips" role="group">'+CEFR.map(function(t){ return '<button type="button" class="dv-tc'+(same&&t===cur[0]?' on':'')+'" data-lv="'+t+'">'+t+'</button>'; }).join('')+'</div><div class="dv-dlg-b"><button type="button" class="tw-btn" data-dvm="clear">Xoá level</button><span class="sp"></span><button type="button" class="tw-btn" data-dvm="cancel">Huỷ</button></div></div>';
+  rrRoot.querySelector('[data-dv]').appendChild(m);
+  function apply(v){ ls.forEach(function(it){ if(v) it.o.level=v; else delete it.o.level; if(L.id===it.id) L.level=v; dvTouch(it); });
+    saveLib(); m.remove(); dvRefresh(); try{ hubRefresh2(); }catch(_){}
+    var msg=v?'Đã đặt level '+v:'Đã xoá level'; if(ls.some(function(it){ return it.o.done; })) autoPub(msg); else dvSnack(msg); }
+  m.addEventListener('click',function(e){ var c=e.target.closest('[data-lv]'); if(c){ apply(c.getAttribute('data-lv')); return; } var b=e.target.closest('[data-dvm]'); if(!b&&e.target!==m) return; if(b&&b.getAttribute('data-dvm')==='clear') apply(''); else m.remove(); });
+  m.addEventListener('keydown',function(e){ if(e.key==='Escape'){ e.stopPropagation(); m.remove(); } });
+}
 function dvTopic(items){
   var ls=items.filter(function(it){ return it.k==='l'; }); if(!ls.length) return;
   var cur=ls.map(function(it){ return it.o.topic||''; }), same=cur.every(function(v){ return v===cur[0]; });
@@ -5079,7 +5092,7 @@ function dvCtxItems(sel){
   L1.push('-');
   L1.push({a:'rename',t:'Đổi tên',ic:'pen',k:'F2',dis:!one});
   L1.push({a:'moveto',t:'Di chuyển đến…',ic:'move'});
-  if(anyL.length) L1.push({a:'topic',t:'Đặt chủ đề (Topic)…',ic:'pen'});
+  if(anyL.length){ L1.push({a:'topic',t:'Đặt chủ đề (Topic)…',ic:'pen'}); L1.push({a:'level',t:'Đặt level CEFR…',ic:'pen'}); }
   if(anyL.length) L1.push({a:'linkto',t:'Thêm vào thư mục khác (không nhân bản)',ic:'link'});
   if(anyL.length&&DV.sec==='my'&&DV.cur&&!DV.q) L1.push({a:'unlink',t:'Bỏ khỏi thư mục này',ic:'x'});
   L1.push({a:'dup',t:'Nhân đôi thành bài mới',ic:'copy',k:'Ctrl + D'});
@@ -5113,6 +5126,7 @@ function dvDo(a,sel){
     case 'dup': if(s.length) dvDup(s); break;
     case 'moveto': if(s.length) dvPicker(s); break;
     case 'topic': if(s.length) dvTopic(s); break;
+    case 'level': if(s.length) dvLevel(s); break;
     case 'copy': if(s.length) dvCopyClip(s,'copy'); break;
     case 'cut': if(s.length) dvCopyClip(s,'cut'); break;
     case 'paste': dvPaste(); break;
