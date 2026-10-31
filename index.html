@@ -777,6 +777,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 @media (max-width:760px){.dv,.dv:has(.dv-info:not([hidden])){grid-template-columns:1fr;height:auto;max-height:none}.dv-side{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--rr-line)}.dv-store{display:none}.dv-new{height:38px;padding:0 12px}.dv-nav span{white-space:nowrap}.dv-info{border-left:0;border-top:1px solid var(--rr-line)}.dv-lh,.dv-row{grid-template-columns:minmax(0,1fr) 90px}.dv-lh span:nth-child(2),.dv-lh span:nth-child(4),.dv-c2,.dv-c4{display:none}.dv-area{max-height:70vh}}
 .dv-th .rr-thumb,.dv-mini .rr-thumb{display:block;width:100%;height:100%;aspect-ratio:auto;border-radius:0!important}
 .dv-th.big .rr-thumb{border-radius:10px!important}
+.tw-adv{margin-top:14px;border-top:1px dashed var(--rr-line);padding-top:10px}.tw-adv summary{cursor:pointer;font:600 13px var(--rr-ui);opacity:.75}.tw-adv .tw-cl-grid{margin-top:12px}.tw-cl-on.off{background:color-mix(in srgb,#d9534f 20%,transparent);color:#d9534f}
 </style>
 <style id="rd-css">
 :root{--rd-bg:#f4f6f8;--rd-paper:#ffffff;--rd-ink:#182132;--rd-muted:#5d6779;--rd-line:#dde2ea;--rd-accent:#2a49d6;--rd-accent-soft:#e6eaff;--rd-note:#fff7d6;--rd-note-ink:#5a4500;--rd-student:#0e9f6e;--rd-student-soft:#e3f6ee;--rd-read:'Literata',Georgia,'Times New Roman',serif;--rd-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -4224,10 +4225,30 @@ function clErr(e){
   return 'Lỗi: '+m;
 }
 function sharedLessons(){ var by=authName(); return sharedIds().map(function(id){ var x0=LIB.lessons[id], x=withFo(cleanLessonOf(id===L.id?L:x0),x0,underChung); if(x) x.by=by; return x; }).filter(Boolean); }
+function privPayload(){
+  changed(true); var ls={};
+  LIB.order.forEach(function(i){ var x=LIB.lessons[i]; if(x&&x.done&&!x.trashed) ls[i]=JSON.parse(JSON.stringify(x)); });
+  var fo={}; Object.keys(LIB.folders).forEach(function(k){ if(!LIB.folders[k].system) fo[k]=LIB.folders[k]; });
+  return {v:1,at:Date.now(),lessons:ls,folders:fo,order:LIB.order.filter(function(i){ return ls[i]; })};
+}
+function clRestore(){
+  return authToken().then(function(tok){ return clCall('load_private',{},tok); }).then(function(d){
+    if(!d||!d.lessons) return 0; var n=0;
+    Object.keys(d.folders||{}).forEach(function(k){ if(!LIB.folders[k]) LIB.folders[k]=d.folders[k]; });
+    (d.order||Object.keys(d.lessons)).forEach(function(i){ var x=d.lessons[i]; if(!x) return; var cur=LIB.lessons[i];
+      if(!cur){ LIB.lessons[i]=x; LIB.order.push(i); n++; }
+      else if((x.updated||0)>(cur.updated||0)&&!(L&&L.id===i)){ LIB.lessons[i]=x; n++; } });
+    migrateLib(); saveLib(); return n;
+  });
+}
 function clPayload(){ changed(true); return {app:Object.assign({},LIB.app,{theme:exportTheme()}), lessons:[], shared:sharedLessons(), sfolders:foMap(underChung), at:Date.now()}; }
 function clPublish(){
   var c=cl(); if(!clReady()) return Promise.reject(new Error('Chưa nhập đủ thông tin kết nối. Cần mã kho và đăng nhập.'));
-  return authToken().then(function(tok){ return clCall('publish_lib_owner',{p_id:c.id,p_data:clPayload()},tok); }).then(function(){ c.at=Date.now(); saveLib(); });
+  return authToken().then(function(tok){
+    return clCall('publish_lib_owner',{p_id:c.id,p_data:clPayload()},tok).then(function(){
+      return clCall('save_private',{p_data:privPayload()},tok).then(function(){ delete c.privErr; },function(e){ c.privErr=(e&&e.status===404)?'Chưa chạy SQL mới (save_private) nên bài riêng chưa được lưu lên Supabase.':clErr(e); });
+    });
+  }).then(function(){ c.at=Date.now(); saveLib(); if(c.privErr) throw new Error(c.privErr); });
 }
 function khoLink(id){ var c=cl(); id=id||c.id; if(!id) return ''; return location.href.split(/[?#]/)[0]+'?kho='+id; }
 function khoLinkHtml(){
@@ -4236,15 +4257,16 @@ function khoLinkHtml(){
   return '<div class="tw-kho"><span>Link Kho chung (học viên không cần đăng nhập, '+sharedIds().length+' bài của thầy đang ở thư mục KHO TÀI LIỆU CHUNG)</span><input readonly value="'+esc(u)+'" aria-label="Link kho chung" onfocus="this.select()"><button type="button" class="tw-btn" data-cl="copyshared">'+svg('copy')+'Sao chép</button><a class="tw-btn" href="'+esc(u)+'" target="_blank" rel="noopener">'+svg('eye')+'Mở thử</a>'+warn+'</div>';
 }
 function cloudHtml(){
-  var c=cl(), ok=clReady(), st=c.at?'Xuất bản gần nhất: <b>'+fmtDate(c.at)+'</b>':'Chưa xuất bản lần nào.';
-  return '<section class="tw-cloud"><div class="tw-cloud-h"><div><h4>Kho online <i class="tw-beta">Online</i></h4><p>Xuất bản một lần là học viên mở lại file kho bài sẽ thấy bài mới nhất, không cần gửi lại file.</p></div>'+(ok?'<span class="tw-cl-on">Đã kết nối</span>':'')+'</div>'+
-    '<div class="tw-cl-grid">'+
+  var c=cl(), ok=clReady(), st=c.at?'Đồng bộ gần nhất: <b>'+fmtDate(c.at)+'</b>':'Chưa đồng bộ lần nào.';
+  return '<section class="tw-cloud"><div class="tw-cloud-h"><div><h4>Đồng bộ online <i class="tw-beta">Tự động</i></h4><p>Bài đang soạn dở nằm trên máy này. Bấm <b>Hoàn tất</b> là bài tự lưu lên Supabase, không cần xuất bản. Bài nào ra Kho chung thì thầy xếp ở tab Quản lý bài (thư mục KHO TÀI LIỆU CHUNG); bài còn lại chỉ mình thầy thấy.</p></div>'+(ok?'<span class="tw-cl-on">Đã kết nối</span>':'<span class="tw-cl-on off">Chưa đăng nhập</span>')+'</div>'+
+    khoLinkHtml()+
+    '<div class="tw-cl-a"><button type="button" class="tw-btn" data-cl="publish"'+(ok?'':' disabled')+'>'+svg('upload')+'Đồng bộ lại ngay</button><button type="button" class="tw-btn" data-cl="restore"'+(ok?'':' disabled')+'>'+svg('download')+'Khôi phục bài từ Supabase</button><span class="tw-cl-st" data-cl-st>'+st+(c.privErr?' <span style="color:#d9534f">'+esc(c.privErr)+'</span>':'')+'</span></div>'+
+    '<details class="tw-adv"><summary>Cài đặt nâng cao</summary><div class="tw-cl-grid">'+
       '<label>Địa chỉ dự án Supabase<input data-cl-f="url" value="'+esc(c.url)+'" placeholder="https://abcdxyz.supabase.co" autocomplete="off" spellcheck="false"></label>'+
       '<label>Khoá công khai (anon key)<input data-cl-f="key" value="'+esc(c.key)+'" placeholder="eyJhbGciOi…" autocomplete="off" spellcheck="false"></label>'+
-      '<label>Mã kho<input data-cl-f="id" value="'+esc(c.id)+'" placeholder="vd: lop-thay-tri" autocomplete="off" spellcheck="false"><small>Tên riêng của kho. Chỉ chữ thường, số và dấu gạch.</small></label>'+
-      '<label>Tài khoản<input value="'+esc(authName())+'" readonly tabindex="-1"><small>Đang đăng nhập. Chỉ tài khoản này sửa được kho “'+esc(c.id||'…')+'”.</small></label>'+
-    '</div>'+khoLinkHtml()+'<div class="tw-cl-a"><button type="button" class="tw-btn solid" data-cl="publish"'+(ok?'':' disabled')+'>'+svg('upload')+'Xuất bản lên kho online</button><button type="button" class="tw-btn" data-cl="test"'+(c.url&&c.key?'':' disabled')+'>Thử kết nối</button><span class="tw-cl-st" data-cl-st>'+st+'</span></div>'+
-    '<p class="tw-hint">Chưa có dự án? Làm theo các bước tạo Supabase em đã gửi kèm file <b>supabase-setup.sql</b>. Lưu ý: đáp án của đề bài nằm trong dữ liệu kho, giống như trong file kho bài.</p></section>';
+      '<label>Mã kho<input data-cl-f="id" value="'+esc(c.id)+'" placeholder="vd: lop-thay-tri" autocomplete="off" spellcheck="false"><small>Tên nội bộ, chỉ chữ thường, số và dấu gạch.</small></label>'+
+      '<label>Tài khoản<input value="'+esc(authName())+'" readonly tabindex="-1"><small>Đang đăng nhập.</small></label>'+
+    '</div><div class="tw-cl-a"><button type="button" class="tw-btn" data-cl="test"'+(c.url&&c.key?'':' disabled')+'>Thử kết nối</button></div></details></section>';
 }
 /* Tab 3 — export */
 function paneExport(){
@@ -4358,7 +4380,8 @@ rrRoot.addEventListener('click',function(e){
     if(ka==='copylink'){ var ul=khoLink(); RD.copy(ul).then(function(ok){ rrCtl.toast(ok?'Đã sao chép link học viên':'Hãy bấm Ctrl+C để chép'); }); return; }
     if(!clb.dataset.busy){ clb.dataset.busy='1'; clb.disabled=true;
       if(ka==='test'){ stEl.textContent='Đang kiểm tra…'; clCall('get_lib',{p_id:cl().id||'kiem-tra'}).then(function(j){ stEl.textContent=j?'Kết nối tốt. Kho “'+cl().id+'” đã có dữ liệu.':'Kết nối tốt. Kho chưa có dữ liệu, hãy xuất bản.'; }).catch(function(e){ stEl.textContent=clErr(e); }).then(function(){ delete clb.dataset.busy; clb.disabled=false; }); }
-      else if(ka==='publish'){ stEl.textContent='Đang xuất bản…'; clPublish().then(function(){ renderPane(); rrCtl.toast('Đã xuất bản '+libLessons().length+' bài lên kho online'); }).catch(function(e){ stEl.textContent=clErr(e); rrCtl.toast(clErr(e)); }).then(function(){ delete clb.dataset.busy; clb.disabled=false; }); }
+      else if(ka==='restore'){ stEl.textContent='Đang tải từ Supabase…'; clRestore().then(function(n){ renderPane(); rrCtl.toast(n?'Đã khôi phục '+n+' bài từ Supabase':'Không có bài mới nào để khôi phục'); }).catch(function(e){ stEl.textContent=clErr(e); rrCtl.toast(clErr(e)); }).then(function(){ delete clb.dataset.busy; clb.disabled=false; }); }
+      else if(ka==='publish'){ stEl.textContent='Đang đồng bộ…'; clPublish().then(function(){ renderPane(); rrCtl.toast('Đã đồng bộ '+doneIds().length+' bài lên Supabase'); }).catch(function(e){ stEl.textContent=clErr(e); rrCtl.toast(clErr(e)); }).then(function(){ delete clb.dataset.busy; clb.disabled=false; }); }
     } return; }
   var bk=t.closest('[data-bk]'); if(bk){ var k2=bk.getAttribute('data-bk');
     if(k2==='save'){ var nm='reading-room-sao-luu-'+new Date().toISOString().slice(0,10)+'.json'; Promise.resolve(RD.download(backupData(),nm,'application/json')).then(function(res){ renderPane(); rrCtl.toast(res==='declined'?'Đã huỷ lưu file':'Đã tải “'+nm+'”. Hãy cất vào Google Drive.'); }); }
