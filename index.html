@@ -180,7 +180,11 @@ textarea{resize:vertical}
 .pfoot{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--line);flex-wrap:wrap}
 .item{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:7px;background:var(--surface);transition:border-color .15s}
 .item:focus-within{border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
-.item-top{display:flex;align-items:center;gap:6px}
+.item-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.item-top .el-chip{flex:none;white-space:nowrap}
+.item-top .ib:first-of-type{margin-left:auto}
+.item-top .item-anchor{order:9;flex:1 1 100%}
+.item-top .ib{flex:none}
 .qbadge{font:600 11px/1 var(--ui);background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:4px 7px;flex:none}
 .qbadge.nbb{background:var(--note-ink);color:var(--note)}
 .item-anchor{flex:1;min-width:0;text-align:left;border:0;background:none;cursor:pointer;font-family:var(--read);font-style:italic;font-size:13.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:4px 2px;border-radius:6px}
@@ -328,6 +332,10 @@ body.rr-on::before{background:var(--rr-bg)}
 .eyebrow-row .lvl:first-of-type{margin-left:auto}
 .eyebrow-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .lvl{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.lvl-topic input{font:500 12.5px var(--ui);height:28px;width:150px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:0 8px}
+.lvl-topic input::placeholder{color:var(--muted);opacity:.7}
+.tw-tp{background:color-mix(in srgb,#2fbf8f 22%,transparent)!important}
+.dv-b.bt{background:color-mix(in srgb,#2fbf8f 22%,transparent)}
 .lvl select{font:500 12.5px var(--ui);height:28px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:0 6px}
 
 /* ===== Editor follows the Reading Room theme ===== */
@@ -429,6 +437,9 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .ptab-ex .cnt{background:#6d4aff;color:#fff}
 .ptabs{overflow-x:auto;scrollbar-width:none}.ptabs::-webkit-scrollbar{display:none}
 .ptabs button{padding:0 9px;flex:1 0 auto}
+.panel .ptabs{flex:none;padding:6px 4px;gap:0}
+.ptabs button{padding:0 6px;gap:4px;font-size:12px}
+.top-act .btn,.top-act button{white-space:nowrap}
 .ex-main{padding:12px;border-radius:12px;background:color-mix(in srgb,#6d4aff 10%,var(--surface));border:1px solid color-mix(in srgb,#6d4aff 35%,var(--line))}
 .chk span small{display:block;color:var(--muted);font-size:12px;font-weight:400;margin-top:2px;line-height:1.4}
 #ex-body{display:flex;flex-direction:column;gap:12px}
@@ -451,7 +462,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .imp-cat.need{animation:shake .35s}
 @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 /* ===== Teacher workspace (side tabs) ===== */
-.tw{--tw-surf:rgba(255,255,255,.035);--tw-menu:#1a2042;--tw-in:rgba(255,255,255,.05);display:grid;grid-template-columns:224px minmax(0,1fr);gap:28px;padding-block:22px 72px;max-width:1260px;margin-inline:auto;font-family:var(--rr-ui);color:var(--rr-fg)}
+.tw{--tw-surf:rgba(255,255,255,.035);--tw-menu:#1a2042;--tw-in:rgba(255,255,255,.05);display:grid;grid-template-columns:224px minmax(0,1fr);gap:28px;padding-block:22px 72px;max-width:none;margin-inline:0;font-family:var(--rr-ui);color:var(--rr-fg)}
 [data-th="constellation"] .tw{--tw-surf:rgba(255,255,255,.045);--tw-menu:#141a3a}
 [data-th="notebook"] .tw{--tw-surf:rgba(255,255,255,.82);--tw-menu:#ffffff;--tw-in:#ffffff}
 .tw svg.i{width:17px;height:17px}
@@ -769,7 +780,8 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .dv-menu span:not(.gap){flex:1}.dv-menu .gap{width:18px}.dv-menu kbd{font:11.5px var(--rr-ui);opacity:.55}.dv-menu em{font-style:normal;color:var(--rr-accent)}.dv-menu hr{border:0;border-top:1px solid var(--rr-line);margin:5px 0}
 .dv-modal{position:absolute;inset:0;z-index:100;display:grid;place-items:center;background:rgba(0,0,0,.45)}
 .dv-dlg{width:min(420px,92%);padding:20px;border-radius:14px;background:var(--rr-bg);border:1px solid var(--rr-line);box-shadow:0 14px 50px rgba(0,0,0,.5);font:14px/1.5 var(--rr-ui)}.dv-dlg.wide{width:min(520px,92%)}
-.dv-dlg h4{margin:0 0 8px;font:600 17px var(--rr-ui)}.dv-dlg-b{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.dv-dlg h4{margin:0 0 8px;font:600 17px var(--rr-ui)}.dv-pk .dv-pkn{flex:1;text-align:left}.dv-pk .dv-ck{font-style:normal;font-weight:700;margin-left:auto;color:var(--accent,#8fa2ff)}
+.dv-dlg-b{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 .dv-tree{max-height:280px;overflow:auto;border:1px solid var(--rr-line);border-radius:10px;padding:4px}
 .dv-pk{display:flex;align-items:center;gap:8px;width:100%;height:34px;border:0;border-radius:6px;background:none;color:var(--rr-fg);font:13.5px var(--rr-ui);cursor:pointer;text-align:left}.dv-pk:hover:not(:disabled){background:color-mix(in srgb,var(--rr-fg) 8%,transparent)}.dv-pk.on{background:color-mix(in srgb,var(--rr-accent) 25%,transparent);font-weight:600}.dv-pk:disabled{opacity:.35}
 .dv-keys{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;margin:0;max-height:55vh;overflow:auto}.dv-keys dt{font-weight:600;white-space:nowrap}.dv-keys dd{margin:0;opacity:.8}
@@ -1271,6 +1283,7 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
 .rr-card .mt{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font:12px/1 var(--rr-ui);opacity:.85}
 .rr-card .lv.cat{background:color-mix(in srgb,var(--rr-accent) 20%,transparent)}
 .rr-card .lv.exq{background:#6d4aff;color:#fff}
+.rr-card .lv.tp{background:color-mix(in srgb,#2fbf8f 26%,transparent)}
 .rr-card .lv{font:600 11px/1 var(--rr-ui);padding:4px 7px;border-radius:6px;background:rgba(127,127,127,.18)}
 .rr-card .st{font:600 11px/1 var(--rr-ui);padding:4px 7px;border-radius:6px}
 .rr .st-new{background:#dfe5ff;color:#2f4fe0}.rr .st-doing{background:#fff1c7;color:#7a5200}.rr .st-done{background:#d6f3e6;color:#0b6b4a}
@@ -1537,7 +1550,7 @@ html.rr-fs-on{overflow:hidden}
     </div>
 
     <article class="sheet">
-      <div class="eyebrow-row"><span class="eyebrow">Reading comprehension</span><label class="lvl"><span>Loại bài</span><select id="i-cat" aria-label="Loại bài"><option value="">Chọn loại bài</option><option value="ielts">IELTS Cam</option><option value="content">Kiến thức</option></select></label><label class="lvl"><span>Trình độ</span><select id="i-level" aria-label="Trình độ"><option value="">Chưa chọn</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option><option>IELTS</option></select></label></div>
+      <div class="eyebrow-row"><span class="eyebrow">Reading comprehension</span><label class="lvl"><span>Loại bài</span><select id="i-cat" aria-label="Loại bài"><option value="">Chọn loại bài</option><option value="ielts">IELTS Cam</option><option value="content">Kiến thức</option></select></label><label class="lvl"><span>Trình độ</span><select id="i-level" aria-label="Trình độ"><option value="">Chưa chọn</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option><option>IELTS</option></select></label><label class="lvl lvl-topic"><span>Topic</span><input id="i-topic" list="topic-list" maxlength="40" placeholder="Chủ đề, vd: Family" autocomplete="off" aria-label="Topic (chủ đề)"><datalist id="topic-list"></datalist></label></div>
       <textarea id="i-title" class="title-in" rows="1" placeholder="Tiêu đề bài đọc" aria-label="Tiêu đề bài đọc"></textarea>
       <textarea id="i-sub" class="sub-in" rows="1" placeholder="Hướng dẫn cho học viên (tuỳ chọn)" aria-label="Hướng dẫn cho học viên"></textarea>
       <div class="legend" id="legend"></div>
@@ -2519,7 +2532,7 @@ function plain(html){ var d=document.createElement('div'); d.innerHTML=html||'';
 RR.CATS={ielts:'IELTS Cam',content:'Kiến thức'};
 RR.info=function(L){
   var words=plain(L.html).split(/\s+/).filter(Boolean).length;
-  return {title:L.title||'Bài đọc', level:L.level||'', minutes:Math.max(2,Math.round(words/130)), questions:Object.keys(L.elicits||{}).length, notes:Object.keys(L.notes||{}).length, words:words, cat:L.cat||'', catName:RR.CATS[L.cat]||'', exam:(L.exam&&L.exam.count)||0};
+  return {title:L.title||'Bài đọc', level:L.level||'', topic:L.topic||'', minutes:Math.max(2,Math.round(words/130)), questions:Object.keys(L.elicits||{}).length, notes:Object.keys(L.notes||{}).length, words:words, cat:L.cat||'', catName:RR.CATS[L.cat]||'', exam:(L.exam&&L.exam.count)||0};
 };
 /* Excerpt: first real sentences of the lesson, keeping the teacher's highlights */
 function excerptHtml(L,max){
@@ -2559,7 +2572,7 @@ RR.checkHand=function(){
          openLesson(lesson, host, ctl) -> {destroy()}, onShow(view) }
 */
 RR.init=function(opts){
-  var root=opts.root, html=document.documentElement, th=html.getAttribute('data-th')||'stage', view='home', libMode='grid', libLv='all', libCat='all', libQ='', reader=null, current=null;
+  var root=opts.root, html=document.documentElement, th=html.getAttribute('data-th')||'stage', view='home', libMode='grid', libLv='all', libCat='all', libTp='all', libQ='', reader=null, current=null;
   try{ th=localStorage.getItem('rr:theme')||th; libMode=localStorage.getItem('rr:lib')||libMode; }catch(e){}
   root.classList.add('rr');
   root.innerHTML='<div class="rr-bd rr-skybg"></div><div class="rr-bd rr-stars"></div><div class="rr-bd rr-spot"></div><div class="rr-bd rr-paper"></div>'+
@@ -2601,6 +2614,7 @@ RR.init=function(opts){
     if(libLv!=='all'&&!lv[libLv]) libLv='all';
     return '<section class="rr-view">'+header('Kho bài đọc','<span class="rr-cnt" data-n></span>')+'<div class="rr-gut"><div class="rr-tools"><label class="rr-search">'+IC.search+'<input data-q placeholder="Tìm bài đọc" aria-label="Tìm bài đọc" value="'+esc(libQ)+'"></label>'+
       '<span class="rr-seg" role="group" aria-label="Kiểu hiển thị"><button type="button" data-mode="grid" aria-pressed="'+(libMode==='grid')+'">'+IC.grid+'Lưới</button><button type="button" data-mode="list" aria-pressed="'+(libMode==='list')+'">'+IC.list+'Danh sách</button></span>'+
+      (function(){ var tp={}; lessons().forEach(function(L){ if(L.topic) tp[L.topic]=1; }); var tps=Object.keys(tp).sort(function(a,b){ return a.localeCompare(b,'vi'); }); if(libTp!=='all'&&!tp[libTp]) libTp='all'; return tps.length?'<span class="rr-chips rr-tps" role="group" aria-label="Chủ đề">'+['all'].concat(tps).map(function(k){ return '<button type="button" data-tp="'+esc(k)+'" aria-pressed="'+(libTp===k)+'">'+(k==='all'?'Mọi chủ đề':esc(k))+'</button>'; }).join('')+'</span>':''; })()+
       (lvs.length?'<span class="rr-chips" role="group" aria-label="Trình độ">'+['all'].concat(lvs).map(function(l){ return '<button type="button" data-lv="'+esc(l)+'" aria-pressed="'+(libLv===l)+'">'+(l==='all'?'Tất cả':esc(l))+'</button>'; }).join('')+'</span>':'')+
       (function(){ var present={}; lessons().forEach(function(L){ if(L.cat) present[L.cat]=1; }); var any=lessons().some(function(L){ return L.exam&&L.exam.count; }); var keys=Object.keys(RR.CATS).filter(function(k){ return present[k]; }); if(keys.length<2&&!any) return ''; if(libCat!=='all'&&libCat!=='exam'&&!present[libCat]) libCat='all'; return '<span class="rr-chips rr-cats" role="group" aria-label="Loại bài">'+['all'].concat(keys).concat(any?['exam']:[]).map(function(k){ return '<button type="button" data-cat="'+k+'" aria-pressed="'+(libCat===k)+'">'+(k==='all'?'Mọi loại':k==='exam'?'Có đề bài':esc(RR.CATS[k]))+'</button>'; }).join('')+'</span>'; })()+
       '</div><div data-fo-wrap></div><div class="rr-lib" data-lib></div></div></section>';
@@ -2616,7 +2630,7 @@ RR.init=function(opts){
   function rowHtml(list){
     return list.map(function(L,i){
       var I=RR.info(L), s=opts.status?opts.status(L):{st:'new',p:0}, k=hashN(L.id||L.title), rot=((k%5)-2)*0.5;
-      return '<button type="button" class="rr-card" data-open="'+esc(L.id)+'" style="--d:'+(i*50)+'ms;--rot:'+rot+'deg;--nc:'+NOTE[k%4]+'">'+RR.thumb(L,'',s.st)+'<span class="body"><span class="ti">'+esc(I.title)+'</span><span class="mt">'+(I.catName?'<span class="lv cat">'+esc(I.catName)+'</span>':'')+(I.exam?'<span class="lv exq">Có đề · '+I.exam+' câu</span>':'')+(I.level?'<span class="lv lo">'+esc(I.level)+'</span>':'')+'<span>'+I.minutes+' phút · '+I.questions+' câu hỏi</span><span class="st lo st-'+s.st+'">'+ST[s.st]+'</span></span>'+(s.p>0&&s.p<100?'<span class="rr-prog" style="--p:'+s.p+'%"><i></i></span>':'')+'</span></button>';
+      return '<button type="button" class="rr-card" data-open="'+esc(L.id)+'" style="--d:'+(i*50)+'ms;--rot:'+rot+'deg;--nc:'+NOTE[k%4]+'">'+RR.thumb(L,'',s.st)+'<span class="body"><span class="ti">'+esc(I.title)+'</span><span class="mt">'+(I.catName?'<span class="lv cat">'+esc(I.catName)+'</span>':'')+(I.exam?'<span class="lv exq">Có đề · '+I.exam+' câu</span>':'')+(I.topic?'<span class="lv tp">'+esc(I.topic)+'</span>':'')+(I.level?'<span class="lv lo">'+esc(I.level)+'</span>':'')+'<span>'+I.minutes+' phút · '+I.questions+' câu hỏi</span><span class="st lo st-'+s.st+'">'+ST[s.st]+'</span></span>'+(s.p>0&&s.p<100?'<span class="rr-prog" style="--p:'+s.p+'%"><i></i></span>':'')+'</span></button>';
     }).join('');
   }
   var FOLD='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
@@ -2625,8 +2639,8 @@ RR.init=function(opts){
     var fw=main.querySelector('[data-fo-wrap]'); if(fw) fw.innerHTML='';
     var q=libQ.trim().toLowerCase(), all=lessons(), fm=FM(), hasFo=Object.keys(fm).length>0;
     if(libF===null||(libF!==FR()&&!fm[libF])) libF=FR();
-    var filtered=libLv!=='all'||libCat!=='all'||!!q;
-    var base=all.filter(function(L){ return (libLv==='all'||L.level===libLv)&&(libCat==='all'||(libCat==='exam'?!!(L.exam&&L.exam.count):L.cat===libCat))&&(!q||String(L.title||'').toLowerCase().indexOf(q)>=0); });
+    var filtered=libLv!=='all'||libCat!=='all'||libTp!=='all'||!!q;
+    var base=all.filter(function(L){ return (libLv==='all'||L.level===libLv)&&(libTp==='all'||L.topic===libTp)&&(libCat==='all'||(libCat==='exam'?!!(L.exam&&L.exam.count):L.cat===libCat))&&(!q||String(L.title||'').toLowerCase().indexOf(q)>=0||String(L.topic||'').toLowerCase().indexOf(q)>=0); });
     var folderMode=hasFo&&!filtered, list=folderMode?base.filter(function(L){ return inF(L,libF); }):base;
     box.className='rr-lib '+libMode;
     var n=main.querySelector('[data-n]'); if(n) n.textContent=(folderMode?base.filter(function(L){ return libF===FR()||inTree(L,libF)||inF(L,libF); }).length:list.length)+' bài';
@@ -2694,10 +2708,11 @@ RR.init=function(opts){
     else go(view,true);
   });
   main.addEventListener('click',function(e){
-    var t=e.target.closest('[data-go],[data-mode],[data-lv],[data-cat],[data-open],[data-fo]'); if(!t||!main.contains(t)) return;
+    var t=e.target.closest('[data-go],[data-mode],[data-lv],[data-tp],[data-cat],[data-open],[data-fo]'); if(!t||!main.contains(t)) return;
     if(t.hasAttribute('data-go')){ var gv=t.getAttribute('data-go'); if(gv==='lib'&&opts.studentHref&&view==='home'){ var sh=opts.studentHref(); if(sh){ location.assign(sh); return; } } go(gv); }
     else if(t.hasAttribute('data-mode')){ libMode=t.getAttribute('data-mode'); try{ localStorage.setItem('rr:lib',libMode); }catch(err){} main.querySelectorAll('[data-mode]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===t)); }); renderLib(); }
     else if(t.hasAttribute('data-cat')){ libCat=t.getAttribute('data-cat'); main.querySelectorAll('[data-cat]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===t)); }); renderLib(); }
+    else if(t.hasAttribute('data-tp')){ libTp=t.getAttribute('data-tp'); main.querySelectorAll('[data-tp]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===t)); }); renderLib(); }
     else if(t.hasAttribute('data-lv')){ libLv=t.getAttribute('data-lv'); main.querySelectorAll('[data-lv]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===t)); }); renderLib(); }
     else if(t.hasAttribute('data-fo')){ libF=t.getAttribute('data-fo'); renderLib(); var fwe=main.querySelector('[data-fo-wrap]'); if(fwe&&fwe.getBoundingClientRect().top<0) fwe.scrollIntoView({block:'start'}); }
     else if(t.hasAttribute('data-open')){ var id=t.getAttribute('data-open'); current=lessons().filter(function(L){ return L.id===id; })[0]||null; if(current) go('read'); }
@@ -2931,7 +2946,7 @@ function cleanLessonOf(x){
   var tmp=document.createElement('div'); tmp.innerHTML=x.html||''; var els={}, nts={};
   tmp.querySelectorAll('.el').forEach(function(a){ var id=a.getAttribute('data-el'), d=(x.elicits||{})[id]||{}; els[id]=elDef(d); });
   tmp.querySelectorAll('.nb').forEach(function(n){ var id=n.getAttribute('data-nb'), p=n.querySelector('.nb-p'); nts[id]={prompt:(p&&p.textContent.trim())||((x.notes||{})[id]||{}).prompt||''}; });
-  return {v:1,id:x.id,title:x.title||'Bài đọc',subtitle:x.subtitle||'',level:x.level||'',cat:x.cat||'',examOn:!!x.examOn,examText:x.examText||'',examOpen:!!x.examOpen,examCheck:x.examCheck!==false,exam:(x.examOn?RD.parseExam(x.examText):null),codes:x.codes||clone(CODES),styles:RD.styles(x.styles),html:x.html||'',elicits:els,notes:nts};
+  return {v:1,id:x.id,title:x.title||'Bài đọc',subtitle:x.subtitle||'',level:x.level||'',topic:x.topic||'',cat:x.cat||'',examOn:!!x.examOn,examText:x.examText||'',examOpen:!!x.examOpen,examCheck:x.examCheck!==false,exam:(x.examOn?RD.parseExam(x.examText):null),codes:x.codes||clone(CODES),styles:RD.styles(x.styles),html:x.html||'',elicits:els,notes:nts};
 }
 
 /* ---------- Selection helpers ---------- */
@@ -3952,7 +3967,7 @@ $('#imp-ok').addEventListener('click',function(){
   var mode=starting?'replace':document.querySelector('input[name="imp-mode"]:checked').value, bl=impBlocks.slice();
   if(impLesson){
     var x=JSON.parse(JSON.stringify(impLesson));
-    L={id:x.id||uid('L'), cat:x.cat||impCat, examOn:(x.cat?!!x.examOn:$('#imp-exam').checked), examText:x.examText||'', examOpen:!!x.examOpen, examCheck:x.examCheck!==false, examTouched:true, title:x.title||'', subtitle:x.subtitle||'', codes:(x.codes&&x.codes.length?x.codes:clone(CODES)), styles:RD.styles(x.styles), html:x.html, elicits:x.elicits||{}, notes:x.notes||{}};
+    L={id:x.id||uid('L'), topic:x.topic||'', level:x.level||'', cat:x.cat||impCat, examOn:(x.cat?!!x.examOn:$('#imp-exam').checked), examText:x.examText||'', examOpen:!!x.examOpen, examCheck:x.examCheck!==false, examTouched:true, title:x.title||'', subtitle:x.subtitle||'', codes:(x.codes&&x.codes.length?x.codes:clone(CODES)), styles:RD.styles(x.styles), html:x.html, elicits:x.elicits||{}, notes:x.notes||{}};
     loadUI(); saveDraft(); changed(true); if(starting) enterEditor(); else closeImport();
     impBlocks=[]; impLesson=null; $('#imp-text').value=''; renderImp(); toast('Đã nạp bài “'+(L.title||'')+'”'); return;
   }
@@ -4135,6 +4150,10 @@ function growSub(){ ['#i-sub','#i-title'].forEach(function(q){ var s=$(q); s.sty
 $('#i-title').addEventListener('input',function(e){ L.title=e.target.value.replace(/\n/g,' '); growSub(); saveDraft(); });
 $('#i-sub').addEventListener('input',function(e){ L.subtitle=e.target.value; growSub(); saveDraft(); });
 $('#i-level').addEventListener('change',function(e){ L.level=e.target.value; saveDraft(); });
+function topicList(){ var m={}; LIB.order.forEach(function(i){ var x=LIB.lessons[i]; if(x&&x.topic&&!x.trashed) m[x.topic]=1; }); return Object.keys(m).sort(function(a,b){ return a.localeCompare(b,'vi'); }); }
+function fillTopics(){ var dl=$('#topic-list'); if(dl) dl.innerHTML=topicList().map(function(t){ return '<option value="'+esc(t)+'">'; }).join(''); }
+$('#i-topic').addEventListener('focus',fillTopics);
+$('#i-topic').addEventListener('change',function(e){ var v=e.target.value.replace(/\s+/g,' ').trim(); if(v){ var ex=topicList().filter(function(t){ return t.toLowerCase()===v.toLowerCase(); })[0]; if(ex) v=ex; } e.target.value=v; L.topic=v; saveDraft(); });
 $('#i-cat').addEventListener('change',function(e){ L.cat=e.target.value; if(!L.examTouched){ L.examOn=(L.cat==='ielts'); renderExamPane(); } saveDraft(); });
 /* ----- Đề bài pane ----- */
 function renderExamPane(){
@@ -4179,7 +4198,7 @@ function exportLesson(){
   var els={}, nts={};
   tmp.querySelectorAll('.el').forEach(function(a){ var id=a.getAttribute('data-el'), d=L.elicits[id]||{}; els[id]=elDef(d); });
   tmp.querySelectorAll('.nb').forEach(function(n){ var id=n.getAttribute('data-nb'), p=n.querySelector('.nb-p'); nts[id]={prompt:(p&&p.textContent.trim())||(L.notes[id]&&L.notes[id].prompt)||''}; });
-  return {v:1,id:L.id,title:L.title||'Bài đọc',subtitle:L.subtitle||'',level:L.level||'',cat:L.cat||'',examOn:!!L.examOn,examText:L.examText||'',examOpen:!!L.examOpen,examCheck:L.examCheck!==false,exam:(L.examOn?RD.parseExam(L.examText):null),codes:L.codes,styles:L.styles,html:html,elicits:els,notes:nts};
+  return {v:1,id:L.id,title:L.title||'Bài đọc',subtitle:L.subtitle||'',level:L.level||'',topic:L.topic||'',cat:L.cat||'',examOn:!!L.examOn,examText:L.examText||'',examOpen:!!L.examOpen,examCheck:L.examCheck!==false,exam:(L.examOn?RD.parseExam(L.examText):null),codes:L.codes,styles:L.styles,html:html,elicits:els,notes:nts};
 }
 var modal=$('#export');
 $('#open-export').addEventListener('click',function(){
@@ -4222,9 +4241,10 @@ function showHome(v){
 }
 /* ---------- Teacher workspace (side tabs) ---------- */
 var HUB_TABS=[['lessons','book','Bài đọc'],['drafts','pen','Soạn bài đọc'],['cover','layout','Trang cover'],['export','download','Xuất file'],['backup','file','Sao lưu'],['ai','sparkle','Câu lệnh AI'],['guide','help','Hướng dẫn']];
-function hubTabs(){ if(!isOwnerRole()) return HUB_TABS; var t=HUB_TABS.slice(); t.splice(2,0,['drive','folder','Quản lý bài']); return t; }
-var hubTab='lessons', hubQ='', hubLv='all', hubCat='all', hubDev='desk', hubBox=null, coverT=0;
+function hubTabs(){ if(!isOwnerRole()) return HUB_TABS; var t=HUB_TABS.filter(function(x){ return x[0]!=='drafts'; }); t.splice(1,0,['drive','folder','Quản lý bài']); return t; }
+var hubTab='lessons', hubQ='', hubLv='all', hubCat='all', hubTp='all', hubDev='desk', hubBox=null, coverT=0;
 try{ hubTab=localStorage.getItem('rls:hubtab')||hubTab; }catch(e){}
+if(hubTab==='drafts'&&typeof isOwnerRole==='function'&&isOwnerRole()) hubTab='lessons';
 var TH_NAME={stage:'Sân khấu',notebook:'Vở ghi',constellation:'Chòm sao'};
 function doneIds(){ return LIB.order.filter(function(id){ return LIB.lessons[id]&&LIB.lessons[id].done&&!lsnTrashed(LIB.lessons[id]); }); }
 function draftIds(){ return LIB.order.filter(function(id){ return LIB.lessons[id]&&!LIB.lessons[id].done&&!lsnTrashed(LIB.lessons[id]); }); }
@@ -4261,6 +4281,7 @@ function renderPane(){
 function hubTools(ids){
   var lv={}; ids.forEach(function(id){ var x=LIB.lessons[id]; if(x&&x.level) lv[x.level]=1; }); var lvs=Object.keys(lv).sort(); if(hubLv!=='all'&&!lv[hubLv]) hubLv='all';
   return '<div class="tw-tools"><label class="tw-search">'+svg('search')+'<input data-hq placeholder="Tìm theo tên bài" value="'+esc(hubQ)+'" aria-label="Tìm bài"></label>'+
+    (function(){ var tp={}; ids.forEach(function(id){ var x=LIB.lessons[id]; if(x&&x.topic) tp[x.topic]=1; }); var tps=Object.keys(tp).sort(function(a,b){ return a.localeCompare(b,'vi'); }); if(hubTp!=='all'&&!tp[hubTp]) hubTp='all'; return tps.length?'<span class="tw-chips" role="group" aria-label="Lọc chủ đề">'+['all'].concat(tps).map(function(k){ return '<button type="button" data-htp="'+esc(k)+'" aria-pressed="'+(hubTp===k)+'">'+(k==='all'?'Mọi chủ đề':esc(k))+'</button>'; }).join('')+'</span>':''; })()+
     (lvs.length>1?'<span class="tw-chips" role="group" aria-label="Lọc trình độ">'+['all'].concat(lvs).map(function(l){ return '<button type="button" data-hlv="'+esc(l)+'" aria-pressed="'+(hubLv===l)+'">'+(l==='all'?'Tất cả':esc(l))+'</button>'; }).join('')+'</span>':'')+
     '<span class="tw-chips" role="group" aria-label="Lọc loại bài">'+[['all','Mọi loại'],['ielts','IELTS Cam'],['content','Kiến thức'],['exam','Có đề bài']].map(function(c){ return '<button type="button" data-hcat="'+c[0]+'" aria-pressed="'+(hubCat===c[0])+'">'+c[1]+'</button>'; }).join('')+'</span></div>';
 }
@@ -4280,12 +4301,12 @@ function paneDrafts(){
 function renderRows(){
   var box=hubBox&&hubBox.querySelector('[data-rows]'); if(!box) return;
   var drafts=hubTab==='drafts', base=drafts?draftIds():doneIds();
-  var q=hubQ.trim().toLowerCase(), filtered=!!q||hubLv!=='all'||hubCat!=='all';
-  var ids=base.filter(function(id){ var x=LIB.lessons[id]; return x&&(hubLv==='all'||x.level===hubLv)&&(hubCat==='all'||(hubCat==='none'?!x.cat:hubCat==='exam'?!!(x.examOn&&RD.parseExam(x.examText)):x.cat===hubCat))&&(!q||String(x.title||'').toLowerCase().indexOf(q)>=0); });
+  var q=hubQ.trim().toLowerCase(), filtered=!!q||hubLv!=='all'||hubTp!=='all'||hubCat!=='all';
+  var ids=base.filter(function(id){ var x=LIB.lessons[id]; return x&&(hubLv==='all'||x.level===hubLv)&&(hubTp==='all'||x.topic===hubTp)&&(hubCat==='all'||(hubCat==='none'?!x.cat:hubCat==='exam'?!!(x.examOn&&RD.parseExam(x.examText)):x.cat===hubCat))&&(!q||String(x.title||'').toLowerCase().indexOf(q)>=0||String(x.topic||'').toLowerCase().indexOf(q)>=0); });
   box.classList.toggle('filtered',filtered||drafts);
   if(!ids.length){ box.innerHTML='<div class="tw-empty">'+(base.length?'Không có bài nào khớp.':drafts?'Chưa có bài nào đang soạn. Bấm “Bài mới” để bắt đầu.':'Chưa có bài nào soạn xong. Vào “Soạn bài đọc”, soạn bài rồi bấm “Hoàn tất” để đưa bài vào đây.')+'</div>'; return; }
   box.innerHTML=ids.map(function(id){ var x=LIB.lessons[id], I=RR.info(cleanLessonOf(x)), pos=pubIds().indexOf(id);
-    var meta=(x.cat?'<i class="tw-lv tw-cat">'+esc(RR.CATS[x.cat])+'</i>':drafts?'':'<i class="tw-lv tw-nocat">Chưa phân loại</i>')+(I.exam?'<i class="tw-lv tw-exq">Có đề · '+I.exam+' câu</i>':'')+(x.level?'<i class="tw-lv">'+esc(x.level)+'</i>':'')+I.minutes+' phút · '+I.questions+' câu hỏi · '+I.notes+' ô ghi chú'+(x.updated?' · '+fmtDate(x.updated):'');
+    var meta=(x.cat?'<i class="tw-lv tw-cat">'+esc(RR.CATS[x.cat])+'</i>':drafts?'':'<i class="tw-lv tw-nocat">Chưa phân loại</i>')+(I.exam?'<i class="tw-lv tw-exq">Có đề · '+I.exam+' câu</i>':'')+(x.topic?'<i class="tw-lv tw-tp">'+esc(x.topic)+'</i>':'')+(x.level?'<i class="tw-lv">'+esc(x.level)+'</i>':'')+I.minutes+' phút · '+I.questions+' câu hỏi · '+I.notes+' ô ghi chú'+(x.updated?' · '+fmtDate(x.updated):'');
     return '<div class="tw-row'+(drafts?' draft':'')+'" data-id="'+esc(id)+'"'+(filtered||drafts?'':' draggable="true"')+'>'+
       (drafts?'':'<span class="tw-grip" aria-hidden="true">'+svg('grip')+'</span><span class="tw-no">'+(pos>=0?pos+1:'–')+'</span>')+RR.thumb(x,'width:52px;flex:none')+
       '<div class="tw-ri"><b>'+esc(x.title||'Bài chưa đặt tên')+(drafts&&id===L.id?' <i class="tw-cur">Đang mở</i>':'')+'</b><span>'+meta+'</span></div>'+
@@ -4548,6 +4569,7 @@ rrRoot.addEventListener('click',function(e){
     return; }
   if(t.closest('[data-more]')){ var m=t.closest('.tw-more'), was=m.classList.contains('open'); rrRoot.querySelectorAll('.tw-more.open').forEach(function(x){ x.classList.remove('open'); }); if(!was){ m.classList.add('open'); var mr=m.querySelector('.tw-menu'); mr.classList.toggle('up',m.getBoundingClientRect().bottom+mr.offsetHeight+16>innerHeight); } return; }
   var hc=t.closest('[data-hcat]'); if(hc){ hubCat=hc.getAttribute('data-hcat'); rrRoot.querySelectorAll('[data-hcat]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===hc)); }); renderRows(); return; }
+  var tpb=t.closest('[data-htp]'); if(tpb){ hubTp=tpb.getAttribute('data-htp'); rrRoot.querySelectorAll('[data-htp]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===tpb)); }); renderRows(); return; }
   var lv=t.closest('[data-hlv]'); if(lv){ hubLv=lv.getAttribute('data-hlv'); rrRoot.querySelectorAll('[data-hlv]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===lv)); }); renderRows(); return; }
   var dv=t.closest('[data-dev]'); if(dv){ hubDev=dv.getAttribute('data-dev'); rrRoot.querySelectorAll('[data-dev]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===dv)); }); var f=rrRoot.querySelector('.tw-pv-frame'); f.className='tw-pv-frame '+hubDev; coverPreview(true); return; }
   var xt=t.closest('[data-xth]'); if(xt){ LIB.app.theme=xt.getAttribute('data-xth'); saveLib(); rrRoot.querySelectorAll('[data-xth]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===xt)); }); coverPreview(true); return; }
@@ -4664,7 +4686,7 @@ function loadUI(){
   ed.innerHTML=L.html||'<p><br></p>';
   $$('.nb',ed).forEach(decorateNb);
   $$('.tc',ed).forEach(function(e){ var v=e.getAttribute('data-tc'); if(/^#[0-9a-f]{6}$/i.test(v||'')) e.style.color=v; });
-  $('#i-title').value=L.title||''; $('#i-sub').value=L.subtitle||''; $('#i-level').value=L.level||''; $('#i-cat').value=L.cat||''; renderExamPane(); growSub();
+  $('#i-title').value=L.title||''; $('#i-sub').value=L.subtitle||''; $('#i-level').value=L.level||''; $('#i-topic').value=L.topic||''; fillTopics(); $('#i-cat').value=L.cat||''; renderExamPane(); growSub();
   lastElSig=null; lastNbSig=null;
   [['h1','title'],['h2','h1'],['h3','h2'],['h4','h3']].forEach(function(p){ $$(p[0]+':not([class])',ed).forEach(function(h){ h.className=RD.STYLE_META[p[1]].cls; }); });
   applyStyleCss(); renderStyleMenu(); renderStylesPane();
@@ -4716,7 +4738,7 @@ function dvAll(){
     var vf=F.filter(function(f){ return !folderTrashed(f.id); }), vl=Ls.filter(function(x){ return !lsnTrashed(x); });
     if(q){
       vf.filter(function(f){ return String(f.name||'').toLowerCase().indexOf(q)>=0; }).forEach(function(f){ out.push(fi(f)); });
-      vl.filter(function(x){ return String(x.title||'').toLowerCase().indexOf(q)>=0; }).forEach(function(x){ out.push(li(x)); });
+      vl.filter(function(x){ return String(x.title||'').toLowerCase().indexOf(q)>=0||String(x.topic||'').toLowerCase().indexOf(q)>=0; }).forEach(function(x){ out.push(li(x)); });
     } else if(DV.sec==='my'){
       vf.filter(function(f){ return (f.parent||'')===DV.cur; }).forEach(function(f){ out.push(fi(f)); });
       vl.filter(function(x){ return DV.cur===''?true:hasF(x,DV.cur); }).forEach(function(x){ out.push(li(x)); });
@@ -4799,7 +4821,7 @@ function dvBadges(it){
   if(it.k==='f') return '';
   var x=it.o;
   if(DV.sec==='trash') return '';
-  return (x.done?(x.shared?'<i class="dv-b b2" title="Đang ở kho chung">Chung</i>':''):'<i class="dv-b b0">Bản nháp</i>');
+  return (x.topic?'<i class="dv-b bt" title="Topic">'+esc(x.topic)+'</i>':'')+(x.done?(x.shared?'<i class="dv-b b2" title="Đang ở kho chung">Chung</i>':''):'<i class="dv-b b0">Bản nháp</i>');
 }
 function dvLoc(it){
   if(it.k==='l'){ var fs=fl(it.o).filter(function(f){ return LIB.folders[f]; }); return fs.length?fs.map(function(f){ var p=folderPath(f); return p.map(function(q){ return q.name; }).join(' › '); }).join(' · '):'Tất cả bài đọc'; }
@@ -4895,8 +4917,9 @@ function dvMove(items,dest){
 function dvLink(items,dest){
   var ls=items.filter(function(it){ return it.k==='l'; }), skipped=items.length-ls.length, prev=[];
   if(!ls.length){ dvSnack('Chỉ bài đọc mới thêm được vào nhiều thư mục. Thư mục chỉ có một vị trí.'); return; }
-  ls.forEach(function(it){ prev.push({it:it,pf:fl(it.o).slice()}); addF(it.o,dest); dvTouch(it); });
-  saveLib(); var dn=dest?(LIB.folders[dest]||{}).name:'Tất cả bài đọc';
+  var dests=(Array.isArray(dest)?dest:[dest]).filter(function(d){ return d===''||LIB.folders[d]; });
+  ls.forEach(function(it){ prev.push({it:it,pf:fl(it.o).slice()}); dests.forEach(function(d){ addF(it.o,d); }); dvTouch(it); });
+  saveLib(); var dn=dests.map(function(d){ return d?(LIB.folders[d]||{}).name:'Tất cả bài đọc'; }).join('”, “');
   dvSnack('Đã thêm '+ls.length+' bài vào “'+dn+'” (không nhân bản, vẫn là cùng một bài)'+(skipped?'. Bỏ qua '+skipped+' thư mục.':''),function(){ prev.forEach(function(r){ r.it.o.folders=r.pf; syncShared(r.it.o); }); });
   hubRefresh2(); autoPub();
 }
@@ -4997,19 +5020,20 @@ function dvConfirm(title,msg,okLabel,onOk){
   m.addEventListener('keydown',function(e){ if(e.key==='Escape'){ e.stopPropagation(); m.remove(); } });
 }
 function dvPicker(items,mode){
-  var pick='', link=mode==='link';
+  var link=mode==='link', pick=link?[]:'';
   var m=document.createElement('div'); m.className='dv-modal';
-  function tree(){ var h='<button type="button" class="dv-pk'+(pick===''?' on':'')+'" data-pk="">'+dvIc('folder')+'Tất cả bài đọc</button>';
+  function tree(){ var h='<button type="button" class="dv-pk'+(!link&&pick===''?' on':'')+'" data-pk=""'+(link?' disabled':'')+'>'+dvIc('folder')+'Tất cả bài đọc</button>';
     (function walk(par,dep){ Object.keys(LIB.folders).map(function(i){ return LIB.folders[i]; }).filter(function(f){ return (f.parent||'')===par&&!f.trashed; }).sort(function(a,b){ return String(a.name).localeCompare(String(b.name),'vi'); }).forEach(function(f){
       var bad=items.some(function(it){ return it.k==='f'&&(it.id===f.id||isUnder(f.id,it.id)); });
-      h+='<button type="button" class="dv-pk'+(pick===f.id?' on':'')+'" data-pk="'+esc(f.id)+'" style="padding-left:'+(14+dep*18)+'px"'+((bad&&!link)?' disabled':'')+'>'+dvIc('folder')+esc(f.name||'Thư mục')+'</button>'; walk(f.id,dep+1); }); })('',1);
+      var on=link?pick.indexOf(f.id)>=0:pick===f.id; h+='<button type="button" class="dv-pk'+(on?' on':'')+'" data-pk="'+esc(f.id)+'" style="padding-left:'+(14+dep*18)+'px"'+((bad&&!link)?' disabled':'')+' aria-pressed="'+on+'">'+dvIc('folder')+'<span class="dv-pkn">'+esc(f.name||'Thư mục')+'</span>'+(link&&on?'<em class="dv-ck">✓</em>':'')+'</button>'; walk(f.id,dep+1); }); })('',1);
     return h; }
-  function draw(){ m.innerHTML='<div class="dv-dlg" role="dialog" aria-modal="true" aria-label="Di chuyển đến"><h4>'+(link?'Thêm '+items.length+' bài vào thư mục (không nhân bản)':'Di chuyển '+items.length+' mục đến…')+'</h4><div class="dv-tree">'+tree()+'</div><div class="dv-dlg-b"><button type="button" class="tw-btn" data-dvm="newf">'+dvIc('folderPlus')+'Thư mục mới</button><span class="sp"></span><button type="button" class="tw-btn" data-dvm="cancel">Hủy</button><button type="button" class="tw-btn solid" data-dvm="ok">'+(link?'Thêm vào':'Di chuyển')+'</button></div></div>'; }
+  function draw(){ m.innerHTML='<div class="dv-dlg" role="dialog" aria-modal="true" aria-label="Di chuyển đến"><h4>'+(link?'Thêm '+items.length+' bài vào thư mục (chọn được nhiều thư mục, không nhân bản)':'Di chuyển '+items.length+' mục đến…')+'</h4><div class="dv-tree">'+tree()+'</div><div class="dv-dlg-b"><button type="button" class="tw-btn" data-dvm="newf">'+dvIc('folderPlus')+'Thư mục mới</button><span class="sp"></span><button type="button" class="tw-btn" data-dvm="cancel">Hủy</button><button type="button" class="tw-btn solid" data-dvm="ok">'+(link?'Thêm vào':'Di chuyển')+'</button></div></div>'; }
   draw(); rrRoot.querySelector('[data-dv]').appendChild(m);
   m.addEventListener('click',function(e){
-    var p=e.target.closest('[data-pk]'); if(p&&!p.disabled){ pick=p.getAttribute('data-pk'); draw(); return; }
+    var p=e.target.closest('[data-pk]'); if(p&&!p.disabled){ var pid=p.getAttribute('data-pk'); if(link){ var ix=pick.indexOf(pid); if(ix>=0) pick.splice(ix,1); else pick.push(pid); } else pick=pid; draw(); return; }
     var b=e.target.closest('[data-dvm]'); if(!b&&e.target!==m) return; var a=b&&b.getAttribute('data-dvm');
-    if(a==='newf'){ var f={id:dvFid(),name:'Thư mục chưa đặt tên',parent:pick,created:Date.now(),updated:Date.now()}; LIB.folders[f.id]=f; saveLib(); pick=f.id; draw(); return; }
+    if(a==='newf'){ var f={id:dvFid(),name:'Thư mục chưa đặt tên',parent:link?(pick[pick.length-1]||''):pick,created:Date.now(),updated:Date.now()}; LIB.folders[f.id]=f; saveLib(); if(link) pick.push(f.id); else pick=f.id; draw(); return; }
+    if(a==='ok'&&link&&!pick.length){ dvSnack('Hãy chọn ít nhất một thư mục.'); return; }
     m.remove(); if(a==='ok'){ if(link) dvLink(items,pick); else dvMove(items,pick); }
   });
   m.addEventListener('keydown',function(e){ if(e.key==='Escape'){ e.stopPropagation(); m.remove(); } });
