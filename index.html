@@ -1809,6 +1809,9 @@ RD.boot = function(){
      B. Second option
    Types are detected: tfng / ynng / mc / match (a lettered list before the numbers) / fill. */
 RD.parseExam = function(text){
+  // AI hay chèn chữ Cyrillic giống Latin (А, Е, О…), ngoặc/dấu hai chấm full-width: đổi về dạng chuẩn
+  var HG={'А':'A','В':'B','Е':'E','К':'K','М':'M','Н':'H','О':'O','Р':'P','С':'C','Т':'T','Х':'X','а':'a','е':'e','о':'o','р':'p','с':'c','х':'x','Ð':'Đ','［':'[','］':']','（':'(','）':')','：':':'};
+  text=String(text||'').replace(/[АВЕКМНОРСТХаеорсхÐ［］（）：]/g,function(c){ return HG[c]; }).replace(/[\u200b-\u200d\ufeff]/g,'').replace(/\u00a0/g,' ');
   var lines=String(text||'').replace(/\r/g,'').split('\n'), groups=[], g=null, it=null;
   function newG(title,instr){ g={id:'g'+(groups.length+1), title:title||'', instr:instr||'', type:'', opts:[], items:[]}; groups.push(g); it=null; }
   lines.forEach(function(raw){
@@ -1828,7 +1831,7 @@ RD.parseExam = function(text){
   var n=0, keyed=0;
   groups.forEach(function(G){
     G.items.forEach(function(I){
-      var m=I.q.match(/\s*[\[\(](?:ĐA|DA|ans|answer)\s*[:：]\s*([^\]\)]+)[\]\)]\s*$/i); if(m){ I.ans=m[1].trim(); I.q=I.q.slice(0,m.index).trim(); }
+      var m=I.q.match(/\s*[\[\(](?:ĐA|DA|ĐÁP ÁN|ans|answer)\s*[:：]\s*([^\]\)]+)[\]\)]\s*$/i); if(m){ I.ans=m[1].trim(); I.q=I.q.slice(0,m.index).trim(); }
     });
     var txt=(G.title+' '+G.instr).toLowerCase();
     if(/\btrue\b/.test(txt)&&/\bfalse\b/.test(txt)&&/not\s*given/.test(txt)) G.type='tfng';
@@ -3770,7 +3773,7 @@ function impTaskStatus(){
   if(!raw){ s.textContent=''; s.className='imp-json-s'; return; }
   var x=RD.parseExam(raw); if(!x){ s.textContent='Chưa đọc được task. Mỗi nhóm cần bắt đầu bằng dòng “Questions 1-4”.'; s.className='imp-json-s bad'; return; }
   var T={tfng:'True/False/Not Given',ynng:'Yes/No/Not Given',mc:'Multiple Choice',match:'Matching',fill:'Điền từ'};
-  s.textContent='Sẵn sàng thêm '+x.count+' câu task ('+x.groups.map(function(g){ return T[g.type]; }).join(', ')+'), '+x.keyed+'/'+x.count+' câu có đáp án.'; s.className='imp-json-s '+(x.keyed===x.count?'ok':'bad');
+  s.textContent='Sẵn sàng thêm '+x.count+' câu task ('+x.groups.map(function(g){ return T[g.type]; }).join(', ')+'), '+x.keyed+'/'+x.count+' câu có đáp án'+(function(){ var m=[]; x.groups.forEach(function(g){ g.items.forEach(function(i){ if(!i.ans) m.push(i.n); }); }); return m.length?'. Thiếu đáp án ở câu '+m.join(', '):'.'; })(); s.className='imp-json-s '+(x.keyed===x.count?'ok':'bad');
 }
 $('#imp-task').addEventListener('input',function(){ impTaskStatus(); });
 function impTaskApply(starting){
