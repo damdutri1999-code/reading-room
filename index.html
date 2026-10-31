@@ -1036,6 +1036,30 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 @media (min-width:1500px){
   .rd.qopen .rd-wrap{margin-left:auto;margin-right:420px;max-width:min(1260px,calc(100vw - 440px))}
 }
+
+/* Toggle Đọc kỹ / Task đọc hiểu */
+.rd-mode{display:inline-flex;border:1px solid var(--ex-line);border-radius:10px;overflow:hidden;background:var(--ex-soft)}
+.rd-mode .rd-btn{border:0;border-radius:0;background:transparent;color:var(--ex-d);font-weight:600;padding:9px 13px}
+.rd-mode .rd-btn:hover{background:rgba(109,74,255,.1)}
+.rd-mode .rd-btn[aria-pressed="true"]{background:var(--ex);color:#fff}
+.rd-mode .rd-exam-btn{border-left:1px solid var(--ex-line)}
+.rd-mode .rd-count{background:var(--ex);color:#fff}
+.rd-mode .rd-btn[aria-pressed="true"] .rd-count{background:#fff;color:var(--ex-d)}
+/* Task mode: hide elicit cards so the text and tasks get the room */
+.rd.qopen .rd-row > .rd-card:not(.rd-ccard){display:none}
+@media (min-width:1080px){ .rd.qopen .rd-row{grid-template-columns:calc(240px * (1 + (var(--z) - 1) * .5) / var(--z)) minmax(0,1fr)} .rd.qopen .rd-text::before{right:calc(4px / var(--z))} }
+/* Instant feedback */
+.rd-ex-o.on.ok{background:#1f9d6a;border-color:#1f9d6a;color:#fff}
+.rd-ex-o.on.bad{background:#d6393f;border-color:#d6393f;color:#fff}
+.rd-ex-o.on.ok i,.rd-ex-o.on.bad i{background:#fff}
+.rd-ex-o.on.ok i{color:#1f9d6a}.rd-ex-o.on.bad i{color:#d6393f}
+.rd-ex-q.ok .rd-ex-sel,.rd-ex-q.ok .rd-ex-in{border-color:#1f9d6a!important;background:#f1fbf6!important}
+.rd-ex-q.bad .rd-ex-sel,.rd-ex-q.bad .rd-ex-in{border-color:#d6393f!important;background:#fff5f5!important}
+.rd-ex-fb.ok{color:#14704b;font-weight:600}
+.rd-ex-q.bad{animation:rdShake .35s}
+@keyframes rdShake{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+/* Paragraph letters for matching tasks */
+.rd-blk[data-pl]::before{content:attr(data-pl);display:inline-grid;place-items:center;width:1.5em;height:1.5em;margin-right:.6em;border-radius:6px;background:var(--ex);color:#fff;font:700 .68em/1 var(--rd-ui);vertical-align:.18em;float:none}
 @media (max-width:1079px){.rd-exam{width:min(440px,100vw)}}
 
 @media (prefers-reduced-motion:reduce){.rd *,.rd *::before,.rd *::after{animation:none!important;transition:none!important}}
@@ -1495,7 +1519,7 @@ html.rr-fs-on{overflow:hidden}
           <label class="chk"><input type="checkbox" id="ex-check" checked><span>Cho học viên tự chấm<small>Cần có đáp án. Học viên bấm “Chấm bài” sẽ thấy đúng/sai.</small></span></label>
           <textarea id="ex-text" rows="14" spellcheck="false" placeholder="Dán đề vào đây, ví dụ:&#10;&#10;Questions 1-3&#10;Write TRUE, FALSE or NOT GIVEN.&#10;1. Sleeper trains were common. [ĐA: TRUE]&#10;2. Flights are cheaper than trains.&#10;Answer: NOT GIVEN" aria-label="Nội dung đề bài"></textarea>
           <div id="ex-sum" class="ex-sum"></div>
-          <div class="ex-acts"><button type="button" class="btn sm ghost" id="ex-sample"><i data-i="file"></i>Chèn đề mẫu</button><button type="button" class="btn sm ghost" data-prompt-ex><i data-i="sparkle"></i>Nhờ AI chuyển đề</button></div>
+          <div class="ex-acts"><button type="button" class="btn sm ghost" id="ex-sample"><i data-i="file"></i>Chèn đề mẫu</button><button type="button" class="btn sm ghost" data-prompt-ex><i data-i="sparkle"></i>Nhờ AI chuyển đề</button><button type="button" class="btn sm ghost" data-prompt-task><i data-i="sparkle"></i>Nhờ AI soạn task</button></div>
           <details class="ex-help"><summary>Cách ghi đề</summary>
 <p>Mỗi nhóm bắt đầu bằng dòng <b>Questions 1-5</b>, theo sau là dòng hướng dẫn.</p>
 <p>Câu hỏi viết <b>1.</b> <b>2.</b> … Đáp án: thêm <b>[ĐA: …]</b> cuối câu, hoặc dòng <b>Answer: …</b> ngay dưới câu.</p>
@@ -1636,6 +1660,7 @@ html.rr-fs-on{overflow:hidden}
         <textarea id="imp-text" placeholder="…hoặc dán văn bản vào đây. Văn bản đã được AI gắn thẻ màu, hoặc HTML có tô màu, sẽ tự hiện màu ở cột xem trước."></textarea>
         <button type="button" class="aihint" data-prompt-all><i data-i="sparkle"></i><span><b>Nhờ AI tô màu và đặt câu hỏi giùm?</b> Lấy câu lệnh mẫu, dán vào ChatGPT hoặc Claude kèm bài đọc, rồi dán cả câu trả lời vào đây. Studio tự tách bài đã tô màu và JSON elicit.</span></button>
         <label class="imp-json"><span><b>JSON câu hỏi elicit</b> <em>(không bắt buộc)</em></span><textarea id="imp-json" rows="3" spellcheck="false" placeholder='{"elicits":[ … ]}' aria-label="JSON câu hỏi elicit"></textarea><span class="imp-json-s" id="imp-json-s" aria-live="polite"></span></label>
+        <label class="imp-json"><span><b>Task đọc hiểu</b> <em>(không bắt buộc, dành cho bài Kiến thức)</em></span><textarea id="imp-task" rows="3" spellcheck="false" placeholder="Questions 1-4&#10;Choose the correct letter, A, B, C or D.&#10;1. …" aria-label="Task đọc hiểu"></textarea><span class="imp-json-s" id="imp-task-s" aria-live="polite"></span></label>
         <label class="chk"><input type="checkbox" id="imp-detect" checked>Tự nhận diện Tiêu đề và Heading</label>
         <label class="chk"><input type="checkbox" id="imp-join">Nối các dòng bị ngắt giữa câu (văn bản copy từ PDF)</label>
         <div class="imp-cat" data-start-only><span class="imp-cat-l">Loại bài <em>(bắt buộc)</em></span>
@@ -1810,6 +1835,7 @@ RD.parseExam = function(text){
     else if(/\byes\b/.test(txt)&&/\bno\b/.test(txt)&&/not\s*given/.test(txt)) G.type='ynng';
     else if(G.opts.length>1) G.type='match';
     else if(G.items.some(function(I){ return I.opts.length>1; })) G.type='mc';
+    else if(/letter|paragraph/.test(txt)&&(function(){ var rm=/\b([A-Z])\s*(?:[-–—]|to)\s*([A-Z])\b/.exec(G.title+' '+G.instr); if(!rm||rm[2]<=rm[1]) return false; for(var c=rm[1].charCodeAt(0);c<=rm[2].charCodeAt(0);c++) G.opts.push({k:String.fromCharCode(c),t:'Paragraph '+String.fromCharCode(c)}); G.auto=true; return true; })()) G.type='match';
     else G.type='fill';
     G.items.forEach(function(I){ n++; if(I.ans) keyed++; });
   });
@@ -1854,14 +1880,14 @@ RD.mount = function(root, lesson, init, opts){
     (lesson.subtitle?'<p class="rd-sub">'+esc(lesson.subtitle)+'</p>':'')+
     '<div class="rd-bar"><div class="rd-legend" role="group" aria-label="Mã màu">'+chips+'</div>'+
     '<div class="rd-tools"><span class="rd-zoom" role="group" aria-label="Cỡ chữ"><button type="button" class="rd-btn rd-z" data-z="-1" aria-label="Thu nhỏ chữ" title="Thu nhỏ chữ">A<sup>−</sup></button><span class="rd-zwrap"><button type="button" class="rd-btn rd-zv" aria-haspopup="listbox" aria-expanded="false" title="Chọn mức phóng to"><span class="rd-zt">100%</span><svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="rd-zmenu" role="listbox" aria-label="Mức phóng to" hidden></div></span><button type="button" class="rd-btn rd-z" data-z="1" aria-label="Phóng to chữ" title="Phóng to chữ">A<sup>+</sup></button></span><button type="button" class="rd-btn rd-focus-btn" aria-pressed="false">Tập trung</button>'+
-    ''+(lesson.exam&&lesson.exam.groups&&lesson.exam.groups.length?'<button type="button" class="rd-btn rd-exam-btn" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M9 11l3 3 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Đề bài <span class="rd-count rd-ex-n">'+lesson.exam.count+'</span></button>':'')+'<button type="button" class="rd-btn rd-work-btn">Bài làm <span class="rd-count">0</span></button></div></div>'+
+    ''+(lesson.exam&&lesson.exam.groups&&lesson.exam.groups.length?'<span class="rd-mode" role="group" aria-label="Chế độ học"><button type="button" class="rd-btn rd-mode-read" aria-pressed="true">Đọc kỹ</button><button type="button" class="rd-btn rd-exam-btn" aria-pressed="false">Task đọc hiểu <span class="rd-count rd-ex-n">'+lesson.exam.count+'</span></button></span>':'')+'<button type="button" class="rd-btn rd-work-btn">Bài làm <span class="rd-count">0</span></button></div></div>'+
     '<p class="rd-tip">'+(window.matchMedia&&matchMedia('(hover:none)').matches?'Chạm giữ một từ rồi kéo để chọn cụm từ cần ghi chú. Chạm vào ô màu để ẩn hoặc hiện từng loại.':'Bôi đen một cụm từ để ghi chú lên bài. Bấm vào ô màu để ẩn hoặc hiện từng loại.')+'</p></header>'+
     '<article class="rd-text"></article></div>'+
     '<aside class="rd-drawer" aria-label="Bài làm của tôi"><div class="rd-dr-head"><h2>Bài làm của tôi</h2><button type="button" class="rd-btn rd-x">Đóng</button></div>'+
     '<div class="rd-dr-body"><label class="rd-lbl" for="'+uidp+'-name">Tên học viên</label><input class="rd-input rd-name" id="'+uidp+'-name" autocomplete="name" placeholder="Nhập tên của em"><div class="rd-dr-list"></div></div>'+
     '<div class="rd-dr-foot"><button type="button" class="rd-btn rd-btn-solid rd-dl">Tải file kèm bài làm</button><button type="button" class="rd-btn rd-copy">Sao chép bài làm</button>'+
     '<p class="rd-dr-note">File tải về giữ nguyên bài đọc và toàn bộ ghi chú. Mở lại bằng trình duyệt là sửa tiếp được, hoặc gửi cho giáo viên.</p></div></aside>'+
-    (EX?'<aside class="rd-exam" aria-label="Đề bài" aria-hidden="true"><div class="rd-ex-head"><span class="rd-ex-tag">Đề bài</span><b class="rd-ex-prog"></b><button type="button" class="rd-ex-x" aria-label="Ẩn đề bài">Ẩn đề</button></div><div class="rd-ex-body"></div><div class="rd-ex-foot"></div></aside>':'')+
+    (EX?'<aside class="rd-exam" aria-label="Task đọc hiểu" aria-hidden="true"><div class="rd-ex-head"><span class="rd-ex-tag">Task đọc hiểu</span><b class="rd-ex-prog"></b><button type="button" class="rd-ex-x" aria-label="Quay lại đọc kỹ">Đọc kỹ</button></div><div class="rd-ex-body"></div><div class="rd-ex-foot"></div></aside>':'')+
     '<button type="button" class="rd-selbtn" hidden>+ Ghi chú</button>'+
     '<div class="rd-pop" hidden role="dialog" aria-label="Ghi chú"><p class="rd-pop-q"></p><textarea class="rd-ta rd-pop-ta" rows="3" placeholder="Em nghĩ gì về cụm này?" aria-label="Nội dung ghi chú"></textarea>'+
     '<label class="rd-share"'+(opts.live?'':' hidden')+'><input type="checkbox" class="rd-share-chk" checked>Chia sẻ với cả lớp</label>'+
@@ -1880,6 +1906,10 @@ RD.mount = function(root, lesson, init, opts){
   var blocks = Array.prototype.slice.call(art.children);
   blocks.forEach(function(b,i){ b.classList.add('rd-blk'); b.setAttribute('data-b',i);
     b.querySelectorAll('.hl').forEach(function(m,k){ m.style.setProperty('--d',(200+k*150)+'ms'); }); });
+  // Paragraph letters (A, B, C…) when the task asks to match paragraphs
+  if(EX&&EX.groups.some(function(G){ return G.type==='match'&&(/paragraph|section/i.test(G.title+' '+G.instr)||G.items.some(function(I){ return /^(paragraph|section)\s+[A-Z]\b/i.test(I.q); })); })){
+    var pl=0; blocks.forEach(function(b){ if(b.tagName==='P'&&!/\bps-/.test(b.className||'')&&b.textContent.trim()&&pl<26) b.setAttribute('data-pl',String.fromCharCode(65+pl++)); });
+  }
   // Each paragraph sits in its own row: notes column (left) + text (right)
   blocks.forEach(function(b){ if(b.classList.contains('nb')) return; var row=h('div','rd-row'); art.insertBefore(row,b); row.appendChild(b); });
   function rowSpan(row){
@@ -2012,7 +2042,7 @@ RD.mount = function(root, lesson, init, opts){
     count();
     if(opts.onChange) opts.onChange(st);
   }
-  var countEl = $('.rd-count');
+  var countEl = $('.rd-work-btn .rd-count');
   function count(){
     var n = 0;
     order.forEach(function(id){ if((st.answers[id]||'').trim()) n++; });
@@ -2256,53 +2286,53 @@ RD.mount = function(root, lesson, init, opts){
     var canCheck = EX.keyed>0 && lesson.examCheck!==false;
     function exAns(it){ return st.exam['q'+it.n]||''; }
     function exDone(){ var n=0; EX.groups.forEach(function(G){ G.items.forEach(function(I){ if(String(exAns(I)).trim()) n++; }); }); return n; }
-    function exCls(G,I){ if(!st.examChecked||!I.ans) return ''; return RD.examOk(G.type,exAns(I),I.ans)?' ok':' bad'; }
+    function exCls(G,I){ if(!canCheck||!I.ans||!String(exAns(I)).trim()) return ''; return RD.examOk(G.type,exAns(I),I.ans)?' ok':' bad'; }
     function exItem(G,I){
       var a=exAns(I), c=exCls(G,I), ctl='';
       if(G.type==='tfng'||G.type==='ynng'){
-        ctl='<div class="rd-ex-opts row">'+TF[G.type].map(function(v){ return '<button type="button" class="rd-ex-o'+(RD.examNorm(a,G.type)===RD.examNorm(v,G.type)?' on':'')+'" data-q="'+I.n+'" data-v="'+v+'">'+v+'</button>'; }).join('')+'</div>';
+        ctl='<div class="rd-ex-opts row">'+TF[G.type].map(function(v){ var on=RD.examNorm(a,G.type)===RD.examNorm(v,G.type); return '<button type="button" class="rd-ex-o'+(on?' on'+c:'')+'" data-q="'+I.n+'" data-v="'+v+'">'+v+'</button>'; }).join('')+'</div>';
       } else if(G.type==='mc'){
-        ctl='<div class="rd-ex-opts col">'+I.opts.map(function(o){ return '<button type="button" class="rd-ex-o'+(a===o.k?' on':'')+'" data-q="'+I.n+'" data-v="'+esc(o.k)+'"><i>'+esc(o.k)+'</i><span>'+esc(o.t)+'</span></button>'; }).join('')+'</div>';
+        ctl='<div class="rd-ex-opts col">'+I.opts.map(function(o){ return '<button type="button" class="rd-ex-o'+(a===o.k?' on'+c:'')+'" data-q="'+I.n+'" data-v="'+esc(o.k)+'"><i>'+esc(o.k)+'</i><span>'+esc(o.t)+'</span></button>'; }).join('')+'</div>';
       } else if(G.type==='match'){
         ctl='<select class="rd-ex-sel" data-q="'+I.n+'" aria-label="Đáp án câu '+I.n+'"><option value="">Chọn…</option>'+G.opts.map(function(o){ return '<option value="'+esc(o.k)+'"'+(a===o.k?' selected':'')+'>'+esc(o.k)+'</option>'; }).join('')+'</select>';
       } else {
         ctl='<input class="rd-ex-in" type="text" data-q="'+I.n+'" value="'+esc(a)+'" placeholder="Câu trả lời của em" autocomplete="off" spellcheck="false" aria-label="Đáp án câu '+I.n+'">';
       }
-      var fb=(c===' bad')?'<p class="rd-ex-fb">Đáp án: <b>'+esc(String(I.ans).split(/\s*[\/|]\s*/)[0])+'</b></p>':'';
+      var fb=(c===' bad')?'<p class="rd-ex-fb">Chưa đúng. Đọc lại bài và chọn lại nhé.</p>':(c===' ok'?'<p class="rd-ex-fb ok">Chính xác!</p>':'');
       return '<div class="rd-ex-q'+c+'" data-n="'+I.n+'"><div class="rd-ex-qh"><span class="rd-ex-n">'+I.n+'</span><p>'+(G.type==='fill'?esc(I.q).replace(/_{2,}|…{2,}|\.{4,}/g,'<u></u>'):esc(I.q))+'</p>'+(c?'<span class="rd-ex-mark" aria-hidden="true">'+(c===' ok'?'✓':'✗')+'</span>':'')+'</div>'+ctl+fb+'</div>';
     }
     function exRender(keepFocus){
       var f=document.activeElement, fq=f&&f.getAttribute&&f.getAttribute('data-q'), pos=f&&f.selectionStart;
       exBody.innerHTML=EX.groups.map(function(G){
         return '<section class="rd-ex-g"><h3>'+esc(G.title||'Câu hỏi')+'</h3>'+(G.instr?'<p class="rd-ex-ins">'+esc(G.instr)+'</p>':'')+
-          (G.type==='match'?'<ul class="rd-ex-list">'+G.opts.map(function(o){ return '<li><i>'+esc(o.k)+'</i><span>'+esc(o.t)+'</span></li>'; }).join('')+'</ul>':'')+
+          (G.type==='match'&&!G.auto?'<ul class="rd-ex-list">'+G.opts.map(function(o){ return '<li><i>'+esc(o.k)+'</i><span>'+esc(o.t)+'</span></li>'; }).join('')+'</ul>':'')+
           G.items.map(function(I){ return exItem(G,I); }).join('')+'</section>'; }).join('');
       var done=exDone(); exProg.textContent=done+'/'+EX.count+' câu';
-      var score='';
-      if(st.examChecked){ var ok=0, tot=0; EX.groups.forEach(function(G){ G.items.forEach(function(I){ if(!I.ans) return; tot++; if(RD.examOk(G.type,exAns(I),I.ans)) ok++; }); }); score='<div class="rd-ex-score"><b>'+ok+'/'+tot+'</b><span>câu đúng</span></div>'; }
-      exFoot.innerHTML=score+(canCheck?(st.examChecked?'<button type="button" class="rd-ex-b" data-act="again">Sửa lại bài</button>':'<button type="button" class="rd-ex-b solid" data-act="check">Chấm bài</button>'):'')+'<button type="button" class="rd-ex-b ghost" data-act="clear">Xoá hết đáp án</button>';
+      var score='', ok=0, tot=0, ans=0;
+      if(canCheck){ EX.groups.forEach(function(G){ G.items.forEach(function(I){ if(!I.ans) return; tot++; if(String(exAns(I)).trim()){ ans++; if(RD.examOk(G.type,exAns(I),I.ans)) ok++; } }); }); score='<div class="rd-ex-score"><b>'+ok+'/'+tot+'</b><span>câu đúng'+(ans<tot?' · còn '+(tot-ans)+' câu':' · hoàn thành')+'</span></div>'; }
+      exFoot.innerHTML=score+'<button type="button" class="rd-ex-b ghost" data-act="clear">Làm lại từ đầu</button>';
       if(keepFocus&&fq){ var nf=exBody.querySelector('[data-q="'+fq+'"]'); if(nf){ nf.focus(); try{ if(pos!=null) nf.setSelectionRange(pos,pos); }catch(e){} } }
       var ex=$('.rd-ex-n'); if(ex&&exBtn) ex.textContent=done?done+'/'+EX.count:EX.count;
     }
     function exOpen(o){
       if(o) closeDrawer();
-      R.classList.toggle('qopen',o); exP.classList.toggle('open',o); exP.setAttribute('aria-hidden',String(!o)); exBtn.setAttribute('aria-pressed',String(o));
+      R.classList.toggle('qopen',o); exP.classList.toggle('open',o); exP.setAttribute('aria-hidden',String(!o)); exBtn.setAttribute('aria-pressed',String(o)); var rb=$('.rd-mode-read'); if(rb) rb.setAttribute('aria-pressed',String(!o));
       document.documentElement.classList.toggle('rd-dr-open',o);
       linkClear(); setTimeout(function(){ prog(); },460);
       if(o) exRender();
     }
-    on(exBtn,'click',function(){ exOpen(!exP.classList.contains('open')); });
-    on($('.rd-ex-x'),'click',function(){ exOpen(false); exBtn.focus(); });
+    on(exBtn,'click',function(){ exOpen(true); });
+    on($('.rd-mode-read'),'click',function(){ exOpen(false); });
+    on($('.rd-ex-x'),'click',function(){ exOpen(false); var rb=$('.rd-mode-read'); if(rb) rb.focus(); });
     on(R,'keydown',function(e){ if(e.key==='Escape'&&exP.classList.contains('open')) exOpen(false); });
     on(exP,'click',function(e){
-      var o=e.target.closest('.rd-ex-o'); if(o){ if(st.examChecked) return; var q='q'+o.getAttribute('data-q'), v=o.getAttribute('data-v'); st.exam[q]=(st.exam[q]===v)?'':v; save(); exRender(); return; }
+      var o=e.target.closest('.rd-ex-o'); if(o){ var q='q'+o.getAttribute('data-q'), v=o.getAttribute('data-v'); st.exam[q]=(st.exam[q]===v)?'':v; save(); exRender(); return; }
       var b=e.target.closest('[data-act]'); if(!b) return; var a=b.getAttribute('data-act');
-      if(a==='check'){ st.examChecked=true; save(); exRender(); exP.scrollTop=0; exBody.scrollTop=0; }
-      else if(a==='again'){ st.examChecked=false; save(); exRender(); }
-      else if(a==='clear'){ if(!b.dataset.arm){ b.dataset.arm='1'; b.textContent='Bấm lần nữa để xoá'; setTimeout(function(){ if(b.isConnected){ delete b.dataset.arm; b.textContent='Xoá hết đáp án'; } },2600); return; } st.exam={}; st.examChecked=false; save(); exRender(); }
+      if(a==='clear'){ if(!b.dataset.arm){ b.dataset.arm='1'; b.textContent='Bấm lần nữa để làm lại'; setTimeout(function(){ if(b.isConnected){ delete b.dataset.arm; b.textContent='Làm lại từ đầu'; } },2600); return; } st.exam={}; save(); exRender(); }
     });
+    on(exP,'keydown',function(e){ if(e.key==='Enter'&&e.target.classList.contains('rd-ex-in')){ e.preventDefault(); e.target.blur(); } });
     on(exP,'input',function(e){ var el=e.target; if(el.classList.contains('rd-ex-in')){ st.exam['q'+el.getAttribute('data-q')]=el.value; save(); var d=exDone(); exProg.textContent=d+'/'+EX.count+' câu'; var n=$('.rd-ex-n'); if(n) n.textContent=d?d+'/'+EX.count:EX.count; } });
-    on(exP,'change',function(e){ var el=e.target; if(el.classList.contains('rd-ex-sel')){ st.exam['q'+el.getAttribute('data-q')]=el.value; save(); exRender(); } });
+    on(exP,'change',function(e){ var el=e.target; if(el.classList.contains('rd-ex-sel')||el.classList.contains('rd-ex-in')){ st.exam['q'+el.getAttribute('data-q')]=el.value; save(); exRender(el.classList.contains('rd-ex-in')); } });
     exRender();
     cleanup.push(function(){ document.documentElement.classList.remove('rd-dr-open'); });
     if(lesson.examOpen && !opts.noAutoExam) setTimeout(function(){ exOpen(true); },400);
@@ -3479,14 +3509,71 @@ function aiElicitPrompt(){
   return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh.\n\nNHIỆM VỤ: đọc bài đọc ở cuối và soạn bộ câu hỏi elicit theo các tiêu chí dưới đây.\n\n'+EL_WHY+EL_CRITERIA+'\n'+EL_CHECK+'\n'+
   'ĐỊNH DẠNG TRẢ LỜI: chỉ một khối code ```json … ``` chứa JSON hợp lệ. Không thêm lời dẫn, lời kết hay chú thích; không chép lại bài đọc.\n\n'+EL_INPUT;
 }
+var TASK_RULES=
+'TASK ĐỌC HIỂU (chỉ soạn khi LOAI_BAI là CONTENT)\n'+
+'Soạn bộ task kiểm tra đọc hiểu cho học viên làm ngay trong lúc đọc, theo phong cách IELTS Reading nhưng dựa HOÀN TOÀN vào nội dung bài. Câu hỏi và hướng dẫn viết bằng tiếng Anh. BẮT BUỘC có đủ ba nhóm, theo đúng thứ tự, đánh số câu liên tục từ 1:\n\n'+
+'NHÓM 1: Multiple Choice (bắt buộc). 4 đến 5 câu. Mỗi câu có 4 lựa chọn A, B, C, D, chỉ MỘT đáp án đúng. Đáp án sai phải hợp lý nhưng sai rõ ràng so với bài. Vị trí đáp án đúng phân bố đều giữa A, B, C, D. Hướng dẫn: "Choose the correct letter, A, B, C or D."\n\n'+
+'NHÓM 2: True/False/Not Given (bắt buộc). 5 đến 7 câu. Phải có ít nhất 1 câu TRUE, 1 câu FALSE và 1 câu NOT GIVEN. Các câu xếp theo thứ tự thông tin xuất hiện trong bài. Định nghĩa: TRUE = bài nói đúng như vậy; FALSE = bài nói ngược lại; NOT GIVEN = bài không đề cập. Câu NOT GIVEN phải nghe có vẻ hợp lý nhưng bài thật sự không có thông tin. Hướng dẫn: "Do the following statements agree with the information given in the text? Write TRUE, FALSE or NOT GIVEN."\n\n'+
+'NHÓM 3: chọn MỘT trong hai dạng sau, tuỳ bài đọc phù hợp dạng nào hơn (bạn tự quyết định):\n'+
+'- Matching Headings: chọn khi bài có từ 4 đoạn thân bài trở lên và mỗi đoạn xoay quanh MỘT ý chính rõ ràng. Cho danh sách heading đánh số la mã i, ii, iii… nhiều hơn số đoạn cần nối 2 heading (heading thừa là nhiễu). Mỗi câu hỏi là một đoạn ("Paragraph B"), đáp án là số la mã. Chọn 4 đến 6 đoạn. Không nối đoạn đầu nếu đoạn đó chỉ là mở bài chung chung.\n'+
+'- Matching Information: chọn khi các đoạn chứa nhiều chi tiết cụ thể (ví dụ, lý do, so sánh, định nghĩa, số liệu) mà không có một ý chính duy nhất, hoặc khi ý chính các đoạn chồng lấn nhau, hoặc bài có ít hơn 4 đoạn. Mỗi câu là một thông tin cần tìm ("a description of…", "an example of…", "a reason why…"), đáp án là nhãn đoạn. Chọn 4 đến 6 câu; một đoạn có thể được chọn nhiều lần hoặc không lần nào.\n'+
+'- Nếu cả hai đều phù hợp thì chọn Matching Headings.\n\n'+
+'NHÃN ĐOẠN: các đoạn thân bài (KHÔNG tính tiêu đề, phụ đề, heading, ghi chú) được đánh nhãn A, B, C… theo thứ tự từ trên xuống, mỗi đoạn một chữ cái. Học viên sẽ thấy các nhãn này ngay trước mỗi đoạn trong bài. Nhóm 3 phải dùng đúng các nhãn đó.\n\n'+
+'ĐÁP ÁN (rất quan trọng)\n'+
+'- BẠN phải quyết định đáp án đúng cho MỌI câu và ghi vào [ĐA: …]. Không để trống, không viết "tuỳ".\n'+
+'- Trước khi chốt, tự kiểm tra từng câu: tìm đúng chỗ trong bài làm căn cứ; chắc chắn chỉ có MỘT đáp án đúng.\n'+
+'- Không soạn câu cần kiến thức ngoài bài mới trả lời được. Không lặp lại các câu hỏi elicit.\n\n'+
+'ĐỊNH DẠNG TASK (văn bản thuần, đặt trong khối ```task … ```)\n'+
+'Questions 1-4\n'+
+'Choose the correct letter, A, B, C or D.\n'+
+'1. Câu hỏi?\n'+
+'A. Lựa chọn một\n'+
+'B. Lựa chọn hai\n'+
+'C. Lựa chọn ba\n'+
+'D. Lựa chọn bốn\n'+
+'Answer: B\n'+
+'2. Câu hỏi tiếp theo?\n'+
+'A. …\n'+
+'(lặp lại tương tự; mỗi câu một dòng “Answer: X” ngay sau lựa chọn D)\n\n'+
+'Questions 5-10\n'+
+'Do the following statements agree with the information given in the text? Write TRUE, FALSE or NOT GIVEN.\n'+
+'5. Nội dung nhận định. [ĐA: TRUE]\n'+
+'6. Nội dung nhận định. [ĐA: NOT GIVEN]\n\n'+
+'Questions 11-15 (Matching Headings)\n'+
+'The text has paragraphs A-F. Choose the correct heading for each paragraph from the list of headings below.\n'+
+'i. Heading một\n'+
+'ii. Heading hai\n'+
+'iii. Heading ba\n'+
+'11. Paragraph B [ĐA: iii]\n'+
+'12. Paragraph C [ĐA: i]\n\n'+
+'(Hoặc, nếu chọn Matching Information)\n'+
+'Questions 11-15\n'+
+'Which paragraph contains the following information? Write the correct letter, A-F.\n'+
+'11. a description of how the system works [ĐA: C]\n'+
+'12. an example of a negative effect [ĐA: E]\n\n'+
+'QUY TẮC ĐỊNH DẠNG TASK: mỗi nhóm bắt đầu bằng dòng “Questions a-b”, rồi dòng hướng dẫn. Số câu liên tục qua cả ba nhóm. Mỗi câu có đáp án: trắc nghiệm ghi “Answer: B” dưới các lựa chọn; True/False/Not Given và Matching ghi [ĐA: …] cuối dòng. Không thêm lời giải thích, không thêm nhóm nào khác.\n';
+var TASK_INPUT=
+'=== DỮ LIỆU ĐẦU VÀO ===\n'+
+'LOAI_BAI: <ghi CONTENT nếu đây là bài đọc lấy nội dung, kiến thức; ghi IELTS nếu là bài IELTS có sẵn đề>\n'+
+'SO_CAU_ELICIT: <điền số câu>\n'+
+'CAU_HOI_IELTS_READING: <dán câu hỏi IELTS Reading nếu có>\n'+
+'CAU_HOI_Y_DO_TAC_GIA: <dán dạng Multiple Choice về ý đồ/hàm ý tác giả nếu có>\n'+
+'BAI_DOC:\n<dán bài đọc vào đây>\n\n'+
+'Quy ước: mục LOAI_BAI ghi rõ CONTENT nghĩa là bài đọc này dùng để lấy nội dung, KHÔNG phải đề thi: bạn BẮT BUỘC soạn thêm TASK ĐỌC HIỂU (khối ```task) theo phần quy tắc ở trên. Nếu LOAI_BAI còn nguyên dấu < > hoặc ghi IELTS thì KHÔNG soạn task. Với các mục khác: mục nào còn nguyên dấu < > nghĩa là giáo viên không cung cấp; khi đó SO_CAU_ELICIT mặc định 15 đến 20 câu, bỏ qua nhóm "Thông tin sẽ cần" và "Ý đồ tác giả", vẫn tạo các nhóm "Dòng lập luận", "Coherence", "Kiến thức".';
+function aiTaskPrompt(){
+  return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh.\n\nBài đọc ở cuối là bài đọc LẤY NỘI DUNG (content), không phải đề thi. NHIỆM VỤ: soạn bộ task đọc hiểu cho bài này theo quy tắc dưới đây. Công cụ của giáo viên đọc kết quả của bạn bằng chương trình nên phải đúng định dạng.\n\n'+TASK_RULES+'\n'+
+  'ĐỊNH DẠNG TRẢ LỜI: chỉ MỘT khối code ```task … ``` chứa bộ task. Không thêm lời dẫn, giải thích hay chú thích; không chép lại bài đọc.\n\nBÀI ĐỌC (đánh nhãn đoạn A, B, C… theo thứ tự các đoạn thân bài):\n<dán bài đọc vào đây>';
+}
 function aiAllPrompt(){
-  return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh.\n\nNHIỆM VỤ: với bài đọc ở cuối, hãy (1) phân tích bài, (2) tô màu bài bằng thẻ, (3) soạn câu hỏi elicit dạng JSON. Công cụ của giáo viên đọc kết quả của bạn bằng chương trình nên phải đúng định dạng. Bước phân tích làm âm thầm, không cần viết ra.\n\n'+
+  return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh.\n\nNHIỆM VỤ: với bài đọc ở cuối, hãy (1) phân tích bài, (2) tô màu bài bằng thẻ, (3) soạn câu hỏi elicit dạng JSON, (4) NẾU LOAI_BAI là CONTENT thì soạn thêm task đọc hiểu. Công cụ của giáo viên đọc kết quả của bạn bằng chương trình nên phải đúng định dạng. Bước phân tích làm âm thầm, không cần viết ra. Đọc mục LOAI_BAI trong DỮ LIỆU ĐẦU VÀO trước để biết có phải soạn task hay không.\n\n'+
   '########## PHẦN 1: TÔ MÀU ##########\n'+promptColor()+'\n'+
   '########## PHẦN 2: CÂU HỎI ELICIT ##########\n'+EL_WHY+EL_CRITERIA+'\n'+EL_CHECK+'\n'+
+  '########## PHẦN 3: TASK ĐỌC HIỂU ##########\n'+TASK_RULES+'\n'+
   '########## ĐỊNH DẠNG TRẢ LỜI ##########\n'+
-  'Trả lời đúng HAI khối code, theo thứ tự, không có lời dẫn, lời kết hay chú thích nào ngoài hai khối:\n'+
+  'Trả lời đúng các khối code sau, theo thứ tự, không có lời dẫn, lời kết hay chú thích nào ngoài các khối:\n'+
   '1) Khối ```text chứa bài đọc đã tô màu (Phần 1).\n'+
-  '2) Khối ```json chứa JSON elicit (Phần 2). "evidence" chép từ bài GỐC, không kèm thẻ màu.\n\n'+EL_INPUT;
+  '2) Khối ```json chứa JSON elicit (Phần 2). "evidence" chép từ bài GỐC, không kèm thẻ màu.\n'+
+  '3) Khối ```task chứa task đọc hiểu (Phần 3). CHỈ có khối này khi LOAI_BAI là CONTENT; nếu không thì chỉ trả hai khối trên.\n\n'+TASK_INPUT;
 }
 function elType(t){ var s=String(t||'').toLowerCase(); if(/research|tra\s*c|\*/.test(s)) return 'research'; if(/^(yn|y\/n|yes|no|tf)|yes\s*\/?\s*no|có\s*\/?\s*không/.test(s)) return 'yn'; return 'wh'; }
 function elParse(raw){
@@ -3667,14 +3754,29 @@ $('#imp-list').addEventListener('change',function(e){ var s=e.target.closest('[d
 $('#imp-list').addEventListener('click',function(e){ var t=e.target.closest('button.ip-tag'); if(!t||impLesson) return; var b=impBlocks[+t.getAttribute('data-i')]; b.style=CYCLE[(CYCLE.indexOf(b.style)+1)%CYCLE.length]; renderImp(); });
 var impT;
 function splitReply(){
-  var ta=$('#imp-text'), t=ta.value, m=/```(?:json)?[ \t]*\n?\s*(\{\s*"elicits"[\s\S]*?\})\s*```/i.exec(t)||/```json[ \t]*\n([\s\S]*?)```/i.exec(t);
+  var ta=$('#imp-text'), t=ta.value, tkm=/```task[ \t]*\n([\s\S]*?)```/i.exec(t);
+  if(tkm){ $('#imp-task').value=tkm[1].trim(); t=t.replace(tkm[0],''); }
+  var m=/```(?:json)?[ \t]*\n?\s*(\{\s*"elicits"[\s\S]*?\})\s*```/i.exec(t)||/```json[ \t]*\n([\s\S]*?)```/i.exec(t);
   if(m){ $('#imp-json').value=m[1].trim(); t=t.replace(m[0],''); }
   else { var j=t.search(/\n[ \t]*\{\s*"elicits"\s*:/); if(j>=0){ $('#imp-json').value=t.slice(j).trim(); t=t.slice(0,j); } }
   var fb=/```[a-z]*[ \t]*\n([\s\S]*?)```/i.exec(t); if(fb) t=fb[1];
   if(/```/.test(t)){ t=t.replace(/^[ \t]*```[a-z]*[ \t]*$/gim,'').replace(/\n{3,}/g,'\n\n'); }
   t=t.replace(/^\s+|\s+$/g,'')===t?t:t.trim();
   if(t!==ta.value) ta.value=t;
-  impJsonStatus();
+  impJsonStatus(); impTaskStatus();
+}
+function impTaskStatus(){
+  var s=$('#imp-task-s'), raw=$('#imp-task').value.trim(); if(!s) return;
+  if(!raw){ s.textContent=''; s.className='imp-json-s'; return; }
+  var x=RD.parseExam(raw); if(!x){ s.textContent='Chưa đọc được task. Mỗi nhóm cần bắt đầu bằng dòng “Questions 1-4”.'; s.className='imp-json-s bad'; return; }
+  var T={tfng:'True/False/Not Given',ynng:'Yes/No/Not Given',mc:'Multiple Choice',match:'Matching',fill:'Điền từ'};
+  s.textContent='Sẵn sàng thêm '+x.count+' câu task ('+x.groups.map(function(g){ return T[g.type]; }).join(', ')+'), '+x.keyed+'/'+x.count+' câu có đáp án.'; s.className='imp-json-s '+(x.keyed===x.count?'ok':'bad');
+}
+$('#imp-task').addEventListener('input',function(){ impTaskStatus(); });
+function impTaskApply(starting){
+  var raw=$('#imp-task').value.trim(); if(!raw) return 0; var x=RD.parseExam(raw); if(!x) return 0;
+  if(starting||!(L.examText||'').trim()) L.examText=raw; else L.examText=L.examText.replace(/\s+$/,'')+'\n\n'+raw;
+  L.examOn=true; L.examTouched=true; L.examCheck=true; return x.count;
 }
 function impJsonStatus(){
   var raw=$('#imp-json').value.trim(), s=$('#imp-json-s'); if(!s) return;
@@ -3788,11 +3890,11 @@ $('#imp-ok').addEventListener('click',function(){
     var last=ed.lastElementChild; while(last&&last.tagName==='P'&&!last.textContent.trim()){ var pv2=last.previousElementSibling; last.remove(); last=pv2; }
     ed.insertAdjacentHTML('beforeend',html+'<p><br></p>'); $$('.nb',ed).forEach(decorateNb);
   }
-  var jr=impJsonApply();
+  var jr=impJsonApply(), tn=impTaskApply(starting||mode==='replace');
   changed(true); if(starting) enterEditor(); else closeImport();
   if(starting&&L.examOn&&!(L.examText||'').trim()) setTimeout(function(){ showTab('ex'); },50);
-  impBlocks=[]; impEls={}; impMap={}; impCount={}; $('#imp-text').value=''; $('#imp-json').value=''; impJsonStatus(); renderImp();
-  toast(jr?(jr.err?'Đã đưa '+bl.length+' đoạn vào bài, nhưng không đọc được JSON elicit: '+jr.err:'Đã đưa '+bl.length+' đoạn và gắn '+jr.n+'/'+jr.total+' câu elicit'+(jr.lost?' ('+jr.lost+' căn cứ không khớp, xem tab Câu hỏi › Nạp từ AI)':'')):'Đã đưa '+bl.length+' đoạn vào bài',!!(jr&&(jr.err||jr.lost)));
+  impBlocks=[]; impEls={}; impMap={}; impCount={}; $('#imp-text').value=''; $('#imp-json').value=''; $('#imp-task').value=''; impJsonStatus(); impTaskStatus(); renderImp();
+  toast(tn&&!jr?'Đã đưa '+bl.length+' đoạn vào bài và thêm '+tn+' câu task đọc hiểu':jr?(jr.err?'Đã đưa '+bl.length+' đoạn vào bài, nhưng không đọc được JSON elicit: '+jr.err:'Đã đưa '+bl.length+' đoạn và gắn '+jr.n+'/'+jr.total+' câu elicit'+(jr.lost?' ('+jr.lost+' căn cứ không khớp, xem tab Câu hỏi › Nạp từ AI)':'')):'Đã đưa '+bl.length+' đoạn vào bài',!!(jr&&(jr.err||jr.lost)));
 });
 
 var impMap={}, impCount={};
@@ -3825,12 +3927,12 @@ function blocksHtml(bl){
 }
 /* Prompt for AI */
 function openPrompt(btn){
-  var al=btn.hasAttribute('data-prompt-all'), el=btn.hasAttribute('data-prompt-el'), ex=btn.hasAttribute('data-prompt-ex'), p=$('#pop-prompt'); $('#pp-text').value=al?aiAllPrompt():el?aiElicitPrompt():ex?aiExamPrompt():aiPrompt(); $('#pp-h').textContent=al?'Câu lệnh nhờ AI tô màu và đặt câu hỏi elicit':el?'Câu lệnh nhờ AI tạo câu hỏi elicit':ex?'Câu lệnh nhờ AI chuyển đề bài':'Câu lệnh nhờ AI tô màu'; $('#pp-lede').textContent=al?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, điền số câu và dán bài đọc. AI trả hai khối code: bài đã tô màu và JSON elicit. Thầy cô chỉ cần chép cả câu trả lời và dán vào ô văn bản, Studio tự tách hai phần.':el?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, rồi dán bài đọc (và danh sách câu hỏi nếu thầy cô đã có). Chép khối JSON AI trả về và dán vào “Nạp từ AI”.':ex?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng đề gốc (có thể dán từ PDF). Chép kết quả và dán vào ô đề bài.':'Chép câu lệnh này vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng bài đọc của bạn. Khi AI trả lời, chép nguyên khối code và dán vào Studio: màu, câu hỏi và ô ghi chú tự hiện ra.';
+  var al=btn.hasAttribute('data-prompt-all'), tk=btn.hasAttribute('data-prompt-task'), el=btn.hasAttribute('data-prompt-el'), ex=btn.hasAttribute('data-prompt-ex'), p=$('#pop-prompt'); $('#pp-text').value=al?aiAllPrompt():tk?aiTaskPrompt():el?aiElicitPrompt():ex?aiExamPrompt():aiPrompt(); $('#pp-h').textContent=al?'Câu lệnh nhờ AI tô màu, đặt câu hỏi elicit và soạn task':tk?'Câu lệnh nhờ AI soạn task đọc hiểu':el?'Câu lệnh nhờ AI tạo câu hỏi elicit':ex?'Câu lệnh nhờ AI chuyển đề bài':'Câu lệnh nhờ AI tô màu'; $('#pp-lede').textContent=al?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, điền số câu, ghi rõ LOAI_BAI (CONTENT nếu là bài lấy nội dung) và dán bài đọc. AI trả hai khối code (bài đã tô màu, JSON elicit), thêm khối task nếu là bài CONTENT. Thầy cô chép cả câu trả lời và dán vào ô văn bản, Studio tự tách các phần.':tk?'Chép câu lệnh vào ChatGPT, Claude hay Gemini rồi dán bài đọc. AI trả một khối task. Chép khối đó và dán vào ô task hoặc vào tab Đề bài.':el?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, rồi dán bài đọc (và danh sách câu hỏi nếu thầy cô đã có). Chép khối JSON AI trả về và dán vào “Nạp từ AI”.':ex?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng đề gốc (có thể dán từ PDF). Chép kết quả và dán vào ô đề bài.':'Chép câu lệnh này vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng bài đọc của bạn. Khi AI trả lời, chép nguyên khối code và dán vào Studio: màu, câu hỏi và ô ghi chú tự hiện ra.';
   p.hidden=false; var r=btn.getBoundingClientRect();
   p.style.left=Math.max(12,Math.min(innerWidth-p.offsetWidth-12,r.left))+'px';
   var top=r.top-p.offsetHeight-10; if(top<12) top=r.bottom+10; p.style.top=top+'px';
 }
-document.addEventListener('click',function(e){ var b=e.target.closest('[data-prompt],[data-prompt-ex],[data-prompt-el],[data-prompt-all]'); if(b){ openPrompt(b); return; } var p=$('#pop-prompt'); if(!p.hidden&&!p.contains(e.target)) p.hidden=true; });
+document.addEventListener('click',function(e){ var b=e.target.closest('[data-prompt],[data-prompt-ex],[data-prompt-el],[data-prompt-all],[data-prompt-task]'); if(b){ openPrompt(b); return; } var p=$('#pop-prompt'); if(!p.hidden&&!p.contains(e.target)) p.hidden=true; });
 $('#pp-x').addEventListener('click',function(){ $('#pop-prompt').hidden=true; });
 $('#pp-copy').addEventListener('click',function(){ var t=$('#pp-text'); RD.copy(t.value).then(function(ok){ if(!ok){ t.focus(); t.select(); } toast(ok?'Đã sao chép câu lệnh. Dán vào ChatGPT, Claude… kèm bài đọc.':'Hãy bấm Ctrl+C để chép'); }); });
 
@@ -4283,14 +4385,14 @@ function paneExport(){
 }
 /* Tab 4 — AI prompt */
 var aiKind='all';
-var AI_KINDS=[['all','Tô màu + elicit','Một lần cho cả hai: AI phân tích bài, tô màu, rồi đặt câu hỏi elicit dạng JSON theo tiêu chí.'],['el','Chỉ elicit','Bài đã tô màu rồi, chỉ cần AI đặt câu hỏi elicit dạng JSON.'],['color','Chỉ tô màu','AI chỉ tô màu và gắn thẻ, không đặt câu hỏi elicit riêng.'],['exam','Chuyển đề bài','AI chuyển đề IELTS (PDF, ảnh chụp) sang dạng web đọc được.']];
-function aiPromptOf(k){ return k==='el'?aiElicitPrompt():k==='color'?aiPrompt():k==='exam'?aiExamPrompt():aiAllPrompt(); }
+var AI_KINDS=[['all','Tô màu + elicit + task','Một lần cho tất cả: AI tô màu, đặt câu hỏi elicit, và với bài CONTENT thì soạn thêm task đọc hiểu (Multiple Choice, True/False/Not Given, Matching) kèm đáp án.'],['task','Chỉ task đọc hiểu','AI chỉ soạn task đọc hiểu cho bài CONTENT: Multiple Choice, True/False/Not Given và Matching Headings hoặc Matching Information, có đáp án.'],['el','Chỉ elicit','Bài đã tô màu rồi, chỉ cần AI đặt câu hỏi elicit dạng JSON.'],['color','Chỉ tô màu','AI chỉ tô màu và gắn thẻ, không đặt câu hỏi elicit riêng.'],['exam','Chuyển đề bài','AI chuyển đề IELTS (PDF, ảnh chụp) sang dạng web đọc được.']];
+function aiPromptOf(k){ return k==='task'?aiTaskPrompt():k==='el'?aiElicitPrompt():k==='color'?aiPrompt():k==='exam'?aiExamPrompt():aiAllPrompt(); }
 function paneAI(){
   var cur=AI_KINDS.filter(function(k){ return k[0]===aiKind; })[0]||AI_KINDS[0];
   return paneHead('Câu lệnh nhờ AI','Sao chép câu lệnh vào ChatGPT, Claude hay Gemini của thầy cô. Câu lệnh đã có đủ quy tắc, thầy cô chỉ điền số câu và dán bài đọc.')+
     '<div class="tw-chips tw-ai-k" role="group" aria-label="Loại câu lệnh">'+AI_KINDS.map(function(k){ return '<button type="button" data-ai-kind="'+k[0]+'" aria-pressed="'+(k[0]===aiKind)+'">'+k[1]+'</button>'; }).join('')+'</div>'+
     '<p class="tw-hint" id="tw-ai-d">'+esc(cur[2])+'</p>'+
-    '<ol class="tw-steps"><li><b>Sao chép câu lệnh</b><span>Bấm nút bên dưới.</span></li><li><b>Dán vào AI kèm bài đọc</b><span>Điền số câu và thay dòng “&lt;dán bài đọc vào đây&gt;”.</span></li><li><b>Dán kết quả vào Studio</b><span>Bấm “Bài mới” rồi dán cả câu trả lời của AI. Màu và câu hỏi tự hiện.</span></li></ol>'+
+    '<ol class="tw-steps"><li><b>Sao chép câu lệnh</b><span>Bấm nút bên dưới.</span></li><li><b>Dán vào AI kèm bài đọc</b><span>Ghi rõ <code>LOAI_BAI: CONTENT</code> nếu là bài lấy nội dung, điền số câu và thay dòng “&lt;dán bài đọc vào đây&gt;”.</span></li><li><b>Dán kết quả vào Studio</b><span>Bấm “Bài mới” rồi dán cả câu trả lời của AI. Màu, câu hỏi và task tự hiện.</span></li></ol>'+
     '<div class="tw-ai"><textarea id="tw-prompt" rows="16" readonly aria-label="Câu lệnh mẫu"></textarea><div class="tw-ai-a"><button type="button" class="tw-btn solid" data-copy-prompt>'+svg('copy')+'Sao chép câu lệnh</button><button type="button" class="tw-btn" data-hub="new">'+svg('upload')+'Dán kết quả vào bài mới</button></div></div>';
 }
 /* Tab 5 — guide */
