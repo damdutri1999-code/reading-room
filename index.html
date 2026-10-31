@@ -1150,6 +1150,22 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
 .rr-toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,14px);opacity:0;background:var(--rr-fg);color:var(--rr-bg);font:500 13px/1.3 var(--rr-ui);padding:10px 14px;border-radius:10px;transition:.25s;z-index:90;pointer-events:none;max-width:calc(100vw - 32px)}
 .rr-toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){.rr *,.rr *::before,.rr *::after{animation:none!important;transition:none!important}.rr-w,.rr-hn h1,.rr-hc h1,.rr-hn .tips .rr-stk,.rr-sky .rr-stk{opacity:1;filter:none;clip-path:none}.rr-sky svg path{stroke-dashoffset:0}}
+
+.rr-login{display:flex;flex-direction:column;align-items:flex-start;gap:22px;padding-top:28px;padding-bottom:60px}
+.rr-lcard{width:min(100%,420px);box-sizing:border-box;display:flex;flex-direction:column;gap:14px;padding:26px;border-radius:20px;background:color-mix(in srgb,var(--rr-fg) 6%,var(--rr-bg));border:1px solid var(--rr-line);color:var(--rr-fg)}
+.rr-lcard .ri{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--rr-accent);color:var(--rr-accent-fg)}
+.rr-lcard .ri svg{width:20px;height:20px}
+.rr-lcard h2{margin:0;font:700 24px/1.2 var(--rr-display,var(--rr-ui))}
+.rr-lcard p{margin:0;font:14px/1.5 var(--rr-ui);color:var(--rr-muted)}
+.rr-lcard label{display:flex;flex-direction:column;gap:6px;font:500 13px/1.2 var(--rr-ui);color:var(--rr-muted)}
+.rr-lcard input{width:100%;box-sizing:border-box;height:46px;border-radius:12px;border:1px solid var(--rr-line,rgba(255,255,255,.2));background:rgba(127,127,127,.12);color:var(--rr-fg);font:16px var(--rr-ui);padding:0 14px;outline:none}
+.rr-lcard input:focus{border-color:var(--rr-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--rr-accent) 30%,transparent)}
+.rr-lcard .pw{position:relative;display:block}.rr-lcard .pw input{padding-right:64px}
+.rr-lcard .pwt{position:absolute;right:6px;top:6px;height:34px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:var(--rr-muted);font:600 13px var(--rr-ui);cursor:pointer}
+.rr-lcard .err{min-height:18px;font:500 13px/1.4 var(--rr-ui);color:#e5484d}
+.rr-lgo{height:48px;border:0;border-radius:12px;background:var(--rr-accent);color:var(--rr-accent-fg);font:700 16px var(--rr-ui);cursor:pointer}
+.rr-lgo:disabled{opacity:.6;cursor:wait}
+.rr-who{display:flex;align-items:center;gap:10px;font:500 13px var(--rr-ui);color:var(--rr-muted)}
 </style>
 <style id="code-style"></style>
 <style id="style-css"></style>
@@ -2208,6 +2224,12 @@ RR.init=function(opts){
     }).join(''):'<div class="rr-empty">Không có bài nào khớp. Thử từ khoá khác hoặc chọn “Tất cả”.</div>';
   }
   function readHtml(L){ return '<section class="rr-view rr-read">'+header(L.title||'Bài đọc','','lib','Kho bài đọc')+'<div data-reader></div></section>'; }
+  function loginHtml(){
+    return '<section class="rr-view rr-gut rr-login"><button type="button" class="rr-lbtn" data-go="home">'+IC.back+'Trang chủ</button><form class="rr-lcard" data-login novalidate><span class="ri">'+IC.pen+'</span><h2>Đăng nhập giáo viên</h2><p>Học viên không cần đăng nhập. Chỉ giáo viên mới vào được khu soạn bài.</p>'+
+      '<label>Tên đăng nhập hoặc email<input name="u" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>'+
+      '<label>Mật khẩu<span class="pw"><input name="p" type="password" autocomplete="current-password" required><button type="button" class="pwt" data-pw aria-label="Hiện mật khẩu">Hiện</button></span></label>'+
+      '<div class="err" data-lerr role="alert" aria-live="polite"></div><button type="submit" class="rr-lgo">Đăng nhập</button></form></section>';
+  }
   function render(){
     try{ th=localStorage.getItem('rr:theme')||th; }catch(e){}
     html.setAttribute('data-th',th);
@@ -2215,7 +2237,8 @@ RR.init=function(opts){
     if(reader){ try{ reader.destroy(); }catch(e){} reader=null; }
     if(view==='home') main.innerHTML=homeHtml();
     else if(view==='lib'){ main.innerHTML=libHtml(); renderLib(); }
-    else if(view==='teacher'){ main.innerHTML='<section class="rr-view">'+header('Chào thầy cô')+'<div class="rr-gut" data-teacher></div></section>'; opts.teacher(main.querySelector('[data-teacher]'),ctl); }
+    else if(view==='teacher'&&opts.gate&&!opts.gate.ok()){ main.innerHTML=loginHtml(); var li=main.querySelector('[name=u]'); if(li&&!li.value) setTimeout(function(){ try{ li.focus({preventScroll:true}); }catch(e){} },60); }
+    else if(view==='teacher'){ var who=opts.gate?'<span class="rr-who">'+esc(opts.gate.name())+'<button type="button" class="rr-lbtn" data-logout>Đăng xuất</button></span>':''; main.innerHTML='<section class="rr-view">'+header('Chào thầy cô',who)+'<div class="rr-gut" data-teacher></div></section>'; opts.teacher(main.querySelector('[data-teacher]'),ctl); }
     else if(view==='read'&&current){
       main.innerHTML=readHtml(current);
       var vh=main.querySelector('.rr-vh'); root.style.setProperty('--rr-vh',(vh?vh.offsetHeight:64)+'px');
@@ -2223,7 +2246,21 @@ RR.init=function(opts){
     }
     if(opts.onShow) opts.onShow(view);
   }
-  function go(v,keepScroll){ view=v; render(); if(!keepScroll) window.scrollTo(0,0); }
+  var navLock=false;
+  function hashOf(){ return view==='read'&&current?'#/read/'+encodeURIComponent(current.id):'#/'+view; }
+  function pushNav(h,replace){ if(navLock) return; h=h||hashOf(); if(location.hash===h) return; try{ history[replace?'replaceState':'pushState']({rr:1},'',h); }catch(e){} }
+  function parseHash(h){
+    var m=/^#\/(home|lib|teacher)$/.exec(h||''); if(m&&(m[1]!=='teacher'||opts.teacher)) return {v:m[1]};
+    m=/^#\/read\/(.+)$/.exec(h||''); if(m){ var id=''; try{ id=decodeURIComponent(m[1]); }catch(e){} var L=lessons().filter(function(x){ return x.id===id; })[0]; if(L) return {v:'read',L:L}; }
+    return null;
+  }
+  function go(v,keepScroll){ view=v; render(); pushNav(); if(!keepScroll) window.scrollTo(0,0); }
+  window.addEventListener('popstate',function(){
+    var h=location.hash||'';
+    if(opts.mode==='studio'&&(!h||h==='#/edit')){ if(!root.hidden&&opts.onEdit){ navLock=true; try{ opts.onEdit(); }finally{ navLock=false; } } return; }
+    var p=parseHash(h)||{v:'home'};
+    navLock=true; try{ if(root.hidden){ root.hidden=false; if(opts.onBack) opts.onBack(); } view=p.v; if(p.L) current=p.L; render(); window.scrollTo(0,0); }finally{ navLock=false; }
+  });
   root.querySelector('.rr-themes').addEventListener('click',function(e){
     var b=e.target.closest('[data-th]'); if(!b) return; th=b.getAttribute('data-th'); try{ localStorage.setItem('rr:theme',th); }catch(err){}
     if(view==='read'){ html.setAttribute('data-th',th); root.querySelectorAll('.rr-themes button').forEach(function(x){ x.setAttribute('aria-checked',String(x===b)); }); }
@@ -2237,11 +2274,23 @@ RR.init=function(opts){
     else if(t.hasAttribute('data-lv')){ libLv=t.getAttribute('data-lv'); main.querySelectorAll('[data-lv]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===t)); }); renderLib(); }
     else if(t.hasAttribute('data-open')){ var id=t.getAttribute('data-open'); current=lessons().filter(function(L){ return L.id===id; })[0]||null; if(current) go('read'); }
   });
+  main.addEventListener('click',function(e){
+    if(e.target.closest('[data-logout]')){ opts.gate.logout(); go('home'); return; }
+    var pw=e.target.closest('[data-pw]'); if(pw){ var i=pw.parentNode.querySelector('input'); var sh=i.type==='password'; i.type=sh?'text':'password'; pw.textContent=sh?'Ẩn':'Hiện'; }
+  });
+  main.addEventListener('submit',function(e){
+    var f=e.target.closest('[data-login]'); if(!f) return; e.preventDefault();
+    var er=f.querySelector('[data-lerr]'), b=f.querySelector('.rr-lgo'), u=f.u.value.trim(), p=f.p.value;
+    if(!u||!p){ er.textContent='Hãy nhập tên đăng nhập và mật khẩu.'; return; }
+    er.textContent=''; b.disabled=true; b.textContent='Đang đăng nhập…';
+    Promise.resolve(opts.gate.login(u,p)).then(function(){ go('teacher'); },function(x){ er.textContent=String(x&&x.message||x); b.disabled=false; b.textContent='Đăng nhập'; f.p.select(); });
+  });
   main.addEventListener('input',function(e){ if(e.target.hasAttribute('data-q')){ libQ=e.target.value; renderLib(); } });
   var onMove=function(e){ html.style.setProperty('--mx',e.clientX+'px'); html.style.setProperty('--my',e.clientY+'px'); };
   document.addEventListener('pointermove',onMove,{passive:true});
-  var ctl={ go:go, toast:toast, view:function(){ return view; }, refresh:function(){ render(); }, theme:function(){ return th; }, show:function(v){ root.hidden=false; go(v||'home'); }, hide:function(){ if(reader){ try{ reader.destroy(); }catch(e){} reader=null; } root.hidden=true; } };
+  var ctl={ go:go, toast:toast, view:function(){ return view; }, refresh:function(){ render(); }, theme:function(){ return th; }, show:function(v){ root.hidden=false; go(v||'home'); }, hide:function(){ if(reader){ try{ reader.destroy(); }catch(e){} reader=null; } root.hidden=true; if(opts.mode==='studio') pushNav('#/edit'); } };
   RR.checkHand();
+  if(opts.mode!=='studio'){ var p0=parseHash(location.hash); if(p0){ view=p0.v; if(p0.L) current=p0.L; } pushNav(null,true); }
   render();
   return ctl;
 };
@@ -3367,7 +3416,7 @@ function showHome(v){
   if(!$('#studio').hidden||!$('#preview').hidden){ if(!$('#preview').hidden) setMode('edit'); changed(true); }
   document.body.classList.add('rr-on');
   if(!rrCtl) rrCtl=RR.init({root:rrRoot, mode:'studio', app:function(){ return LIB.app; }, lessons:libLessons,
-    status:function(){ return {st:'new',p:0}; }, teacher:renderTeacherHub,
+    status:function(){ return {st:'new',p:0}; }, teacher:renderTeacherHub, gate:{ok:authOk,name:authName,login:authLogin,logout:authLogout}, onEdit:function(){ leaveHome(); }, onBack:function(){ document.body.classList.add('rr-on'); if($('#preview')&&!$('#preview').hidden) setMode('edit'); },
     openLesson:function(x,host){ return RD.mount(host,x,{},{persist:false}); }});
   rrCtl.show(v||'home');
 }
@@ -3465,28 +3514,58 @@ function coverPreview(now){
 
 /* ---------- Online library (Supabase) ---------- */
 function cl(){ return LIB.cloud||(LIB.cloud={url:'https://jbkryrrqrodridgycnaw.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impia3J5cnJxcm9kcmlkZ3ljbmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MTkyNjIsImV4cCI6MjEwODk5NTI2Mn0.RfCj9k0x7rzfo1PGkOx4FcWEoz9NwmwcU12T6ipgA5U',id:'',code:''}); }
-function clReady(){ var c=LIB.cloud; return !!(c&&c.url&&c.key&&c.id&&c.code); }
+function clReady(){ var c=LIB.cloud; return !!(c&&c.url&&c.key&&c.id&&authOk()); }
 function clUrl(u){ return String(u||'').trim().replace(/\/+$/,'').replace(/\/rest\/v1.*$/,''); }
-function clCall(fn,body){
+/* ---------- Teacher sign-in (Supabase Auth) ---------- */
+var AKEY='rls:auth:v1', AUTH=(function(){ try{ return JSON.parse(localStorage.getItem(AKEY)||'null'); }catch(e){ return null; } })();
+function authSave(){ try{ if(AUTH) localStorage.setItem(AKEY,JSON.stringify(AUTH)); else localStorage.removeItem(AKEY); }catch(e){} }
+function authEmail(u){ u=String(u||'').trim(); if(u.indexOf('@')>0) return u.toLowerCase(); var s=u.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').toLowerCase().replace(/[^a-z0-9._-]+/g,''); return s?s+'@reading-room.app':''; }
+function authName(){ return AUTH&&AUTH.name||''; }
+function authOk(){ return !!(AUTH&&AUTH.refresh); }
+function authRaw(path,body){
+  var c=cl(); return fetch(clUrl(c.url)+'/auth/v1/'+path,{method:'POST',headers:{'apikey':c.key,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(res){ return res.text().then(function(t){ var j=null; try{ j=JSON.parse(t); }catch(e){} if(!res.ok){ var e=new Error((j&&(j.error_description||j.msg||j.message))||t||('HTTP '+res.status)); e.status=res.status; e.code=j&&(j.error_code||j.error); throw e; } return j; }); });
+}
+function authErr(e){
+  var m=String(e&&e.message||e), cd=String(e&&e.code||'');
+  if(/invalid_credentials|Invalid login/i.test(m+cd)) return 'Tên đăng nhập hoặc mật khẩu chưa đúng.';
+  if(/email_not_confirmed|not confirmed/i.test(m+cd)) return 'Tài khoản chưa được xác nhận. Trong Supabase hãy bật “Auto Confirm User” cho tài khoản này.';
+  if(/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Không kết nối được. Kiểm tra mạng rồi thử lại.';
+  if(/over_request_rate_limit|rate limit/i.test(m+cd)) return 'Thử quá nhiều lần. Chờ một lát rồi thử lại.';
+  return 'Không đăng nhập được: '+m;
+}
+function authStore(j,label){ AUTH={access:j.access_token,refresh:j.refresh_token,exp:Date.now()+(j.expires_in||3600)*1000-30000,name:label||AUTH&&AUTH.name||(j.user&&j.user.email)||'',email:j.user&&j.user.email||AUTH&&AUTH.email||''}; authSave(); }
+function authLogin(u,p){
+  var em=authEmail(u); if(!em) return Promise.reject(new Error('Hãy nhập tên đăng nhập.'));
+  var label=String(u).trim().indexOf('@')>0?String(u).trim():String(u).trim();
+  return authRaw('token?grant_type=password',{email:em,password:p}).then(function(j){ authStore(j,label); var c=cl(); if(!c.id){ var s=em.split('@')[0].replace(/[^a-z0-9-]/g,'-'); if(s.length>=3) c.id=s; saveLib(); } },function(e){ throw new Error(authErr(e)); });
+}
+function authLogout(){ AUTH=null; authSave(); }
+function authToken(){
+  if(!authOk()) return Promise.reject(new Error('auth_none'));
+  if(AUTH.exp>Date.now()) return Promise.resolve(AUTH.access);
+  return authRaw('token?grant_type=refresh_token',{refresh_token:AUTH.refresh}).then(function(j){ authStore(j); return AUTH.access; },function(e){ if(e&&(e.status===400||e.status===401||e.status===403)) authLogout(); throw new Error('auth_expired'); });
+}
+function clCall(fn,body,tok){
   var c=cl(); 
-  return fetch(clUrl(c.url)+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':c.key,'Authorization':'Bearer '+c.key,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(res){
+  return fetch(clUrl(c.url)+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':c.key,'Authorization':'Bearer '+(tok||c.key),'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(res){
     return res.text().then(function(t){ var j=null; try{ j=JSON.parse(t); }catch(e){} if(!res.ok){ var m=(j&&(j.message||j.error))||t||('HTTP '+res.status); var err=new Error(m); err.status=res.status; throw err; } return j; });
   });
 }
 function clErr(e){
   var m=String(e&&e.message||e);
-  if(/bad_code/.test(m)) return 'Mã giáo viên không đúng cho kho này.';
-  if(/code_short/.test(m)) return 'Mã giáo viên cần ít nhất 6 ký tự.';
+  if(/not_owner|bad_code/.test(m)) return 'Mã kho này đã thuộc về giáo viên khác. Hãy chọn một mã kho khác.';
+  if(/auth_none|auth_expired|not_signed_in/.test(m)) return 'Phiên đăng nhập đã hết. Hãy đăng xuất rồi đăng nhập lại.';
   if(/too_big/.test(m)) return 'Kho quá lớn để xuất bản (trên 5MB).';
   if(/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Không kết nối được. Kiểm tra địa chỉ Supabase và mạng.';
+  if(/JWT expired/i.test(m)) return 'Phiên đăng nhập đã hết. Hãy đăng xuất rồi đăng nhập lại.';
   if(/401|403|Invalid API key|JWT/i.test(m)) return 'Khoá công khai chưa đúng.';
   if(/404|Could not find the function/i.test(m)) return 'Chưa tạo các hàm trên Supabase. Hãy chạy file SQL trong SQL Editor.';
   return 'Lỗi: '+m;
 }
 function clPayload(){ changed(true); return {app:Object.assign({},LIB.app,{theme:exportTheme()}), lessons:libLessons(), at:Date.now()}; }
 function clPublish(){
-  var c=cl(); if(!clReady()) return Promise.reject(new Error('Chưa nhập đủ thông tin kết nối.'));
-  return clCall('publish_lib',{p_id:c.id,p_code:c.code,p_data:clPayload()}).then(function(){ c.at=Date.now(); saveLib(); });
+  var c=cl(); if(!clReady()) return Promise.reject(new Error('Chưa nhập đủ thông tin kết nối. Cần mã kho và đăng nhập.'));
+  return authToken().then(function(tok){ return clCall('publish_lib_owner',{p_id:c.id,p_data:clPayload()},tok); }).then(function(){ c.at=Date.now(); saveLib(); });
 }
 function cloudHtml(){
   var c=cl(), ok=clReady(), st=c.at?'Xuất bản gần nhất: <b>'+fmtDate(c.at)+'</b>':'Chưa xuất bản lần nào.';
@@ -3495,7 +3574,7 @@ function cloudHtml(){
       '<label>Địa chỉ dự án Supabase<input data-cl-f="url" value="'+esc(c.url)+'" placeholder="https://abcdxyz.supabase.co" autocomplete="off" spellcheck="false"></label>'+
       '<label>Khoá công khai (anon key)<input data-cl-f="key" value="'+esc(c.key)+'" placeholder="eyJhbGciOi…" autocomplete="off" spellcheck="false"></label>'+
       '<label>Mã kho<input data-cl-f="id" value="'+esc(c.id)+'" placeholder="vd: lop-thay-tri" autocomplete="off" spellcheck="false"><small>Tên riêng của kho. Chỉ chữ thường, số và dấu gạch.</small></label>'+
-      '<label>Mã giáo viên<input data-cl-f="code" type="password" value="'+esc(c.code)+'" placeholder="ít nhất 6 ký tự" autocomplete="new-password"><small>Chỉ người có mã này mới xuất bản được. Lần đầu xuất bản sẽ đặt mã này cho kho.</small></label>'+
+      '<label>Tài khoản<input value="'+esc(authName())+'" readonly tabindex="-1"><small>Đang đăng nhập. Chỉ tài khoản này sửa được kho “'+esc(c.id||'…')+'”.</small></label>'+
     '</div><div class="tw-cl-a"><button type="button" class="tw-btn solid" data-cl="publish"'+(ok?'':' disabled')+'>'+svg('upload')+'Xuất bản lên kho online</button><button type="button" class="tw-btn" data-cl="test"'+(c.url&&c.key?'':' disabled')+'>Thử kết nối</button><span class="tw-cl-st" data-cl-st>'+st+'</span></div>'+
     '<p class="tw-hint">Chưa có dự án? Làm theo các bước tạo Supabase em đã gửi kèm file <b>supabase-setup.sql</b>. Lưu ý: đáp án của đề bài nằm trong dữ liệu kho, giống như trong file kho bài.</p></section>';
 }
@@ -3546,7 +3625,7 @@ function paneBackup(){
     '<section class="tw-bk-card"><h4>2 · Khôi phục</h4><p>Chọn file sao lưu (.json) đã tải trước đó.</p>'+
       '<div class="tw-bk-a"><button type="button" class="tw-btn" data-bk="pick">'+svg('upload')+'Chọn file sao lưu</button><input type="file" id="bk-file" accept=".json,application/json" hidden></div>'+pend+'</section></div>';
 }
-function backupData(){ changed(true); LIB.lastBackup=Date.now(); saveLib(); var cp=JSON.parse(JSON.stringify(LIB)); if(cp.cloud) cp.cloud.code=''; return JSON.stringify({rr:'backup',v:1,at:Date.now(),lib:cp}); }
+function backupData(){ changed(true); LIB.lastBackup=Date.now(); saveLib(); var cp=JSON.parse(JSON.stringify(LIB)); if(cp.cloud){ cp.cloud.code=''; } return JSON.stringify({rr:'backup',v:1,at:Date.now(),lib:cp}); }
 function readBackup(f){
   var rd=new FileReader();
   rd.onload=function(){
