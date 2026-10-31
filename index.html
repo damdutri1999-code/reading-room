@@ -1,5 +1,7 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Reading Lesson Studio</title>
+<link rel="preconnect" href="https://jbkryrrqrodridgycnaw.supabase.co" crossorigin>
+<script>(function(){var m=/[?&]kho=([a-z0-9-]{3,40})/i.exec(location.search);if(!m)return;var id=m[1].toLowerCase(),sh=id==="chung";try{window.__kp={id:id,p:fetch("https://jbkryrrqrodridgycnaw.supabase.co/rest/v1/rpc/"+(sh?"get_shared":"get_lib"),{method:"POST",headers:{"apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impia3J5cnJxcm9kcmlkZ3ljbmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MTkyNjIsImV4cCI6MjEwODk5NTI2Mn0.RfCj9k0x7rzfo1PGkOx4FcWEoz9NwmwcU12T6ipgA5U","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impia3J5cnJxcm9kcmlkZ3ljbmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MTkyNjIsImV4cCI6MjEwODk5NTI2Mn0.RfCj9k0x7rzfo1PGkOx4FcWEoz9NwmwcU12T6ipgA5U","Content-Type":"application/json"},body:JSON.stringify(sh?{}:{p_id:id})}).then(function(r){if(!r.ok)throw new Error("http");return r.json();})};window.__kp.p.catch(function(){});}catch(e){}})();</script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lexend:wght@400;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=Patrick+Hand&family=Pangolin&display=swap">
@@ -2399,14 +2401,13 @@ function khoMsg(t,sub,retry){
 var khoId=(/[?&]kho=([a-z0-9-]{3,40})/i.exec(location.search)||[])[1];
 function khoBoot(id){
   khoId=id; khoMsg('Đang mở kho bài…','');
-  var ac=new AbortController(), tm=setTimeout(function(){ ac.abort(); },12000);
-  var isShared=id.toLowerCase()==='chung';
-  fetch(CLOUD_DEF.url+'/rest/v1/rpc/'+(isShared?'get_shared':'get_lib'),{method:'POST',signal:ac.signal,headers:{'apikey':CLOUD_DEF.key,'Authorization':'Bearer '+CLOUD_DEF.key,'Content-Type':'application/json'},body:JSON.stringify(isShared?{}:{p_id:id.toLowerCase()})})
-  .then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); })
+  var tm, isShared=id.toLowerCase()==='chung', kp=window.__kp; window.__kp=null;
+  var pr=(kp&&kp.id===id.toLowerCase())?kp.p:fetch(CLOUD_DEF.url+'/rest/v1/rpc/'+(isShared?'get_shared':'get_lib'),{method:'POST',headers:{'apikey':CLOUD_DEF.key,'Authorization':'Bearer '+CLOUD_DEF.key,'Content-Type':'application/json'},body:JSON.stringify(isShared?{}:{p_id:id.toLowerCase()})}).then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); });
+  Promise.race([pr,new Promise(function(_,rej){ tm=setTimeout(function(){ rej(new Error('timeout')); },15000); })])
   .then(function(j){ clearTimeout(tm);
     var d=isShared?{app:{name:'Kho chung',klass:'Bài đọc do các giáo viên chia sẻ',tagline:'Chọn một bài và bắt đầu đọc.',theme:'stage'},lessons:(j&&j.lessons)||[]}:(j&&j.data); if(!d||!Array.isArray(d.lessons)){ khoMsg('Không tìm thấy kho “'+id+'”','Hãy kiểm tra lại đường dẫn mà thầy cô gửi.'); return; }
     var th=(d.app&&d.app.theme)||'stage';
-    var data={app:d.app||{name:'Reading Room',klass:'',tagline:''},theme:th,lessons:d.lessons,cloud:{url:CLOUD_DEF.url,key:CLOUD_DEF.key,id:id.toLowerCase()}};
+    var data={app:d.app||{name:'Reading Room',klass:'',tagline:''},theme:th,lessons:d.lessons,cloud:{url:CLOUD_DEF.url,key:CLOUD_DEF.key,id:id.toLowerCase(),fresh:true}};
     var html=studentDoc(data); document.open(); document.write(html); document.close();
   }).catch(function(){ clearTimeout(tm); khoMsg('Chưa mở được kho bài','Có thể mạng đang chậm. Hãy thử lại sau ít giây.',true); });
 }
@@ -4103,7 +4104,7 @@ function studentDoc(data){
    'status:function(L){var w=work(L);if(!w)return{st:"new",p:0};var I=RR.info(L),tot=I.questions+I.notes,done=0;Object.keys(w.answers||{}).forEach(function(k){if(String(w.answers[k]).trim())done++;});Object.keys(w.notes||{}).forEach(function(k){if(String(w.notes[k]).trim())done++;});'+
    'var p=tot?Math.min(100,Math.round(done/tot*100)):((w.comments||[]).length?50:0);return{st:w.submitted?"done":((done||(w.comments||[]).length)?"doing":"new"),p:w.submitted?100:p};},'+
    'teacher:null,usage:function(){if(!D.cloud)return Promise.resolve(null);var C=D.cloud,ac=new AbortController();setTimeout(function(){ac.abort();},8000);return fetch(C.url+"/rest/v1/rpc/get_usage",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.ok?r.json():null;});},openLesson:function(L,host){return RD.mount(host,L,{},{persist:true});}});'+
-   'if(D.cloud){var C=D.cloud,ac=new AbortController(),tm=setTimeout(function(){ac.abort();},8000);var SH=C.id==="chung";fetch(C.url+"/rest/v1/rpc/"+(SH?"get_shared":"get_lib"),{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:JSON.stringify(SH?{}:{p_id:C.id})}).then(function(r){return r.ok?r.json():null;}).then(function(j){clearTimeout(tm);var d=SH?(j&&{lessons:j.lessons}):(j&&j.data);if(!d||!d.lessons||!d.lessons.length)return;var cur=JSON.stringify(D.lessons);var nxt=JSON.stringify(d.lessons);if(cur===nxt&&JSON.stringify(D.app)===JSON.stringify(d.app))return;D.lessons=d.lessons;if(d.app)D.app=d.app;if(ctl.view()!=="read"){ctl.refresh();ctl.toast("Đã cập nhật bài mới");}else{ctl.toast("Có bài mới. Quay lại kho bài để xem.");}}).catch(function(){});}'+
+   'if(D.cloud&&!D.cloud.fresh){var C=D.cloud,ac=new AbortController(),tm=setTimeout(function(){ac.abort();},8000);var SH=C.id==="chung";fetch(C.url+"/rest/v1/rpc/"+(SH?"get_shared":"get_lib"),{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:JSON.stringify(SH?{}:{p_id:C.id})}).then(function(r){return r.ok?r.json():null;}).then(function(j){clearTimeout(tm);var d=SH?(j&&{lessons:j.lessons}):(j&&j.data);if(!d||!d.lessons||!d.lessons.length)return;var cur=JSON.stringify(D.lessons);var nxt=JSON.stringify(d.lessons);if(cur===nxt&&JSON.stringify(D.app)===JSON.stringify(d.app))return;D.lessons=d.lessons;if(d.app)D.app=d.app;if(ctl.view()!=="read"){ctl.refresh();ctl.toast("Đã cập nhật bài mới");}else{ctl.toast("Có bài mới. Quay lại kho bài để xem.");}}).catch(function(){});}'+
    '})();<\/script></body></html>';
 }
 function exportLibrary(){
