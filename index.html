@@ -681,6 +681,12 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .eli-mode label{display:flex;gap:8px;align-items:center;cursor:pointer}
 .el-chip{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font:600 10.5px/1.4 var(--ui);background:rgba(127,127,127,.15);color:inherit;vertical-align:middle}
 .el-chip.t-yn{background:#dbeafe;color:#1d4ed8}.el-chip.t-wh{background:#fde68a;color:#7a4a00}.el-chip.t-research{background:#ede9fe;color:#5b34d6}
+
+.imp-json{display:flex;flex-direction:column;gap:6px;font:500 13px var(--ui)}
+.imp-json em{font-style:normal;opacity:.65;font-weight:400}
+#imp-json{width:100%;box-sizing:border-box;min-height:84px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+.imp-json-s{min-height:16px;font:12.5px/1.4 var(--ui);opacity:.8}
+.imp-json-s.ok{color:#0b7a53;opacity:1}.imp-json-s.bad{color:#d1332e;opacity:1}
 </style>
 <style id="rd-css">
 :root{--rd-bg:#f4f6f8;--rd-paper:#ffffff;--rd-ink:#182132;--rd-muted:#5d6779;--rd-line:#dde2ea;--rd-accent:#2a49d6;--rd-accent-soft:#e6eaff;--rd-note:#fff7d6;--rd-note-ink:#5a4500;--rd-student:#0e9f6e;--rd-student-soft:#e3f6ee;--rd-read:'Literata',Georgia,'Times New Roman',serif;--rd-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -1427,7 +1433,8 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
       <div class="imp-src">
         <label class="drop" id="drop"><span class="eic"><i data-i="file"></i></span><span><b>Kéo thả tệp vào đây hoặc bấm để chọn</b>.txt · .md · .docx (Word)</span><input type="file" id="imp-file" accept=".txt,.md,.docx,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></label>
         <textarea id="imp-text" placeholder="…hoặc dán văn bản vào đây. Văn bản đã được AI gắn thẻ màu, hoặc HTML có tô màu, sẽ tự hiện màu ở cột xem trước."></textarea>
-        <button type="button" class="aihint" data-prompt><i data-i="sparkle"></i><span><b>Nhờ AI tô màu giùm?</b> Lấy câu lệnh mẫu, dán vào ChatGPT hoặc Claude kèm bài đọc, rồi dán kết quả vào đây.</span></button>
+        <button type="button" class="aihint" data-prompt-all><i data-i="sparkle"></i><span><b>Nhờ AI tô màu và đặt câu hỏi giùm?</b> Lấy câu lệnh mẫu, dán vào ChatGPT hoặc Claude kèm bài đọc, rồi dán cả câu trả lời vào đây. Studio tự tách bài đã tô màu và JSON elicit.</span></button>
+        <label class="imp-json"><span><b>JSON câu hỏi elicit</b> <em>(không bắt buộc)</em></span><textarea id="imp-json" rows="3" spellcheck="false" placeholder='{"elicits":[ … ]}' aria-label="JSON câu hỏi elicit"></textarea><span class="imp-json-s" id="imp-json-s" aria-live="polite"></span></label>
         <label class="chk"><input type="checkbox" id="imp-detect" checked>Tự nhận diện Tiêu đề và Heading</label>
         <label class="chk"><input type="checkbox" id="imp-join">Nối các dòng bị ngắt giữa câu (văn bản copy từ PDF)</label>
         <div class="imp-cat" data-start-only><span class="imp-cat-l">Loại bài <em>(bắt buộc)</em></span>
@@ -1443,7 +1450,7 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
     <div class="mrow">
       <div class="mode" data-modal role="radiogroup" aria-label="Cách đưa vào bài"><label><input type="radio" name="imp-mode" value="replace" checked>Thay toàn bộ bài</label><label><input type="radio" name="imp-mode" value="append">Thêm vào cuối bài</label></div>
       <span class="sp"></span>
-      <button type="button" class="btn ghost" data-prompt><i data-i="sparkle"></i>Câu lệnh cho AI</button>
+      <button type="button" class="btn ghost" data-prompt-all><i data-i="sparkle"></i>Câu lệnh cho AI</button>
       <button type="button" class="btn ghost" data-start id="imp-blank">Bắt đầu với trang trắng</button>
       <button type="button" class="btn ghost" data-modal id="imp-cancel">Huỷ</button>
       <button type="button" class="btn solid" id="imp-ok"><i data-i="check"></i>Đưa vào bài</button>
@@ -3077,24 +3084,50 @@ function aiPrompt(){
 /* ---------- Elicit từ AI (JSON) ---------- */
 var EL_TYPES={yn:'Yes/No',wh:'WH',research:'Tra cứu'};
 function elChips(d){ d=d||{}; return (d.type&&EL_TYPES[d.type]?'<span class="el-chip t-'+d.type+'">'+EL_TYPES[d.type]+'</span>':'')+(d.group?'<span class="el-chip">'+esc(d.group)+'</span>':''); }
+var EL_CRITERIA=
+'MỤC TIÊU CỦA BỘ CÂU HỎI ELICIT\n'+
+'Tạo bộ câu hỏi gợi mở bằng tiếng Việt, bám sát chính xác nội dung bài đọc. Câu hỏi giúp học viên hiểu chủ đề, theo dõi lập luận và nhận ra cách các ý trong bài liên kết với nhau. Hãy tạo đủ nhiều câu hỏi hữu ích để giáo viên xem lại và xoá bớt. Số lượng cụ thể do giáo viên cho biết ở phần “THÔNG TIN GIÁO VIÊN CUNG CẤP”; nếu chưa ghi thì tạo khoảng 15 đến 20 câu.\n\n'+
+'QUY TẮC CHUNG\n'+
+'1. Mỗi câu hỏi phải dựa trên một câu, cụm từ hoặc chi tiết thực sự có trong bài đọc.\n'+
+'2. Với mỗi câu hỏi, trích nguyên văn phần làm căn cứ vào trường "evidence". Không tự sửa câu trích dẫn.\n'+
+'3. Câu hỏi phải giúp học viên hiểu bài hoặc thực hiện một thao tác đọc rõ ràng. Tránh câu hỏi chung chung, không gắn với văn bản.\n'+
+'4. Viết câu hỏi bằng tiếng Việt.\n'+
+'5. Phối trộn hai dạng câu hỏi:\n   - "yn": câu hỏi Có/Không.\n   - "wh": câu hỏi bắt đầu bằng Ai, Cái gì, Ở đâu, Khi nào, Tại sao, Như thế nào, v.v.\n'+
+'6. Mục tiêu tỷ lệ trên tổng số câu hỏi là 60% "yn" và 40% "wh". Nếu không thể đạt tỷ lệ chính xác, hãy làm tròn hợp lý.\n'+
+'7. Câu hỏi Có/Không không nên chỉ kiểm tra khả năng nhớ. Khi phù hợp, yêu cầu học viên giải thích hoặc tìm bằng chứng.\n'+
+'8. Mỗi câu phải có câu trả lời gợi ý ngắn trong trường "answer".\n'+
+'9. Không bịa trích dẫn, không suy diễn quá điều bài đọc nói và không trình bày kiến thức ngoài bài như thể đó là nội dung của bài.\n'+
+'10. Tạo nhiều câu hỏi phù hợp để giáo viên lựa chọn; không tự giới hạn ở một vài câu.\n'+
+'11. Câu hỏi mở rộng kiến thức phải được đặt ngay sau câu hỏi về chi tiết trong bài mà câu hỏi đó mở rộng.\n\n'+
+'CÁC NHÓM CÂU HỎI\n'+
+'A. "Thông tin sẽ cần": chỉ tạo nhóm này nếu giáo viên cung cấp câu hỏi IELTS Reading có sẵn. Dùng hình ảnh hoặc gợi ý trước khi đọc để học viên dự đoán từ khoá có thể xuất hiện trong bài. Không giả định có hình ảnh nếu giáo viên chưa cung cấp. Nếu không có câu hỏi IELTS Reading thì bỏ qua nhóm này. Evidence của nhóm này là đoạn trong bài chứa từ khoá hoặc thông tin tương ứng.\n'+
+'B. "Dòng lập luận": luôn tạo. Tập trung vào các chi tiết liên quan đến chủ đề và giúp học viên hiểu bài hơn: cách một ý được giải thích, lý do hỗ trợ kết luận, mối quan hệ giữa các chi tiết, ý nghĩa của câu/đoạn khó. Giúp học viên lần theo mạch suy nghĩ và tìm manh mối trong văn bản.\n'+
+'C. "Coherence": luôn tạo. Khai thác liên từ và linking devices; referencing (từ hoặc cụm từ tham chiếu đến thông tin khác trong bài); substitution (từ hoặc cụm từ thay thế cho thông tin đã nêu); cách các ý kết nối kể cả khi không có từ nối rõ ràng; quan hệ tiếp nối, đối lập, nguyên nhân-kết quả, ví dụ và trình tự khi có trong bài. Khi phù hợp, trích đúng từ, cụm từ hoặc câu làm căn cứ rồi hỏi từ đó tham chiếu/thay thế cho điều gì, hoặc hai ý liên kết với nhau như thế nào.\n'+
+'D. "Kiến thức": luôn tạo. Câu hỏi phải bắt đầu từ kiến thức theo chủ đề được nêu cụ thể trong bài. Có thể tạo câu hỏi mở rộng để học viên tìm hiểu thêm ngoài bài. Mỗi câu mở rộng phải: (1) bắt đầu bằng dấu sao "*" trong nội dung trường "q"; (2) dùng type "research"; (3) có trường "terms" gồm các từ khoá tiếng Anh gợi ý để tra cứu; (4) được đặt ngay sau câu hỏi về chi tiết trong bài có liên quan. Không yêu cầu tìm hiểu chủ đề ngoài bài nếu không chỉ rõ mối liên hệ với chi tiết trong bài.\n'+
+'E. "Ý đồ tác giả": chỉ tạo khi giáo viên cung cấp dạng câu hỏi IELTS Reading Multiple Choice hỏi về ý đồ hoặc hàm ý của tác giả (dấu hiệu như "Implications", "What points does the author mean" hoặc cách hỏi tương đương). Nếu không có thì bỏ qua nhóm này. Khi được kích hoạt, tạo câu hỏi giúp học viên suy luận ý tác giả muốn truyền đạt, hàm ý, thái độ hoặc mục đích từ một chi tiết cụ thể trong bài; yêu cầu giải thích suy luận và chỉ ra bằng chứng trong bài.\n\n'+
+'CẤU TRÚC JSON\n'+
+'{"elicits":[\n'+
+'  {"n":1,"group":"Dòng lập luận","type":"yn","q":"Câu hỏi bằng tiếng Việt?","evidence":["Trích nguyên văn từ bài đọc."],"answer":"Câu trả lời gợi ý."},\n'+
+'  {"n":2,"group":"Kiến thức","type":"research","q":"* Câu hỏi mở rộng bằng tiếng Việt?","evidence":["Chi tiết nguyên văn trong bài có liên quan."],"terms":["English key term 1","English key term 2"],"answer":"Gợi ý cách tra cứu hoặc thảo luận."}\n'+
+']}\n\n'+
+'QUY TẮC JSON\n'+
+'- Tên trường được phép: "n", "group", "type", "q", "evidence", "terms", "answer". Chỉ research mới có "terms".\n'+
+'- Đánh số "n" liên tục theo thứ tự xuất hiện. Dùng đúng tên nhóm: "Thông tin sẽ cần", "Dòng lập luận", "Coherence", "Kiến thức", "Ý đồ tác giả".\n'+
+'- type chỉ là "yn", "wh" hoặc "research".\n'+
+'- "evidence" là MẢNG các đoạn chữ chép NGUYÊN VĂN từ bài (đúng từng chữ, chữ hoa/thường, dấu câu), mỗi đoạn tối đa một câu, KHÔNG dùng dấu “…”, không dịch, không viết lại. Căn cứ nằm ở hai chỗ thì ghi thành hai mục. Nhiều câu hỏi được dùng chung một đoạn evidence.\n'+
+'- Đảm bảo JSON hợp lệ: dấu ngoặc kép và dấu phẩy đúng chuẩn, không có dấu phẩy thừa cuối danh sách.\n';
+var EL_INPUT='THÔNG TIN GIÁO VIÊN CUNG CẤP (điền hoặc xoá dòng không dùng)\n- Số lượng câu hỏi elicit: <điền số, ví dụ 20>\n- Câu hỏi IELTS Reading có sẵn (nếu có, dán vào đây): <…>\n- Dạng Multiple Choice về ý đồ/hàm ý tác giả (nếu có, dán vào đây): <…>\n\nBÀI ĐỌC:\n<dán bài đọc vào đây>';
 function aiElicitPrompt(){
-  return 'Bạn là trợ lý soạn bài Reading comprehension. Hãy soạn bộ câu hỏi elicit cho bài đọc ở cuối và trả kết quả dưới dạng JSON.\n\n'+
-  'QUY TẮC:\n'+
-  '1. Chỉ trả MỘT khối code (```json … ```), không thêm lời giải thích nào ngoài khối code.\n'+
-  '2. Không chép lại, không sửa bài đọc. Chỉ trả danh sách câu hỏi.\n'+
-  '3. Mỗi câu hỏi có các trường: n (số thứ tự), group (tên nhóm), type, q (câu hỏi), evidence (căn cứ), answer (gợi ý trả lời). Riêng type "research" có thêm terms (từ khoá tra cứu).\n'+
-  '4. type chỉ được là một trong: "yn" (Yes/No), "wh" (câu hỏi WH), "research" (câu tra cứu thêm ngoài bài).\n'+
-  '5. evidence là MẢNG các đoạn chữ chép NGUYÊN VĂN từ bài đọc: đúng từng chữ, chữ hoa/thường và dấu câu. Mỗi đoạn tối đa một câu. KHÔNG dùng dấu “…”, không viết lại, không dịch. Nếu căn cứ nằm ở hai chỗ thì ghi thành hai mục.\n'+
-  '6. Nhiều câu hỏi có thể dùng chung một đoạn evidence.\n'+
-  '7. answer là gợi ý trả lời ngắn. Học viên chỉ thấy khi bấm “Xem gợi ý”.\n'+
-  '8. Nếu tôi đã đưa sẵn danh sách câu hỏi: chuyển đổi NGUYÊN VĂN từng câu sang JSON, không sáng tác thêm, không bỏ câu nào. Nếu chưa có thì tự soạn theo yêu cầu ở dưới.\n\n'+
-  'MẪU ĐỊNH DẠNG:\n```json\n{"elicits":[\n'+
-  '  {"n":1,"group":"Dòng lập luận","type":"yn","q":"Theo bài, sau một ngày bận rộn chúng ta có thể cảm thấy mệt không?","evidence":["After a busy day, we may feel tired."],"answer":"Có. Sau một ngày bận rộn, chúng ta có thể cảm thấy mệt."},\n'+
-  '  {"n":2,"group":"Coherence","type":"wh","q":"“These simple activities” nhắc lại những hoạt động nào?","evidence":["We can take a short walk, listen to music, or sit quietly.","These simple activities help us feel calm."],"answer":"Đi bộ ngắn, nghe nhạc hoặc ngồi yên."},\n'+
-  '  {"n":3,"group":"Kiến thức","type":"research","q":"Nghỉ ngơi liên quan thế nào đến sức khỏe?","evidence":["it can help our bodies and minds."],"terms":["rest and health","sleep and health"],"answer":"Tìm một nguồn đáng tin cậy rồi chia sẻ một thông tin."}\n'+
-  ']}\n```\n\n'+
-  'YÊU CẦU / DANH SÁCH CÂU HỎI:\n<dán danh sách câu hỏi của bạn, hoặc nêu số câu và các nhóm muốn có>\n\n'+
-  'BÀI ĐỌC:\n<dán bài đọc vào đây>';
+  return 'Bạn là trợ lý soạn bài Reading comprehension. Hãy đọc bài đọc ở cuối rồi soạn bộ câu hỏi elicit theo các tiêu chí dưới đây.\nChỉ trả MỘT khối code ```json … ``` chứa JSON hợp lệ, không thêm lời dẫn, lời kết hay chú thích. Không chép lại bài đọc.\n\n'+EL_CRITERIA+'\n'+EL_INPUT;
+}
+function aiAllPrompt(){
+  var codes=L.codes.map(function(c){ return '['+c.id+']…[/'+c.id+'] = '+c.label+(CODE_HINT[c.id]?': '+CODE_HINT[c.id]:''); }).join('\n');
+  return 'Bạn là trợ lý soạn bài Reading comprehension. Hãy làm ba bước với bài đọc ở cuối.\n\n'+
+  'BƯỚC 1. PHÂN TÍCH (làm trong đầu, không cần viết ra): xác định chủ đề, ý chính của từng đoạn, từ khoá, từ nối/signpost, ví dụ và dẫn chứng, cách các ý nối với nhau.\n\n'+
+  'BƯỚC 2. TÔ MÀU bài đọc bằng các thẻ sau. Giữ nguyên 100% chữ gốc, không sửa, không thêm, không bớt.\n'+codes+'\n'+
+  'Tiêu đề và heading đặt đầu dòng: # Tiêu đề bài, > Phụ đề (nếu có), ## Heading 1, ### Heading 2. Có thể dùng **đậm**, *nghiêng*. Các thẻ được lồng nhau. Mỗi đoạn văn cách nhau một dòng trống. Không dùng thẻ [q: …] trong bước này, câu hỏi elicit nằm ở bước 3.\n\n'+
+  'BƯỚC 3. ĐẶT CÂU HỎI ELICIT dưới dạng JSON theo các tiêu chí sau.\n\n'+EL_CRITERIA+'\n'+
+  'ĐỊNH DẠNG TRẢ LỜI: đúng HAI khối code, theo thứ tự, không thêm lời dẫn hay chú thích:\n1) khối ```text chứa bài đọc đã tô màu (bước 2);\n2) khối ```json chứa JSON elicit (bước 3). Evidence trong JSON phải chép từ bài GỐC, không kèm thẻ màu.\n\n'+EL_INPUT;
 }
 function elType(t){ var s=String(t||'').toLowerCase(); if(/research|tra\s*c|\*/.test(s)) return 'research'; if(/^(yn|y\/n|yes|no|tf)|yes\s*\/?\s*no|có\s*\/?\s*không/.test(s)) return 'yn'; return 'wh'; }
 function elParse(raw){
@@ -3274,7 +3307,32 @@ function renderImp(){
 $('#imp-list').addEventListener('change',function(e){ var s=e.target.closest('[data-map]'), k=e.target.closest('[data-keep]'); if(s) impMap[s.getAttribute('data-map')].hl=s.value||null; else if(k) impMap[k.getAttribute('data-keep')].tc=k.checked; else return; applyMap(); renderImp(); });
 $('#imp-list').addEventListener('click',function(e){ var t=e.target.closest('button.ip-tag'); if(!t||impLesson) return; var b=impBlocks[+t.getAttribute('data-i')]; b.style=CYCLE[(CYCLE.indexOf(b.style)+1)%CYCLE.length]; renderImp(); });
 var impT;
+function splitReply(){
+  var ta=$('#imp-text'), t=ta.value, m=/```(?:json)?[ \t]*\n?\s*(\{\s*"elicits"[\s\S]*?\})\s*```/i.exec(t)||/```json[ \t]*\n([\s\S]*?)```/i.exec(t);
+  if(m){ $('#imp-json').value=m[1].trim(); t=t.replace(m[0],''); }
+  else { var j=t.search(/\n[ \t]*\{\s*"elicits"\s*:/); if(j>=0){ $('#imp-json').value=t.slice(j).trim(); t=t.slice(0,j); } }
+  var fb=/```[a-z]*[ \t]*\n([\s\S]*?)```/i.exec(t); if(fb) t=fb[1];
+  if(/```/.test(t)){ t=t.replace(/^[ \t]*```[a-z]*[ \t]*$/gim,'').replace(/\n{3,}/g,'\n\n'); }
+  t=t.replace(/^\s+|\s+$/g,'')===t?t:t.trim();
+  if(t!==ta.value) ta.value=t;
+  impJsonStatus();
+}
+function impJsonStatus(){
+  var raw=$('#imp-json').value.trim(), s=$('#imp-json-s'); if(!s) return;
+  if(!raw){ s.textContent=''; s.className='imp-json-s'; return; }
+  var p=elParse(raw); if(p.err){ s.textContent=p.err; s.className='imp-json-s bad'; return; }
+  s.textContent='Sẵn sàng gắn '+p.items.length+' câu hỏi elicit khi bấm “'+($('#import').classList.contains('as-start')?'Vào soạn bài':'Đưa vào bài')+'”.'; s.className='imp-json-s ok';
+}
+$('#imp-json').addEventListener('input',function(){ clearTimeout(impJT); impJT=setTimeout(impJsonStatus,250); });
+var impJT;
+function impJsonApply(){
+  var raw=$('#imp-json').value.trim(); if(!raw) return null;
+  var p=elParse(raw); if(p.err) return {err:p.err};
+  var rep=elPlan(p.items), n=elApply(p.items,'add');
+  return {n:n,total:p.items.length,lost:rep.lost.length};
+}
 function reparse(){
+  splitReply();
   impFromDocx=false; impLesson=null; impEls={};
   var t=$('#imp-text').value, sl=studioLesson(t);
   if(!t.trim()){ impMap={}; impCount={}; }
@@ -3371,10 +3429,11 @@ $('#imp-ok').addEventListener('click',function(){
     var last=ed.lastElementChild; while(last&&last.tagName==='P'&&!last.textContent.trim()){ var pv2=last.previousElementSibling; last.remove(); last=pv2; }
     ed.insertAdjacentHTML('beforeend',html+'<p><br></p>'); $$('.nb',ed).forEach(decorateNb);
   }
+  var jr=impJsonApply();
   changed(true); if(starting) enterEditor(); else closeImport();
   if(starting&&L.examOn&&!(L.examText||'').trim()) setTimeout(function(){ showTab('ex'); },50);
-  impBlocks=[]; impEls={}; impMap={}; impCount={}; $('#imp-text').value=''; renderImp();
-  toast('Đã đưa '+bl.length+' đoạn vào bài');
+  impBlocks=[]; impEls={}; impMap={}; impCount={}; $('#imp-text').value=''; $('#imp-json').value=''; impJsonStatus(); renderImp();
+  toast(jr?(jr.err?'Đã đưa '+bl.length+' đoạn vào bài, nhưng không đọc được JSON elicit: '+jr.err:'Đã đưa '+bl.length+' đoạn và gắn '+jr.n+'/'+jr.total+' câu elicit'+(jr.lost?' ('+jr.lost+' căn cứ không khớp, xem tab Câu hỏi › Nạp từ AI)':'')):'Đã đưa '+bl.length+' đoạn vào bài',!!(jr&&(jr.err||jr.lost)));
 });
 
 var impMap={}, impCount={};
@@ -3407,12 +3466,12 @@ function blocksHtml(bl){
 }
 /* Prompt for AI */
 function openPrompt(btn){
-  var el=btn.hasAttribute('data-prompt-el'), ex=btn.hasAttribute('data-prompt-ex'), p=$('#pop-prompt'); $('#pp-text').value=el?aiElicitPrompt():ex?aiExamPrompt():aiPrompt(); $('#pp-h').textContent=el?'Câu lệnh nhờ AI tạo câu hỏi elicit':ex?'Câu lệnh nhờ AI chuyển đề bài':'Câu lệnh nhờ AI tô màu'; $('#pp-lede').textContent=el?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, rồi dán bài đọc (và danh sách câu hỏi nếu thầy cô đã có). Chép khối JSON AI trả về và dán vào “Nạp từ AI”.':ex?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng đề gốc (có thể dán từ PDF). Chép kết quả và dán vào ô đề bài.':'Chép câu lệnh này vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng bài đọc của bạn. Khi AI trả lời, chép nguyên khối code và dán vào Studio: màu, câu hỏi và ô ghi chú tự hiện ra.';
+  var al=btn.hasAttribute('data-prompt-all'), el=btn.hasAttribute('data-prompt-el'), ex=btn.hasAttribute('data-prompt-ex'), p=$('#pop-prompt'); $('#pp-text').value=al?aiAllPrompt():el?aiElicitPrompt():ex?aiExamPrompt():aiPrompt(); $('#pp-h').textContent=al?'Câu lệnh nhờ AI tô màu và đặt câu hỏi elicit':el?'Câu lệnh nhờ AI tạo câu hỏi elicit':ex?'Câu lệnh nhờ AI chuyển đề bài':'Câu lệnh nhờ AI tô màu'; $('#pp-lede').textContent=al?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, điền số câu và dán bài đọc. AI trả hai khối code: bài đã tô màu và JSON elicit. Thầy cô chỉ cần chép cả câu trả lời và dán vào ô văn bản, Studio tự tách hai phần.':el?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, rồi dán bài đọc (và danh sách câu hỏi nếu thầy cô đã có). Chép khối JSON AI trả về và dán vào “Nạp từ AI”.':ex?'Chép câu lệnh vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng đề gốc (có thể dán từ PDF). Chép kết quả và dán vào ô đề bài.':'Chép câu lệnh này vào ChatGPT, Claude hay Gemini, thay dòng cuối bằng bài đọc của bạn. Khi AI trả lời, chép nguyên khối code và dán vào Studio: màu, câu hỏi và ô ghi chú tự hiện ra.';
   p.hidden=false; var r=btn.getBoundingClientRect();
   p.style.left=Math.max(12,Math.min(innerWidth-p.offsetWidth-12,r.left))+'px';
   var top=r.top-p.offsetHeight-10; if(top<12) top=r.bottom+10; p.style.top=top+'px';
 }
-document.addEventListener('click',function(e){ var b=e.target.closest('[data-prompt],[data-prompt-ex],[data-prompt-el]'); if(b){ openPrompt(b); return; } var p=$('#pop-prompt'); if(!p.hidden&&!p.contains(e.target)) p.hidden=true; });
+document.addEventListener('click',function(e){ var b=e.target.closest('[data-prompt],[data-prompt-ex],[data-prompt-el],[data-prompt-all]'); if(b){ openPrompt(b); return; } var p=$('#pop-prompt'); if(!p.hidden&&!p.contains(e.target)) p.hidden=true; });
 $('#pp-x').addEventListener('click',function(){ $('#pop-prompt').hidden=true; });
 $('#pp-copy').addEventListener('click',function(){ var t=$('#pp-text'); RD.copy(t.value).then(function(ok){ if(!ok){ t.focus(); t.select(); } toast(ok?'Đã sao chép câu lệnh. Dán vào ChatGPT, Claude… kèm bài đọc.':'Hãy bấm Ctrl+C để chép'); }); });
 
