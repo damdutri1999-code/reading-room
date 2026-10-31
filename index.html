@@ -4914,6 +4914,7 @@ rrRoot.addEventListener('click',function(e){
   if(it){ var key=it.getAttribute('data-dvk'), keys=Array.prototype.map.call(rrRoot.querySelectorAll('.dv-it'),function(n){ return n.getAttribute('data-dvk'); });
     if(e.shiftKey&&DV.anchor&&keys.indexOf(DV.anchor)>=0){ var a1=keys.indexOf(DV.anchor), b1=keys.indexOf(key); dvSetSel(keys.slice(Math.min(a1,b1),Math.max(a1,b1)+1)); }
     else if(e.ctrlKey||e.metaKey){ var i2=DV.sel.indexOf(key); if(i2>=0) DV.sel.splice(i2,1); else DV.sel.push(key); DV.anchor=key; dvSelUI(); }
+    else if(key.charAt(0)==='f'&&DV.sec!=='trash'&&!DV.ren){ dvOpen(dvGet(key)); return; }
     else { var now=Date.now(); if(DV.lastK===key&&now-DV.lastT<450&&!e.shiftKey&&!e.ctrlKey&&!e.metaKey){ DV.lastK=null; dvOpen(dvGet(key)); return; } DV.lastK=key; DV.lastT=now; dvSetSel([key],key); }
     d.focus({preventScroll:true}); return; }
   if(t.closest('[data-dv-area]')){ dvSetSel([],null); d.focus({preventScroll:true}); }
