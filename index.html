@@ -979,11 +979,9 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .rd-qc:not(.open):has(textarea:focus) .rd-box,.rd-qc:not(.open):not(.shut):has(.rd-cl:focus-visible) .rd-box{z-index:12;border-color:var(--rd-accent);box-shadow:0 14px 30px -14px color-mix(in srgb,var(--rd-accent) 60%,transparent)}
 .rd-qc:not(.open):has(textarea:focus) .rd-cl .t,.rd-qc:not(.open):not(.shut):has(.rd-cl:focus-visible) .rd-cl .t{white-space:normal;overflow:visible;text-overflow:clip}
 .rd-qc:not(.open):has(textarea:focus) .rd-more,.rd-qc:not(.open):not(.shut):has(.rd-cl:focus-visible) .rd-more{display:block;margin-top:4px}
-@media (hover:hover){
-.rd-qc:not(.open):not(.shut):hover .rd-box{z-index:12;border-color:var(--rd-accent);box-shadow:0 14px 30px -14px color-mix(in srgb,var(--rd-accent) 60%,transparent)}
-.rd-qc:not(.open):not(.shut):hover .rd-cl .t{white-space:normal;overflow:visible;text-overflow:clip}
-.rd-qc:not(.open):not(.shut):hover .rd-more{display:block;margin-top:4px}
-}
+.rd-qc.peek:not(.open):not(.shut) .rd-box{z-index:12;border-color:var(--rd-accent);box-shadow:0 14px 30px -14px color-mix(in srgb,var(--rd-accent) 60%,transparent)}
+.rd-qc.peek:not(.open):not(.shut) .rd-cl .t{white-space:normal;overflow:visible;text-overflow:clip}
+.rd-qc.peek:not(.open):not(.shut) .rd-more{display:block;margin-top:4px}
 .rd-qc .rd-more{display:none}
 .rd-qc.open{height:auto;margin-bottom:12px}
 .rd-qc.open .rd-box{position:static;padding:10px 12px 8px;border-color:var(--rd-accent)}
@@ -1738,6 +1736,7 @@ RD.mount = function(root, lesson, init, opts){
     row.style.setProperty('--n',Math.max(1,nl,el));
   }
 
+  var touchT=0; on(document,'touchstart',function(){ touchT=Date.now(); },{passive:true});
   var tas = [];
   function grow(t){ t.style.height='auto'; t.style.height=(t.scrollHeight+2)+'px'; }
   var toastEl = $('.rd-toast'), toastT;
@@ -1834,8 +1833,8 @@ RD.mount = function(root, lesson, init, opts){
     on(c,'mouseenter',function(){ anchors.forEach(function(a){ a.classList.add('hot'); }); linkShow('el:'+id,anchors,c,'var(--rd-accent)'); });
     on(c,'mouseleave',function(){ anchors.forEach(function(a){ a.classList.remove('hot'); }); linkHide(); });
     on(clb,'click',function(){ var o=!c.classList.contains('open'); setOpen(o); c.classList.toggle('shut',!o); if(o) anchors.forEach(function(a,i){ setTimeout(function(){ flash([a]); },reduce?0:i*420); }); });
-    on(c,'mouseenter',function(){ if(!c.classList.contains('open')) grow(ta); });
-    on(c,'mouseleave',function(){ c.classList.remove('shut'); });
+    on(c,'mouseenter',function(){ if(Date.now()-touchT<1200) return; c.classList.add('peek'); if(!c.classList.contains('open')) grow(ta); });
+    on(c,'mouseleave',function(){ c.classList.remove('peek'); c.classList.remove('shut'); });
     anchors.forEach(function(a){
       a.setAttribute('tabindex','0'); a.setAttribute('role','button'); a.setAttribute('aria-label','Mở câu hỏi Q'+n);
       on(a,'mouseenter',function(){ c.classList.add('hot'); anchors.forEach(function(x){ x.classList.add('hot'); }); linkShow('el:'+id,anchors,c,'var(--rd-accent)'); });
