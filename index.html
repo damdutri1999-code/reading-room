@@ -1047,7 +1047,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .rd-mode .rd-btn[aria-pressed="true"] .rd-count{background:#fff;color:var(--ex-d)}
 /* Task mode: hide elicit cards so the text and tasks get the room */
 .rd.qopen .rd-row > .rd-card:not(.rd-ccard){display:none}
-@media (min-width:1080px){ .rd.qopen .rd-row{grid-template-columns:calc(240px * (1 + (var(--z) - 1) * .5) / var(--z)) minmax(0,1fr)} .rd.qopen .rd-text::before{right:calc(4px / var(--z))} }
+@media (min-width:1080px){ .rd.qopen .rd-row{grid-template-columns:calc(240px * (1 + (var(--z) - 1) * .5) / var(--z)) minmax(0,1fr)} .rd.qopen .rd-text{padding-right:calc(30px / var(--z))} .rd.qopen .rd-text::before{right:0} }
 /* Instant feedback */
 .rd-ex-o.on.ok{background:#1f9d6a;border-color:#1f9d6a;color:#fff}
 .rd-ex-o.on.bad{background:#d6393f;border-color:#d6393f;color:#fff}
