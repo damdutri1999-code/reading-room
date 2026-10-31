@@ -2262,7 +2262,7 @@ RR.init=function(opts){
   function app(){ return opts.app(); }
   function lessons(){ return opts.lessons()||[]; }
   function roles(){
-    var s='<button type="button" class="rr-role s" data-go="lib"><span class="ri">'+IC.book+'</span><b>Học viên '+IC.arr+'</b><small>'+(opts.studentHref?'Vào kho chung':'Vào kho bài đọc của lớp')+'</small></button>';
+    var s='<button type="button" class="rr-role s" data-go="lib"><span class="ri">'+IC.book+'</span><b>'+(opts.studentHref?'Vào kho bài chung':'Học viên')+' '+IC.arr+'</b><small>'+(opts.studentHref?'Dành cho học viên · không cần đăng nhập':'Vào kho bài đọc của lớp')+'</small></button>';
     var t=opts.teacher?'<button type="button" class="rr-role t" data-go="teacher"><span class="ri">'+IC.pen+'</span><b>Giáo viên '+IC.arr+'</b><small>Nạp bài mới, chỉnh bài</small></button>':'';
     return '<div class="rr-roles'+(opts.teacher?'':' one')+'">'+s+t+'</div>';
   }
