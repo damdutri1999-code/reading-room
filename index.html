@@ -758,7 +758,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .dv-b{font:600 10.5px/1 var(--rr-ui);font-style:normal;padding:4px 7px;border-radius:999px;background:color-mix(in srgb,var(--rr-fg) 10%,transparent)}
 .dv-b.b1{background:color-mix(in srgb,#2e9e5b 25%,transparent)}.dv-b.b2{background:color-mix(in srgb,#3b82f6 25%,transparent)}.dv-b.b0{background:color-mix(in srgb,#f59e0b 25%,transparent)}
 .dv-ren{width:100%;font:inherit;color:var(--rr-fg);background:var(--rr-bg);border:2px solid var(--rr-accent);border-radius:6px;padding:3px 6px;outline:0}
-.dv-lh,.dv-row{display:grid;grid-template-columns:minmax(0,1fr) 110px 120px 120px;gap:10px;align-items:center;padding:0 12px}
+.dv-lh,.dv-row{display:grid;grid-template-columns:minmax(0,1fr) 100px 110px 130px 110px;gap:10px;align-items:center;padding:0 12px}
 .dv-lh{font:600 12px var(--rr-ui);opacity:.65;height:32px;border-bottom:1px solid var(--rr-line)}
 .dv-row{height:46px;border-radius:8px;border:1px solid transparent;font:13.5px var(--rr-ui);cursor:default;user-select:none}
 .dv-row:hover{background:color-mix(in srgb,var(--rr-fg) 5%,transparent)}
@@ -793,6 +793,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 </style>
 
 <style>.dv-tin{width:100%;box-sizing:border-box;height:38px;border:1px solid var(--rr-line);border-radius:10px;background:transparent;color:var(--rr-fg);padding:0 12px;font:500 14px var(--rr-ui);margin:8px 0 2px}.dv-tin:focus{outline:2px solid var(--rr-accent,#7c8cff);outline-offset:1px}.dv-tchips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px;max-height:150px;overflow:auto}.dv-tl{font:600 12px var(--rr-ui);opacity:.65;margin-right:2px}.dv-tc{height:28px;padding:0 12px;border-radius:999px;border:1px solid var(--rr-line);background:transparent;color:var(--rr-fg);font:500 13px var(--rr-ui);cursor:pointer}.dv-tc:hover{background:color-mix(in srgb,var(--rr-fg) 8%,transparent)}.dv-tc.on{background:color-mix(in srgb,#2fbf8f 24%,transparent);border-color:#2fbf8f}
+.dv-c5{min-width:0;overflow:hidden}.dv-c5 .dv-b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}
 </style>
 <style id="rd-css">
 :root{--rd-bg:#f4f6f8;--rd-paper:#ffffff;--rd-ink:#182132;--rd-muted:#5d6779;--rd-line:#dde2ea;--rd-accent:#2a49d6;--rd-accent-soft:#e6eaff;--rd-note:#fff7d6;--rd-note-ink:#5a4500;--rd-student:#0e9f6e;--rd-student-soft:#e3f6ee;--rd-read:'Literata',Georgia,'Times New Roman',serif;--rd-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -4820,11 +4821,11 @@ function dvThumb(it){
   if(it.k==='f') return '<span class="dv-fold">'+dvIc('folder')+(it.o.starred?'':'')+'</span>';
   return '<span class="dv-th">'+RR.thumb(it.o,'width:100%;height:100%')+'</span>';
 }
-function dvBadges(it){
+function dvBadges(it,noTopic){
   if(it.k==='f') return '';
   var x=it.o;
   if(DV.sec==='trash') return '';
-  return (x.topic?'<i class="dv-b bt" title="Topic">'+esc(x.topic)+'</i>':'')+(x.done?(x.shared?'<i class="dv-b b2" title="Đang ở kho chung">Chung</i>':''):'<i class="dv-b b0">Bản nháp</i>');
+  return (x.topic&&!noTopic?'<i class="dv-b bt" title="Topic">'+esc(x.topic)+'</i>':'')+(x.done?(x.shared?'<i class="dv-b b2" title="Đang ở kho chung">Chung</i>':''):'<i class="dv-b b0">Bản nháp</i>');
 }
 function dvLoc(it){
   if(it.k==='l'){ var fs=fl(it.o).filter(function(f){ return LIB.folders[f]; }); return fs.length?fs.map(function(f){ var p=folderPath(f); return p.map(function(q){ return q.name; }).join(' › '); }).join(' · '):'Tất cả bài đọc'; }
@@ -4843,11 +4844,11 @@ function dvArea(){
     var msg=DV.q?'Không tìm thấy mục nào khớp.':DV.sec==='trash'?'Thùng rác trống.':DV.sec==='starred'?'Chưa có mục nào gắn dấu sao. Bấm chuột phải vào một bài hoặc thư mục để gắn.':DV.sec==='loose'?'Không còn bài nào chưa phân. Bài hoàn tất mới sẽ hiện ở đây cho tới khi thầy xếp vào thư mục.':DV.sec==='recent'?'Chưa có bài nào.':'Thư mục này trống. Bấm chuột phải để tạo thư mục hoặc bài mới.';
     h='<div class="dv-empty">'+dvIc(DV.sec==='trash'?'trash':'folder')+'<p>'+msg+'</p></div>';
   } else if(list){
-    h='<div class="dv-lh" aria-hidden="true"><span>Tên</span><span>Chủ sở hữu</span><span>'+(DV.sec==='trash'?'Vị trí cũ':'Sửa đổi')+'</span><span>Kho</span></div><div class="dv-list" role="listbox" aria-multiselectable="true">';
+    h='<div class="dv-lh" aria-hidden="true"><span>Tên</span><span>Chủ sở hữu</span><span>'+(DV.sec==='trash'?'Vị trí cũ':'Sửa đổi')+'</span><span>Chủ đề</span><span>Trạng thái</span></div><div class="dv-list" role="listbox" aria-multiselectable="true">';
     items.forEach(function(it){ var key=dvKey(it.k,it.id), s=DV.sel.indexOf(key)>=0;
       h+='<div class="dv-it dv-row'+(s?' sel':'')+'" role="option" aria-selected="'+s+'" data-dvk="'+key+'" draggable="'+(DV.sec==='trash'||DV.ren===key?'false':'true')+'"'+(it.k==='f'&&DV.sec!=='trash'?' data-dvdrop="'+esc(it.id)+'"':'')+'>'+
         '<span class="dv-c1">'+(it.k==='f'?dvIc('folder','fi'):'<span class="dv-mini">'+RR.thumb(it.o,'width:100%;height:100%')+'</span>')+dvNameHtml(it)+(it.o.starred?dvIc('star','st'):'')+'</span>'+
-        '<span class="dv-c2">'+esc(ownerName())+'</span><span class="dv-c3">'+(DV.sec==='trash'?esc(dvLoc(it)):(it.t?fmtDate(it.t):'–'))+'</span><span class="dv-c4">'+dvBadges(it)+'</span></div>'; });
+        '<span class="dv-c2">'+esc(ownerName())+'</span><span class="dv-c3">'+(DV.sec==='trash'?esc(dvLoc(it)):(it.t?fmtDate(it.t):'–'))+'</span><span class="dv-c5">'+(it.k==='l'&&it.o.topic&&DV.sec!=='trash'?'<i class="dv-b bt" title="Topic">'+esc(it.o.topic)+'</i>':'')+'</span><span class="dv-c4">'+dvBadges(it,true)+'</span></div>'; });
     h+='</div>';
   } else {
     var fo=items.filter(function(i){ return i.k==='f'; }), fl=items.filter(function(i){ return i.k==='l'; });
