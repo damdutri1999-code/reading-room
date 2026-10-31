@@ -4040,14 +4040,14 @@ function showHome(v){
   rrCtl.show(v||'home');
 }
 /* ---------- Teacher workspace (side tabs) ---------- */
-var HUB_TABS=[['lessons','book','Bài đọc'],['drafts','pen','Soạn bài đọc'],['cover','layout','Trang cover'],['export','download','Xuất cho lớp'],['backup','file','Sao lưu'],['ai','sparkle','Câu lệnh AI'],['guide','help','Hướng dẫn']];
+var HUB_TABS=[['lessons','book','Bài đọc'],['drafts','pen','Soạn bài đọc'],['cover','layout','Trang cover'],['export','download','Xuất file'],['backup','file','Sao lưu'],['ai','sparkle','Câu lệnh AI'],['guide','help','Hướng dẫn']];
 function hubTabs(){ if(!isOwnerRole()) return HUB_TABS; var t=HUB_TABS.slice(); t.splice(2,0,['drive','folder','Quản lý bài']); return t; }
 var hubTab='lessons', hubQ='', hubLv='all', hubCat='all', hubDev='desk', hubBox=null, coverT=0;
 try{ hubTab=localStorage.getItem('rls:hubtab')||hubTab; }catch(e){}
 var TH_NAME={stage:'Sân khấu',notebook:'Vở ghi',constellation:'Chòm sao'};
 function doneIds(){ return LIB.order.filter(function(id){ return LIB.lessons[id]&&LIB.lessons[id].done&&!lsnTrashed(LIB.lessons[id]); }); }
 function draftIds(){ return LIB.order.filter(function(id){ return LIB.lessons[id]&&!LIB.lessons[id].done&&!lsnTrashed(LIB.lessons[id]); }); }
-function pubIds(){ return doneIds().filter(function(id){ return !LIB.lessons[id].hidden; }); }
+function pubIds(){ return doneIds(); }
 function sharedIds(){ return doneIds().filter(function(id){ return LIB.lessons[id].shared; }); }
 function backupDue(){ if(!LIB.order.length) return false; return !LIB.lastBackup||(Date.now()-LIB.lastBackup)>=7*864e5; }
 function exportTheme(){ return LIB.app.theme||(rrCtl&&rrCtl.theme())||curTheme(); }
@@ -4083,12 +4083,12 @@ function hubTools(ids){
     (lvs.length>1?'<span class="tw-chips" role="group" aria-label="Lọc trình độ">'+['all'].concat(lvs).map(function(l){ return '<button type="button" data-hlv="'+esc(l)+'" aria-pressed="'+(hubLv===l)+'">'+(l==='all'?'Tất cả':esc(l))+'</button>'; }).join('')+'</span>':'')+
     '<span class="tw-chips" role="group" aria-label="Lọc loại bài">'+[['all','Mọi loại'],['ielts','IELTS Cam'],['content','Kiến thức'],['exam','Có đề bài']].map(function(c){ return '<button type="button" data-hcat="'+c[0]+'" aria-pressed="'+(hubCat===c[0])+'">'+c[1]+'</button>'; }).join('')+'</span></div>';
 }
-function paneLessonsSub(){ var n=doneIds().length; return n?n+' bài đã soạn xong · '+pubIds().length+' trong kho lớp · '+sharedIds().length+' trong kho chung':'Kho bài đã soạn xong của thầy'; }
+function paneLessonsSub(){ var n=doneIds().length; return n?n+' bài đã soạn xong · '+sharedIds().length+' trong Kho chung (thư mục KHO TÀI LIỆU CHUNG)':'Kho bài đã soạn xong của thầy'; }
 function paneLessons(){
   var ids=doneIds(), pub=pubIds().length;
   return paneHead('Bài đọc của thầy',paneLessonsSub())+
     (ids.length>3?hubTools(ids):'')+
-    (ids.length>1?'<p class="tw-hint">Kéo <span class="tw-grip-i">'+svg('grip')+'</span> để sắp thứ tự bài. <b>Kho lớp</b>: bài hiện trong kho riêng của lớp thầy cô. <b>Kho chung</b>: chia sẻ bài vào kho chung; bài nào thầy cô muốn giữ riêng thì để tắt.</p>':'')+
+    (ids.length>1?'<p class="tw-hint">Kéo <span class="tw-grip-i">'+svg('grip')+'</span> để sắp thứ tự bài. <b>Kho chung</b>: bật thì bài nằm trong thư mục KHO TÀI LIỆU CHUNG và mọi người đọc được; bài nào thầy muốn giữ riêng thì để tắt. Muốn xếp bài vào nhiều thư mục, dùng tab Quản lý bài.</p>':'')+
     '<div class="tw-list" data-rows></div>';
 }
 function paneDrafts(){
@@ -4105,10 +4105,10 @@ function renderRows(){
   if(!ids.length){ box.innerHTML='<div class="tw-empty">'+(base.length?'Không có bài nào khớp.':drafts?'Chưa có bài nào đang soạn. Bấm “Bài mới” để bắt đầu.':'Chưa có bài nào soạn xong. Vào “Soạn bài đọc”, soạn bài rồi bấm “Hoàn tất” để đưa bài vào đây.')+'</div>'; return; }
   box.innerHTML=ids.map(function(id){ var x=LIB.lessons[id], I=RR.info(cleanLessonOf(x)), pos=pubIds().indexOf(id);
     var meta=(x.cat?'<i class="tw-lv tw-cat">'+esc(RR.CATS[x.cat])+'</i>':drafts?'':'<i class="tw-lv tw-nocat">Chưa phân loại</i>')+(I.exam?'<i class="tw-lv tw-exq">Có đề · '+I.exam+' câu</i>':'')+(x.level?'<i class="tw-lv">'+esc(x.level)+'</i>':'')+I.minutes+' phút · '+I.questions+' câu hỏi · '+I.notes+' ô ghi chú'+(x.updated?' · '+fmtDate(x.updated):'');
-    return '<div class="tw-row'+(x.hidden&&!drafts?' off':'')+(drafts?' draft':'')+'" data-id="'+esc(id)+'"'+(filtered||drafts?'':' draggable="true"')+'>'+
+    return '<div class="tw-row'+(drafts?' draft':'')+'" data-id="'+esc(id)+'"'+(filtered||drafts?'':' draggable="true"')+'>'+
       (drafts?'':'<span class="tw-grip" aria-hidden="true">'+svg('grip')+'</span><span class="tw-no">'+(pos>=0?pos+1:'–')+'</span>')+RR.thumb(x,'width:52px;flex:none')+
       '<div class="tw-ri"><b>'+esc(x.title||'Bài chưa đặt tên')+(drafts&&id===L.id?' <i class="tw-cur">Đang mở</i>':'')+'</b><span>'+meta+'</span></div>'+
-      (drafts?'':'<span class="tw-sws"><label class="tw-sw" title="Hiện trong kho của lớp thầy cô"><input type="checkbox" data-pub'+(x.hidden?'':' checked')+'><i></i><span>Kho lớp</span></label><label class="tw-sw" title="Chia sẻ bài này vào kho chung cho mọi người"><input type="checkbox" data-share'+(x.shared?' checked':'')+'><i></i><span>Kho chung</span></label></span>')+
+      (drafts?'':'<span class="tw-sws"><label class="tw-sw" title="Chia sẻ bài này vào kho chung cho mọi người"><input type="checkbox" data-share'+(x.shared?' checked':'')+'><i></i><span>Kho chung</span></label></span>')+
       (drafts?'<button type="button" class="tw-btn" data-act2="finish">'+svg('check')+'Hoàn tất</button><button type="button" class="tw-btn solid" data-act2="edit">'+svg('pen')+'Soạn tiếp</button>':'<button type="button" class="tw-btn" data-act2="edit">Soạn lại</button>')+
       '<span class="tw-more"><button type="button" class="tw-ib" data-more aria-label="Thêm thao tác" aria-haspopup="menu">'+svg('more')+'</button>'+
       '<span class="tw-menu" role="menu"><button type="button" role="menuitem" data-act2="view">'+svg('eye')+'Xem như học viên</button>'+(drafts?'':'<button type="button" role="menuitem" data-act2="dl">'+svg('download')+'Tải bài lẻ (.html)</button>')+'<button type="button" role="menuitem" data-act2="dup">'+svg('copy')+'Nhân bản</button>'+
@@ -4224,16 +4224,16 @@ function clErr(e){
   return 'Lỗi: '+m;
 }
 function sharedLessons(){ var by=authName(); return sharedIds().map(function(id){ var x0=LIB.lessons[id], x=withFo(cleanLessonOf(id===L.id?L:x0),x0,underChung); if(x) x.by=by; return x; }).filter(Boolean); }
-function clPayload(){ changed(true); return {app:Object.assign({},LIB.app,{theme:exportTheme()}), lessons:libLessons(), shared:sharedLessons(), folders:foMap(), sfolders:foMap(underChung), at:Date.now()}; }
+function clPayload(){ changed(true); return {app:Object.assign({},LIB.app,{theme:exportTheme()}), lessons:[], shared:sharedLessons(), sfolders:foMap(underChung), at:Date.now()}; }
 function clPublish(){
   var c=cl(); if(!clReady()) return Promise.reject(new Error('Chưa nhập đủ thông tin kết nối. Cần mã kho và đăng nhập.'));
   return authToken().then(function(tok){ return clCall('publish_lib_owner',{p_id:c.id,p_data:clPayload()},tok); }).then(function(){ c.at=Date.now(); saveLib(); });
 }
 function khoLink(id){ var c=cl(); id=id||c.id; if(!id) return ''; return location.href.split(/[?#]/)[0]+'?kho='+id; }
 function khoLinkHtml(){
-  var c=cl(), u=khoLink(); if(!u) return '';
-  var warn=/^file:|^blob:|^about:/.test(u)?'<small class="tw-hint">Link này chỉ chạy khi trang web đã đưa lên mạng (Netlify). Hãy mở Studio từ địa chỉ web của thầy cô rồi lấy link.</small>':'';
-  return '<div class="tw-kho"><span>Link cho học viên'+(c.at?'':' <em>(chưa xuất bản)</em>')+'</span><input readonly value="'+esc(u)+'" aria-label="Link học viên" onfocus="this.select()"><button type="button" class="tw-btn" data-cl="copylink">'+svg('copy')+'Sao chép</button><a class="tw-btn" href="'+esc(u)+'" target="_blank" rel="noopener">'+svg('eye')+'Mở thử</a>'+warn+'<span class="tw-kho-s">Kho chung (mọi giáo viên cùng góp, '+sharedIds().length+' bài của thầy cô đang bật)</span><input readonly value="'+esc(khoLink('chung'))+'" aria-label="Link kho chung" onfocus="this.select()"><button type="button" class="tw-btn" data-cl="copyshared">'+svg('copy')+'Sao chép</button><a class="tw-btn" href="'+esc(khoLink('chung'))+'" target="_blank" rel="noopener">'+svg('eye')+'Mở thử</a></div>';
+  var u=khoLink('chung'); if(!u) return '';
+  var warn=/^file:|^blob:|^about:/.test(u)?'<small class="tw-hint">Link này chỉ chạy khi trang web đã đưa lên mạng. Hãy mở Studio từ địa chỉ web của thầy rồi lấy link.</small>':'';
+  return '<div class="tw-kho"><span>Link Kho chung (học viên không cần đăng nhập, '+sharedIds().length+' bài của thầy đang ở thư mục KHO TÀI LIỆU CHUNG)</span><input readonly value="'+esc(u)+'" aria-label="Link kho chung" onfocus="this.select()"><button type="button" class="tw-btn" data-cl="copyshared">'+svg('copy')+'Sao chép</button><a class="tw-btn" href="'+esc(u)+'" target="_blank" rel="noopener">'+svg('eye')+'Mở thử</a>'+warn+'</div>';
 }
 function cloudHtml(){
   var c=cl(), ok=clReady(), st=c.at?'Xuất bản gần nhất: <b>'+fmtDate(c.at)+'</b>':'Chưa xuất bản lần nào.';
@@ -4249,14 +4249,14 @@ function cloudHtml(){
 /* Tab 3 — export */
 function paneExport(){
   var ids=pubIds(), hid=LIB.order.length-ids.length, th=exportTheme();
-  return paneHead('Xuất kho bài cho lớp','Gói các bài thành <b>một file .html</b>. Học viên mở bằng trình duyệt là thấy trang cover và kho bài; bài làm lưu ngay trên máy của các em.')+
+  return paneHead('Xuất file kho bài','Gói <b>tất cả bài đã hoàn tất</b> thành <b>một file .html</b> để gửi riêng. Người nhận mở bằng trình duyệt là thấy trang cover và kho bài. Kho chung online thì không cần file này.')+
     '<div class="tw-ex"><div class="tw-ex-card"><div class="tw-ex-n"><b>'+ids.length+'</b><span>bài sẽ vào kho</span></div>'+
       '<dl><dt>Trang cover</dt><dd>'+esc(LIB.app.name||'Reading Room')+' <button type="button" class="tw-link" data-tab="cover">Sửa</button></dd><dt>Theme mở đầu</dt><dd>'+TH_NAME[th]+' <button type="button" class="tw-link" data-tab="cover">Đổi</button></dd></dl>'+
       '<label class="tw-fn">Tên file<span><input data-app="file" value="'+esc(libFileName().replace(/\.html$/,''))+'"><em>.html</em></span></label>'+
       '<button type="button" class="tw-btn solid big" data-hub="export"'+(ids.length?'':' disabled')+'>'+svg('download')+'Tải file kho bài</button>'+
       '<button type="button" class="tw-btn" data-go-lib>'+svg('eye')+'Xem kho như học viên</button></div>'+
-    '<div class="tw-ex-list"><h4>Thứ tự trong kho</h4>'+(ids.length?'<ol>'+ids.map(function(id){ var x=LIB.lessons[id]; return '<li>'+RR.thumb(x,'width:40px;flex:none')+'<span><b>'+esc(x.title||'Bài chưa đặt tên')+'</b>'+(x.level?'<i class="tw-lv">'+esc(x.level)+'</i>':'')+'</span></li>'; }).join('')+'</ol>':'<div class="tw-empty">Chưa có bài nào được bật “Kho lớp”.</div>')+
-      (hid?'<p class="tw-hint">'+hid+' bài đang ẩn. <button type="button" class="tw-link" data-tab="lessons">Bật lại ở tab Bài đọc</button></p>':'<p class="tw-hint">Đổi thứ tự hoặc ẩn bài ở <button type="button" class="tw-link" data-tab="lessons">tab Bài đọc</button>.</p>')+
+    '<div class="tw-ex-list"><h4>Thứ tự trong kho</h4>'+(ids.length?'<ol>'+ids.map(function(id){ var x=LIB.lessons[id]; return '<li>'+RR.thumb(x,'width:40px;flex:none')+'<span><b>'+esc(x.title||'Bài chưa đặt tên')+'</b>'+(x.level?'<i class="tw-lv">'+esc(x.level)+'</i>':'')+'</span></li>'; }).join('')+'</ol>':'<div class="tw-empty">Chưa có bài nào hoàn tất.</div>')+
+      '<p class="tw-hint">Đổi thứ tự bài ở <button type="button" class="tw-link" data-tab="lessons">tab Bài đọc</button>.</p>'+
       '<p class="tw-hint">Cần gửi riêng một bài? Mở menu ⋯ của bài đó và chọn “Tải bài lẻ”.</p></div></div>'+cloudHtml();
 }
 /* Tab 4 — AI prompt */
@@ -4273,7 +4273,7 @@ function paneAI(){
 }
 /* Tab 5 — guide */
 function paneGuide(){
-  var steps=[['upload','Nạp bài','Dán văn bản thô, bài AI đã tô màu, HTML có màu, hoặc chọn tệp .txt/.docx.'],['pen','Tô màu','Bôi đen cụm từ rồi chọn mã màu, hoặc bật bút (Alt+1…4) để tô liên tục.'],['question','Câu hỏi dẫn dắt','Bôi đen cụm cần hỏi, bấm “Câu hỏi”. Câu hỏi hiện ở cột phải khi học viên đọc.'],['note','Ô ghi chú','Đặt con trỏ sau đoạn văn, bấm “Ghi chú”. Học viên viết trực tiếp vào ô này.'],['eye','Xem như học viên','Chuyển sang “Xem như học viên” để thử hiệu ứng, phóng to chữ, ghi chú.'],['download','Xuất cho lớp','Xuất từng bài hoặc cả kho bài thành một file .html gửi cho lớp.']];
+  var steps=[['upload','Nạp bài','Dán văn bản thô, bài AI đã tô màu, HTML có màu, hoặc chọn tệp .txt/.docx.'],['pen','Tô màu','Bôi đen cụm từ rồi chọn mã màu, hoặc bật bút (Alt+1…4) để tô liên tục.'],['question','Câu hỏi dẫn dắt','Bôi đen cụm cần hỏi, bấm “Câu hỏi”. Câu hỏi hiện ở cột phải khi học viên đọc.'],['note','Ô ghi chú','Đặt con trỏ sau đoạn văn, bấm “Ghi chú”. Học viên viết trực tiếp vào ô này.'],['eye','Xem như học viên','Chuyển sang “Xem như học viên” để thử hiệu ứng, phóng to chữ, ghi chú.'],['download','Xuất file','Xuất từng bài hoặc cả kho bài thành một file .html gửi cho lớp.']];
   return paneHead('Hướng dẫn nhanh','Quy trình soạn một bài Reading, từ văn bản thô tới file cho học viên.')+
     '<div class="tw-guide">'+steps.map(function(s,i){ return '<div class="tw-gs"><span class="tw-gn">'+(i+1)+'</span><span class="tw-gi">'+svg(s[0])+'</span><b>'+s[1]+'</b><p>'+s[2]+'</p></div>'; }).join('')+'</div>'+
     '<div class="tw-codes"><h4>Bốn mã màu</h4>'+CODES.map(function(c,i){ return '<div class="tw-code"><i style="background:'+c.color+'"></i><b>'+esc(c.label)+'</b><span>'+esc(CODE_HINT[c.id]||'')+'</span><kbd>Alt+'+(i+1)+'</kbd></div>'; }).join('')+'</div>';
@@ -4391,12 +4391,6 @@ rrRoot.addEventListener('change',function(e){
     setChung(sx,e.target.checked); saveLib();
     var hp2=rrRoot.querySelector('.tw-head p'); if(hp2) hp2.textContent=paneLessonsSub();
     autoPub(e.target.checked?'Đã đưa bài vào kho chung':'Đã rút bài khỏi kho chung'); return; }
-  if(!e.target.hasAttribute('data-pub')) return;
-  var id=e.target.closest('[data-id]').getAttribute('data-id'), x=LIB.lessons[id]; if(!x) return;
-  if(e.target.checked) delete x.hidden; else x.hidden=true; saveLib(); renderRows();
-  var em=rrRoot.querySelector('[data-tab="export"] em'); if(em) em.textContent=pubIds().length;
-  var hp=rrRoot.querySelector('.tw-head p'); if(hp) hp.textContent=paneLessonsSub();
-  autoPub(e.target.checked?'Đã đưa bài vào kho lớp':'Đã ẩn bài khỏi kho lớp');
 });
 rrRoot.addEventListener('input',function(e){
   var el=e.target; if(!el.getAttribute) return;
@@ -4597,7 +4591,7 @@ function dvBadges(it){
   if(it.k==='f') return '';
   var x=it.o;
   if(DV.sec==='trash') return '';
-  return (x.done?(x.hidden?'':'<i class="dv-b b1" title="Đang ở kho lớp">Lớp</i>')+(x.shared?'<i class="dv-b b2" title="Đang ở kho chung">Chung</i>':''):'<i class="dv-b b0">Bản nháp</i>');
+  return (x.done?(x.shared?'<i class="dv-b b2" title="Đang ở kho chung">Chung</i>':''):'<i class="dv-b b0">Bản nháp</i>');
 }
 function dvLoc(it){
   if(it.k==='l'){ var fs=fl(it.o).filter(function(f){ return LIB.folders[f]; }); return fs.length?fs.map(function(f){ var p=folderPath(f); return p.map(function(q){ return q.name; }).join(' › '); }).join(' · '):'Của tôi'; }
@@ -4653,7 +4647,7 @@ function dvInfo(){
       h='<div class="dv-ip"><span class="dv-fold big">'+dvIc('folder')+'</span></div><h4>'+esc(it.name)+'</h4><dl><dt>Loại</dt><dd>Thư mục</dd><dt>Vị trí</dt><dd>'+esc(dvLoc(it))+'</dd><dt>Nội dung</dt><dd>'+ls+' bài · '+kids+' thư mục con</dd><dt>Chủ sở hữu</dt><dd>'+esc(ownerName())+' · Owner</dd><dt>Tạo lúc</dt><dd>'+fmtDate(it.o.created)+'</dd></dl>'; }
     else { var x=it.o, I=RR.info(cleanLessonOf(x));
       h='<div class="dv-ip"><span class="dv-th big">'+RR.thumb(x,'width:100%;height:100%')+'</span></div><h4>'+esc(it.name)+'</h4><dl><dt>Loại</dt><dd>Bài đọc'+(x.cat?' · '+esc(RR.CATS[x.cat]):'')+(x.level?' · '+esc(x.level):'')+'</dd><dt>Trạng thái</dt><dd>'+(x.done?'Đã hoàn tất':'Bản nháp')+'</dd><dt>Nội dung</dt><dd>'+I.minutes+' phút · '+I.questions+' câu hỏi · '+I.notes+' ô ghi chú</dd><dt>Nằm trong</dt><dd>'+esc(dvLoc(it))+'</dd><dt>Chủ sở hữu</dt><dd>'+esc(ownerName())+' · Owner</dd><dt>Sửa đổi</dt><dd>'+(x.updated?fmtDate(x.updated):'–')+'</dd></dl>'+
-        (x.done&&DV.sec!=='trash'?'<div class="dv-sws"><label class="tw-sw"><input type="checkbox" data-dvsw="lop"'+(x.hidden?'':' checked')+'><i></i><span>Kho lớp</span></label><label class="tw-sw"><input type="checkbox" data-dvsw="chung"'+(x.shared?' checked':'')+'><i></i><span>Kho chung</span></label></div>':'');
+        (x.done&&DV.sec!=='trash'?'<div class="dv-sws"><label class="tw-sw"><input type="checkbox" data-dvsw="chung"'+(x.shared?' checked':'')+'><i></i><span>Kho chung</span></label></div>':'');
     }
   } else if(s.length>1){ h='<h4>'+s.length+' mục đã chọn</h4><p class="dv-muted">Chọn một mục để xem chi tiết.</p>'; }
   else { var p=folderPath(DV.cur), items=dvAll(); h='<div class="dv-ip"><span class="dv-fold big">'+dvIc('folder')+'</span></div><h4>'+esc(DV.sec==='my'?(p.length?p[p.length-1].name:'Của tôi'):({recent:'Gần đây',starred:'Có gắn dấu sao',trash:'Thùng rác'}[DV.sec]))+'</h4><dl><dt>Chủ sở hữu</dt><dd>'+esc(ownerName())+' · Owner</dd><dt>Số mục</dt><dd>'+items.length+'</dd></dl><p class="dv-muted">Chọn một bài hoặc thư mục để xem chi tiết.</p>'; }
@@ -4764,9 +4758,9 @@ function dvCommitRename(val,cancel){
 function dvStar(items){ var all=items.every(function(it){ return it.o.starred; }); items.forEach(function(it){ if(all) delete it.o.starred; else it.o.starred=true; }); saveLib(); dvRefresh(); dvSnack(all?'Đã bỏ dấu sao':'Đã gắn dấu sao'); }
 function dvKho(items,which){
   var ls=items.filter(function(it){ return it.k==='l'&&it.o.done; }); if(!ls.length){ dvSnack('Chỉ bài đã hoàn tất mới có thể đưa ra kho.'); return; }
-  var on=!ls.every(function(it){ return which==='lop'?!it.o.hidden:it.o.shared; });
-  ls.forEach(function(it){ if(which==='lop'){ if(on) delete it.o.hidden; else it.o.hidden=true; } else setChung(it.o,on); });
-  saveLib(); hubRefresh2(); autoPub((on?'Đã đưa ':'Đã rút ')+ls.length+' bài '+(on?'vào ':'khỏi ')+(which==='lop'?'kho lớp':'kho chung (thư mục KHO TÀI LIỆU CHUNG)'));
+  var on=!ls.every(function(it){ return it.o.shared; });
+  ls.forEach(function(it){ setChung(it.o,on); });
+  saveLib(); hubRefresh2(); autoPub((on?'Đã đưa ':'Đã rút ')+ls.length+' bài '+(on?'vào ':'khỏi ')+'kho chung (thư mục KHO TÀI LIỆU CHUNG)');
 }
 function dvFinish(items,undo){
   var ls=items.filter(function(it){ return it.k==='l'&&(undo?it.o.done:!it.o.done); }); if(!ls.length) return;
@@ -4842,7 +4836,7 @@ function dvCtxItems(sel){
   L1.push({a:'copy',t:'Sao chép (dán = lối tắt)',ic:'copy',k:'Ctrl + C'}); L1.push({a:'cut',t:'Cắt',ic:'cut',k:'Ctrl + X'});
   L1.push({a:'star',t:sel.every(function(i){ return i.o.starred; })?'Bỏ dấu sao':'Gắn dấu sao',ic:'star',k:'S'});
   if(anyL.length){ L1.push('-');
-    if(dn){ L1.push({a:'kholop',t:'Kho lớp',chk:anyL.every(function(i){ return !i.o.hidden; })}); L1.push({a:'khochung',t:'Kho chung',chk:anyL.every(function(i){ return i.o.shared; })}); L1.push({a:'undone',t:'Chuyển về bản nháp',ic:'pen'}); }
+    if(dn){ L1.push({a:'khochung',t:'Kho chung',chk:anyL.every(function(i){ return i.o.shared; })}); L1.push({a:'undone',t:'Chuyển về bản nháp',ic:'pen'}); }
     else L1.push({a:'finish',t:'Hoàn tất và đưa ra kho',ic:'check'});
     if(l1) { L1.push({a:'share',t:'Copy link bài đọc',ic:'link',dis:!(l1.done&&l1.shared)}); L1.push({a:'dl',t:'Tải xuống (.html)',ic:'download'}); }
   }
@@ -4872,7 +4866,6 @@ function dvDo(a,sel){
     case 'cut': if(s.length) dvCopyClip(s,'cut'); break;
     case 'paste': dvPaste(); break;
     case 'star': if(s.length) dvStar(s); break;
-    case 'kholop': dvKho(s,'lop'); break;
     case 'khochung': dvKho(s,'chung'); break;
     case 'finish': dvFinish(s,false); break;
     case 'undone': dvFinish(s,true); break;
@@ -4928,7 +4921,7 @@ rrRoot.addEventListener('contextmenu',function(e){
 rrRoot.addEventListener('input',function(e){ if(e.target.hasAttribute&&e.target.hasAttribute('data-dvq')){ DV.q=e.target.value; DV.sel=[]; dvTop(); var q=rrRoot.querySelector('[data-dvq]'); if(q){ q.focus(); var n=q.value.length; q.setSelectionRange(n,n); } dvArea(); } });
 rrRoot.addEventListener('change',function(e){
   var sw=e.target.getAttribute&&e.target.getAttribute('data-dvsw'); if(!sw) return;
-  var s=dvSelItems(); if(s.length===1&&s[0].k==='l'){ var x=s[0].o; if(sw==='lop'){ if(e.target.checked) delete x.hidden; else x.hidden=true; } else setChung(x,e.target.checked); saveLib(); hubRefresh2(); autoPub((e.target.checked?'Đã đưa bài vào ':'Đã rút bài khỏi ')+(sw==='lop'?'kho lớp':'kho chung')); }
+  var s=dvSelItems(); if(s.length===1&&s[0].k==='l'){ var x=s[0].o; setChung(x,e.target.checked); saveLib(); hubRefresh2(); autoPub((e.target.checked?'Đã đưa bài vào ':'Đã rút bài khỏi ')+'kho chung'); }
 });
 rrRoot.addEventListener('keydown',function(e){
   var d=dvInDrive(e); if(!d) return; var t=e.target;
