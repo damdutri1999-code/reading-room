@@ -811,7 +811,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .rd-zoom .rd-btn sup{font-size:10px;margin-left:1px}
 .rd-zoom .rd-z[data-z="1"]{font-size:15px}
 .rd-zwrap{position:relative;display:inline-flex}
-.rd-zoom .rd-zv{min-width:66px;gap:6px;font-variant-numeric:tabular-nums;color:var(--rd-muted);border-inline:1px solid var(--rd-line)}
+.rd-zoom .rd-zv{min-width:66px;gap:6px;font-variant-numeric:tabular-nums;color:var(--rd-muted)}
 .rd-zoom .rd-zv:hover{background:var(--rd-accent-soft)}
 .rd-zmenu{position:absolute;z-index:45;top:calc(100% + 6px);left:50%;transform:translateX(-50%);width:148px;max-height:min(340px,60vh);overflow:auto;padding:6px;border-radius:12px;background:var(--rd-paper);color:var(--rd-ink);border:1px solid var(--rd-line);box-shadow:0 20px 44px -16px rgba(0,0,0,.5);animation:rdPop2 .18s ease both}
 .rd-zmenu[hidden]{display:none}
@@ -1933,7 +1933,7 @@ RD.mount = function(root, lesson, init, opts){
     '<h1 class="rd-title">'+esc(lesson.title||'Bài đọc')+'</h1>'+
     (lesson.subtitle?'<p class="rd-sub">'+esc(lesson.subtitle)+'</p>':'')+
     '<div class="rd-bar"><div class="rd-legend" role="group" aria-label="Mã màu">'+chips+'</div>'+
-    '<div class="rd-tools"><span class="rd-zoom" role="group" aria-label="Cỡ chữ"><button type="button" class="rd-btn rd-z" data-z="-1" aria-label="Thu nhỏ chữ" title="Thu nhỏ chữ">A<sup>−</sup></button><span class="rd-zwrap"><button type="button" class="rd-btn rd-zv" aria-haspopup="listbox" aria-expanded="false" title="Chọn mức phóng to"><span class="rd-zt">100%</span><svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="rd-zmenu" role="listbox" aria-label="Mức phóng to" hidden></div></span><button type="button" class="rd-btn rd-z" data-z="1" aria-label="Phóng to chữ" title="Phóng to chữ">A<sup>+</sup></button></span><button type="button" class="rd-btn rd-focus-btn" aria-pressed="false">Tập trung</button>'+
+    '<div class="rd-tools"><span class="rd-zoom" role="group" aria-label="Cỡ chữ"><span class="rd-zwrap"><button type="button" class="rd-btn rd-zv" aria-haspopup="listbox" aria-expanded="false" title="Chọn mức phóng to"><span class="rd-zt">100%</span><svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="rd-zmenu" role="listbox" aria-label="Mức phóng to" hidden></div></span></span><button type="button" class="rd-btn rd-focus-btn" aria-pressed="false">Tập trung</button>'+
     ''+(lesson.exam&&lesson.exam.groups&&lesson.exam.groups.length?'<span class="rd-mode" role="group" aria-label="Chế độ học"><button type="button" class="rd-btn rd-mode-read" aria-pressed="true">Đọc kỹ</button><button type="button" class="rd-btn rd-exam-btn" aria-pressed="false">Task đọc hiểu <span class="rd-count rd-ex-n">'+lesson.exam.count+'</span></button></span>':'')+'<button type="button" class="rd-btn rd-work-btn">Bài làm <span class="rd-count">0</span></button></div></div>'+
     '<p class="rd-tip">'+(window.matchMedia&&matchMedia('(hover:none)').matches?'Chạm giữ một từ rồi kéo để chọn cụm từ cần ghi chú. Chạm vào ô màu để ẩn hoặc hiện từng loại.':'Bôi đen một cụm từ để ghi chú lên bài. Bấm vào ô màu để ẩn hoặc hiện từng loại.')+'</p></header>'+
     '<article class="rd-text"></article></div>'+
