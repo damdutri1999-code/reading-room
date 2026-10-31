@@ -687,6 +687,13 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 #imp-json{width:100%;box-sizing:border-box;min-height:84px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
 .imp-json-s{min-height:16px;font:12.5px/1.4 var(--ui);opacity:.8}
 .imp-json-s.ok{color:#0b7a53;opacity:1}.imp-json-s.bad{color:#d1332e;opacity:1}
+
+.tw-kho{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:14px;padding:12px 14px;border-radius:12px;border:1px dashed var(--rr-line);background:color-mix(in srgb,var(--rr-fg) 4%,transparent)}
+.tw-kho>span{font:600 13px var(--rr-ui);flex:1 0 100%}
+.tw-kho em{font-style:normal;font-weight:400;color:var(--rr-muted)}
+.tw-kho input{flex:1 1 220px;min-width:0;height:38px;box-sizing:border-box;border-radius:10px;border:1px solid var(--rr-line);background:var(--tw-in);color:var(--rr-fg);font:13px ui-monospace,Menlo,monospace;padding:0 10px}
+.tw-kho a.tw-btn{text-decoration:none}
+.tw-kho small{flex:1 0 100%}
 </style>
 <style id="rd-css">
 :root{--rd-bg:#f4f6f8;--rd-paper:#ffffff;--rd-ink:#182132;--rd-muted:#5d6779;--rd-line:#dde2ea;--rd-accent:#2a49d6;--rd-accent-soft:#e6eaff;--rd-note:#fff7d6;--rd-note-ink:#5a4500;--rd-student:#0e9f6e;--rd-student-soft:#e3f6ee;--rd-read:'Literata',Georgia,'Times New Roman',serif;--rd-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -2380,6 +2387,27 @@ var DKEY='rls:draft:v1', HKEY='rls:helpseen';
 function $(s){ return document.querySelector(s); }
 function $$(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
 var esc=RD.esc;
+/* ---------- Student link: ?kho=<id> opens the online library, no Studio ---------- */
+var CLOUD_DEF={url:'https://jbkryrrqrodridgycnaw.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impia3J5cnJxcm9kcmlkZ3ljbmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MTkyNjIsImV4cCI6MjEwODk5NTI2Mn0.RfCj9k0x7rzfo1PGkOx4FcWEoz9NwmwcU12T6ipgA5U'};
+function khoMsg(t,sub,retry){
+  document.body.classList.add('rr-on'); var r=document.getElementById('rr-root'); r.hidden=false;
+  r.innerHTML='<div style="min-height:100vh;display:grid;place-items:center;padding:24px;background:#0c1020;color:#eef1fb;font:16px/1.5 system-ui,sans-serif;text-align:center"><div style="max-width:420px"><div style="font:700 22px/1.3 Georgia,serif;margin-bottom:8px">'+esc(t)+'</div><p style="margin:0 0 16px;opacity:.75">'+esc(sub||'')+'</p>'+(retry?'<button type="button" id="kho-retry" style="height:44px;padding:0 20px;border:0;border-radius:12px;background:#8fa2ff;color:#0c1020;font:600 15px system-ui;cursor:pointer">Thử lại</button>':'')+'</div></div>';
+  var b=document.getElementById('kho-retry'); if(b) b.onclick=function(){ khoBoot(khoId); };
+}
+var khoId=(/[?&]kho=([a-z0-9-]{3,40})/i.exec(location.search)||[])[1];
+function khoBoot(id){
+  khoId=id; khoMsg('Đang mở kho bài…','');
+  var ac=new AbortController(), tm=setTimeout(function(){ ac.abort(); },12000);
+  fetch(CLOUD_DEF.url+'/rest/v1/rpc/get_lib',{method:'POST',signal:ac.signal,headers:{'apikey':CLOUD_DEF.key,'Authorization':'Bearer '+CLOUD_DEF.key,'Content-Type':'application/json'},body:JSON.stringify({p_id:id.toLowerCase()})})
+  .then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); })
+  .then(function(j){ clearTimeout(tm);
+    var d=j&&j.data; if(!d||!Array.isArray(d.lessons)){ khoMsg('Không tìm thấy kho “'+id+'”','Hãy kiểm tra lại đường dẫn mà thầy cô gửi.'); return; }
+    var th=(d.app&&d.app.theme)||'stage';
+    var data={app:d.app||{name:'Reading Room',klass:'',tagline:''},theme:th,lessons:d.lessons,cloud:{url:CLOUD_DEF.url,key:CLOUD_DEF.key,id:id.toLowerCase()}};
+    var html=studentDoc(data); document.open(); document.write(html); document.close();
+  }).catch(function(){ clearTimeout(tm); khoMsg('Chưa mở được kho bài','Có thể mạng đang chậm. Hãy thử lại sau ít giây.',true); });
+}
+if(khoId){ khoBoot(khoId); return; }
 
 /* ---------- Icons ---------- */
 var ICON={
@@ -3808,7 +3836,7 @@ function coverPreview(now){
 }
 
 /* ---------- Online library (Supabase) ---------- */
-function cl(){ return LIB.cloud||(LIB.cloud={url:'https://jbkryrrqrodridgycnaw.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impia3J5cnJxcm9kcmlkZ3ljbmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MTkyNjIsImV4cCI6MjEwODk5NTI2Mn0.RfCj9k0x7rzfo1PGkOx4FcWEoz9NwmwcU12T6ipgA5U',id:'',code:''}); }
+function cl(){ return LIB.cloud||(LIB.cloud={url:CLOUD_DEF.url,key:CLOUD_DEF.key,id:'',code:''}); }
 function clReady(){ var c=LIB.cloud; return !!(c&&c.url&&c.key&&c.id&&authOk()); }
 function clUrl(u){ return String(u||'').trim().replace(/\/+$/,'').replace(/\/rest\/v1.*$/,''); }
 /* ---------- Teacher sign-in (Supabase Auth) ---------- */
@@ -3862,6 +3890,12 @@ function clPublish(){
   var c=cl(); if(!clReady()) return Promise.reject(new Error('Chưa nhập đủ thông tin kết nối. Cần mã kho và đăng nhập.'));
   return authToken().then(function(tok){ return clCall('publish_lib_owner',{p_id:c.id,p_data:clPayload()},tok); }).then(function(){ c.at=Date.now(); saveLib(); });
 }
+function khoLink(){ var c=cl(); if(!c.id) return ''; return location.href.split(/[?#]/)[0]+'?kho='+c.id; }
+function khoLinkHtml(){
+  var c=cl(), u=khoLink(); if(!u) return '';
+  var warn=/^file:|^blob:|^about:/.test(u)?'<small class="tw-hint">Link này chỉ chạy khi trang web đã đưa lên mạng (Netlify). Hãy mở Studio từ địa chỉ web của thầy cô rồi lấy link.</small>':'';
+  return '<div class="tw-kho"><span>Link cho học viên'+(c.at?'':' <em>(chưa xuất bản)</em>')+'</span><input readonly value="'+esc(u)+'" aria-label="Link học viên" onfocus="this.select()"><button type="button" class="tw-btn" data-cl="copylink">'+svg('copy')+'Sao chép</button><a class="tw-btn" href="'+esc(u)+'" target="_blank" rel="noopener">'+svg('eye')+'Mở thử</a>'+warn+'</div>';
+}
 function cloudHtml(){
   var c=cl(), ok=clReady(), st=c.at?'Xuất bản gần nhất: <b>'+fmtDate(c.at)+'</b>':'Chưa xuất bản lần nào.';
   return '<section class="tw-cloud"><div class="tw-cloud-h"><div><h4>Kho online <i class="tw-beta">Dùng chung</i></h4><p>Xuất bản một lần là học viên mở lại file kho bài sẽ thấy bài mới nhất, không cần gửi lại file.</p></div>'+(ok?'<span class="tw-cl-on">Đã kết nối</span>':'')+'</div>'+
@@ -3870,7 +3904,7 @@ function cloudHtml(){
       '<label>Khoá công khai (anon key)<input data-cl-f="key" value="'+esc(c.key)+'" placeholder="eyJhbGciOi…" autocomplete="off" spellcheck="false"></label>'+
       '<label>Mã kho<input data-cl-f="id" value="'+esc(c.id)+'" placeholder="vd: lop-thay-tri" autocomplete="off" spellcheck="false"><small>Tên riêng của kho. Chỉ chữ thường, số và dấu gạch.</small></label>'+
       '<label>Tài khoản<input value="'+esc(authName())+'" readonly tabindex="-1"><small>Đang đăng nhập. Chỉ tài khoản này sửa được kho “'+esc(c.id||'…')+'”.</small></label>'+
-    '</div><div class="tw-cl-a"><button type="button" class="tw-btn solid" data-cl="publish"'+(ok?'':' disabled')+'>'+svg('upload')+'Xuất bản lên kho online</button><button type="button" class="tw-btn" data-cl="test"'+(c.url&&c.key?'':' disabled')+'>Thử kết nối</button><span class="tw-cl-st" data-cl-st>'+st+'</span></div>'+
+    '</div>'+khoLinkHtml()+'<div class="tw-cl-a"><button type="button" class="tw-btn solid" data-cl="publish"'+(ok?'':' disabled')+'>'+svg('upload')+'Xuất bản lên kho online</button><button type="button" class="tw-btn" data-cl="test"'+(c.url&&c.key?'':' disabled')+'>Thử kết nối</button><span class="tw-cl-st" data-cl-st>'+st+'</span></div>'+
     '<p class="tw-hint">Chưa có dự án? Làm theo các bước tạo Supabase em đã gửi kèm file <b>supabase-setup.sql</b>. Lưu ý: đáp án của đề bài nằm trong dữ liệu kho, giống như trong file kho bài.</p></section>';
 }
 /* Tab 3 — export */
@@ -3979,6 +4013,7 @@ rrRoot.addEventListener('click',function(e){
   if(t.closest('[data-go-home]')){ try{ if(LIB.app.theme) localStorage.setItem('rr:theme',LIB.app.theme); }catch(err){} rrCtl.go('home'); return; }
   if(t.closest('[data-go-lib]')){ rrCtl.go('lib'); return; }
   var clb=t.closest('[data-cl]'); if(clb){ var ka=clb.getAttribute('data-cl'), stEl=rrRoot.querySelector('[data-cl-st]');
+    if(ka==='copylink'){ var ul=khoLink(); RD.copy(ul).then(function(ok){ rrCtl.toast(ok?'Đã sao chép link học viên':'Hãy bấm Ctrl+C để chép'); }); return; }
     if(!clb.dataset.busy){ clb.dataset.busy='1'; clb.disabled=true;
       if(ka==='test'){ stEl.textContent='Đang kiểm tra…'; clCall('get_lib',{p_id:cl().id||'kiem-tra'}).then(function(j){ stEl.textContent=j?'Kết nối tốt. Kho “'+cl().id+'” đã có dữ liệu.':'Kết nối tốt. Kho chưa có dữ liệu, hãy xuất bản.'; }).catch(function(e){ stEl.textContent=clErr(e); }).then(function(){ delete clb.dataset.busy; clb.disabled=false; }); }
       else if(ka==='publish'){ stEl.textContent='Đang xuất bản…'; clPublish().then(function(){ renderPane(); rrCtl.toast('Đã xuất bản '+libLessons().length+' bài lên kho online'); }).catch(function(e){ stEl.textContent=clErr(e); rrCtl.toast(clErr(e)); }).then(function(){ delete clb.dataset.busy; clb.disabled=false; }); }
@@ -4036,11 +4071,15 @@ $('#start-home').addEventListener('click',startHome);
 
 /* ---------- Class library file ---------- */
 function buildLibrary(preview){
-  var get=function(id){ var el=document.getElementById(id); return el?el.textContent:''; };
   var th=exportTheme();
   var data={app:Object.assign({},LIB.app,{theme:th}), theme:th, lessons:libLessons()}; if(!preview&&clUrl(cl().url)&&cl().key&&cl().id) data.cloud={url:clUrl(cl().url),key:cl().key,id:cl().id};
+  return studentDoc(data);
+}
+function studentDoc(data){
+  var get=function(id){ var el=document.getElementById(id); return el?el.textContent:''; };
+  var th=data.theme||'stage';
   var j=JSON.stringify(data).replace(/</g,'\\u003c');
-  return '<!doctype html>\n<html lang="vi" data-th="'+th+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>'+esc(LIB.app.name||'Reading Room')+'</title>'+
+  return '<!doctype html>\n<html lang="vi" data-th="'+th+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>'+esc(data.app.name||'Reading Room')+'</title>'+
    '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lexend:wght@400;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=Patrick+Hand&family=Pangolin&display=swap">'+
    '<style id="rd-css">'+get('rd-css')+'</style><style id="rr-css">'+get('rr-css')+'</style><style>html,body{margin:0}body{-webkit-text-size-adjust:100%}</style></head>'+
    '<body class="rr-on"><div id="rr-root"></div><script id="rr-data" type="application/json">'+j+'<\/script>'+
