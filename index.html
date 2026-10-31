@@ -664,6 +664,11 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
   .tw-code{flex-wrap:wrap}.tw-code span{flex:1 1 100%;order:3}
 }
 @media (hover:none),(pointer:coarse){.tw-search input,.tw-form input,.tw-form textarea,.tw-fn input{font-size:16px}.tw-ib{width:42px;height:42px}}
+
+.tw-dot{position:absolute;right:12px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:#ff9f2e;box-shadow:0 0 0 3px color-mix(in srgb,#ff9f2e 25%,transparent)}
+.tw-row.draft .tw-ri{flex:1}
+#done-btn.on{background:#d6f3e6;border-color:#9fdcbf;color:#0b6b4a}
+#done-btn.on svg{color:#0b6b4a}
 </style>
 <style id="rd-css">
 :root{--rd-bg:#f4f6f8;--rd-paper:#ffffff;--rd-ink:#182132;--rd-muted:#5d6779;--rd-line:#dde2ea;--rd-accent:#2a49d6;--rd-accent-soft:#e6eaff;--rd-note:#fff7d6;--rd-note-ink:#5a4500;--rd-student:#0e9f6e;--rd-student-soft:#e3f6ee;--rd-read:'Literata',Georgia,'Times New Roman',serif;--rd-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -1200,6 +1205,7 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
     <button type="button" class="ib" id="home-btn" data-tip="Trang chủ" aria-label="Trang chủ"><svg class="i" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M10 20v-6h4v6"/></svg></button>
     <span class="saved" id="saved"><i data-i="check"></i><span id="saved-t">Đã lưu</span></span>
     <button type="button" class="ib" id="help-btn" data-tip="Hướng dẫn nhanh" aria-label="Hướng dẫn nhanh"><i data-i="help"></i></button>
+    <button type="button" class="btn" id="done-btn" aria-pressed="false"><i data-i="check"></i><span>Hoàn tất</span></button>
     <button type="button" class="btn solid" id="open-export"><i data-i="download"></i>Xuất file</button>
   </div>
 </header>
@@ -3450,11 +3456,14 @@ function showHome(v){
   rrCtl.show(v||'home');
 }
 /* ---------- Teacher workspace (side tabs) ---------- */
-var HUB_TABS=[['lessons','book','Bài đọc'],['cover','layout','Trang cover'],['export','download','Xuất cho lớp'],['backup','file','Sao lưu'],['ai','sparkle','Câu lệnh AI'],['guide','help','Hướng dẫn']];
+var HUB_TABS=[['lessons','book','Bài đọc'],['drafts','pen','Soạn bài đọc'],['cover','layout','Trang cover'],['export','download','Xuất cho lớp'],['backup','file','Sao lưu'],['ai','sparkle','Câu lệnh AI'],['guide','help','Hướng dẫn']];
 var hubTab='lessons', hubQ='', hubLv='all', hubCat='all', hubDev='desk', hubBox=null, coverT=0;
 try{ hubTab=localStorage.getItem('rls:hubtab')||hubTab; }catch(e){}
 var TH_NAME={stage:'Sân khấu',notebook:'Vở ghi',constellation:'Chòm sao'};
-function pubIds(){ return LIB.order.filter(function(id){ return LIB.lessons[id]&&!LIB.lessons[id].hidden; }); }
+function doneIds(){ return LIB.order.filter(function(id){ return LIB.lessons[id]&&LIB.lessons[id].done; }); }
+function draftIds(){ return LIB.order.filter(function(id){ return LIB.lessons[id]&&!LIB.lessons[id].done; }); }
+function pubIds(){ return doneIds().filter(function(id){ return !LIB.lessons[id].hidden; }); }
+function backupDue(){ if(!LIB.order.length) return false; return !LIB.lastBackup||(Date.now()-LIB.lastBackup)>=7*864e5; }
 function exportTheme(){ return LIB.app.theme||(rrCtl&&rrCtl.theme())||curTheme(); }
 function libFileName(){ return RD.slug(LIB.app.file||((LIB.app.name||'reading-room')+'-kho-bai'))+'.html'; }
 function renderTeacherHub(box){
@@ -3462,7 +3471,7 @@ function renderTeacherHub(box){
   if(!HUB_TABS.some(function(t){ return t[0]===hubTab; })) hubTab='lessons';
   box.innerHTML='<div class="tw"><nav class="tw-side" role="tablist" aria-orientation="vertical" aria-label="Chức năng giáo viên">'+
     '<button type="button" class="tw-new" data-hub="new">'+svg('plus')+'<span>Bài mới</span></button>'+
-    HUB_TABS.map(function(t){ return '<button type="button" role="tab" class="tw-tab" data-tab="'+t[0]+'" aria-selected="'+(t[0]===hubTab)+'">'+svg(t[1])+'<span>'+t[2]+'</span>'+(t[0]==='lessons'?'<em>'+LIB.order.length+'</em>':t[0]==='export'?'<em>'+pubIds().length+'</em>':'')+'</button>'; }).join('')+
+    HUB_TABS.map(function(t){ return '<button type="button" role="tab" class="tw-tab" data-tab="'+t[0]+'" aria-selected="'+(t[0]===hubTab)+'">'+svg(t[1])+'<span>'+t[2]+'</span>'+(t[0]==='lessons'?'<em>'+doneIds().length+'</em>':t[0]==='drafts'?'<em>'+draftIds().length+'</em>':t[0]==='export'?'<em>'+pubIds().length+'</em>':t[0]==='backup'&&backupDue()?'<i class="tw-dot" title="Nên sao lưu"></i>':'')+'</button>'; }).join('')+
     '</nav><div class="tw-main" data-pane role="tabpanel"></div></div>';
   renderPane();
 }
@@ -3472,44 +3481,51 @@ function renderPane(){
   var p=hubBox&&hubBox.querySelector('[data-pane]'); if(!p) return;
   p.className='tw-main pane-'+hubTab;
   if(hubTab==='lessons') p.innerHTML=paneLessons();
+  else if(hubTab==='drafts') p.innerHTML=paneDrafts();
   else if(hubTab==='cover'){ p.innerHTML=paneCover(); coverPreview(true); }
   else if(hubTab==='export') p.innerHTML=paneExport();
   else if(hubTab==='backup') p.innerHTML=paneBackup();
   else if(hubTab==='ai'){ p.innerHTML=paneAI(); p.querySelector('#tw-prompt').value=aiPrompt(); }
   else p.innerHTML=paneGuide();
-  if(hubTab==='lessons') renderRows();
+  if(hubTab==='lessons'||hubTab==='drafts') renderRows();
 }
-/* Tab 1 — lessons */
+/* Tab 1 — collection of finished lessons; Tab 2 — drafts */
+function hubTools(ids){
+  var lv={}; ids.forEach(function(id){ var x=LIB.lessons[id]; if(x&&x.level) lv[x.level]=1; }); var lvs=Object.keys(lv).sort(); if(hubLv!=='all'&&!lv[hubLv]) hubLv='all';
+  return '<div class="tw-tools"><label class="tw-search">'+svg('search')+'<input data-hq placeholder="Tìm theo tên bài" value="'+esc(hubQ)+'" aria-label="Tìm bài"></label>'+
+    (lvs.length>1?'<span class="tw-chips" role="group" aria-label="Lọc trình độ">'+['all'].concat(lvs).map(function(l){ return '<button type="button" data-hlv="'+esc(l)+'" aria-pressed="'+(hubLv===l)+'">'+(l==='all'?'Tất cả':esc(l))+'</button>'; }).join('')+'</span>':'')+
+    '<span class="tw-chips" role="group" aria-label="Lọc loại bài">'+[['all','Mọi loại'],['ielts','IELTS Cam'],['content','Kiến thức'],['exam','Có đề bài']].map(function(c){ return '<button type="button" data-hcat="'+c[0]+'" aria-pressed="'+(hubCat===c[0])+'">'+c[1]+'</button>'; }).join('')+'</span></div>';
+}
 function paneLessons(){
-  var n=LIB.order.length, pub=pubIds().length, cur=LIB.lessons[L.id]?L:null, lv={};
-  LIB.order.forEach(function(id){ var x=LIB.lessons[id]; if(x&&x.level) lv[x.level]=1; }); var lvs=Object.keys(lv).sort(); if(hubLv!=='all'&&!lv[hubLv]) hubLv='all';
-  var resume='';
-  if(cur){ var I=RR.info(cleanLessonOf(cur));
-    resume='<div class="tw-resume">'+RR.thumb(cur,'width:92px;flex:none')+'<div class="tw-rs-b"><small>Đang soạn dở</small><b>'+esc(cur.title||'Bài chưa đặt tên')+'</b><span>'+(cur.level?esc(cur.level)+' · ':'')+I.questions+' câu hỏi · '+I.notes+' ô ghi chú'+(cur.updated?' · sửa '+fmtDate(cur.updated):'')+'</span></div>'+
-      '<div class="tw-rs-a" data-id="'+esc(cur.id)+'"><button type="button" class="tw-btn solid" data-act2="edit">'+svg('pen')+'Soạn tiếp</button><button type="button" class="tw-btn" data-act2="view">'+svg('eye')+'Xem như HV</button></div></div>'; }
-  var warnB=''; if(LIB.order.length){ var days=LIB.lastBackup?Math.floor((Date.now()-LIB.lastBackup)/864e5):null; if(days===null||days>=7) warnB='<div class="tw-warn">'+svg('file')+'<span>'+(days===null?'Thầy chưa sao lưu kho bài lần nào.':'Đã '+days+' ngày thầy chưa sao lưu.')+' Dữ liệu chỉ nằm trong trình duyệt này.</span><button type="button" class="tw-btn solid" data-tab="backup">Sao lưu ngay</button></div>'; }
-  return paneHead('Bài đọc của thầy',n+' bài · '+pub+' bài đang hiện trong kho lớp','<button type="button" class="tw-btn solid" data-hub="new">'+svg('plus')+'Bài mới</button>')+warnB+resume+
-    '<div class="tw-tools"><label class="tw-search">'+svg('search')+'<input data-hq placeholder="Tìm theo tên bài" value="'+esc(hubQ)+'" aria-label="Tìm bài"></label>'+
-    (lvs.length?'<span class="tw-chips" role="group" aria-label="Lọc trình độ">'+['all'].concat(lvs).map(function(l){ return '<button type="button" data-hlv="'+esc(l)+'" aria-pressed="'+(hubLv===l)+'">'+(l==='all'?'Tất cả':esc(l))+'</button>'; }).join('')+'</span>':'')+
-    '<span class="tw-chips" role="group" aria-label="Lọc loại bài">'+[['all','Mọi loại'],['ielts','IELTS Cam'],['content','Kiến thức'],['exam','Có đề bài'],['none','Chưa phân loại']].map(function(c){ return '<button type="button" data-hcat="'+c[0]+'" aria-pressed="'+(hubCat===c[0])+'">'+c[1]+'</button>'; }).join('')+'</span>'+
-    '</div><p class="tw-hint">Kéo <span class="tw-grip-i">'+svg('grip')+'</span> để sắp thứ tự bài trong kho lớp. Tắt “Kho lớp” để ẩn bài khỏi file xuất cho học viên.</p><div class="tw-list" data-rows></div>';
+  var ids=doneIds(), pub=pubIds().length;
+  return paneHead('Bài đọc của thầy',ids.length?ids.length+' bài đã soạn xong · '+pub+' bài đang hiện trong kho lớp':'Kho bài đã soạn xong của thầy')+
+    (ids.length>3?hubTools(ids):'')+
+    (ids.length>1?'<p class="tw-hint">Kéo <span class="tw-grip-i">'+svg('grip')+'</span> để sắp thứ tự bài. Tắt “Kho lớp” để ẩn bài khỏi file xuất cho học viên.</p>':'')+
+    '<div class="tw-list" data-rows></div>';
+}
+function paneDrafts(){
+  var ids=draftIds();
+  return paneHead('Soạn bài đọc',ids.length?ids.length+' bài đang soạn dở. Soạn xong thì bấm “Hoàn tất” để đưa vào kho bài đọc.':'Bài đang soạn dở sẽ nằm ở đây.','<button type="button" class="tw-btn solid" data-hub="new">'+svg('plus')+'Bài mới</button>')+
+    '<div class="tw-list" data-rows></div>';
 }
 function renderRows(){
   var box=hubBox&&hubBox.querySelector('[data-rows]'); if(!box) return;
-  var q=hubQ.trim().toLowerCase(), filtered=!!q||hubLv!=='all'||hubCat!=='all', i=0;
-  var ids=LIB.order.filter(function(id){ var x=LIB.lessons[id]; return x&&(hubLv==='all'||x.level===hubLv)&&(hubCat==='all'||(hubCat==='none'?!x.cat:hubCat==='exam'?!!(x.examOn&&RD.parseExam(x.examText)):x.cat===hubCat))&&(!q||String(x.title||'').toLowerCase().indexOf(q)>=0); });
-  box.classList.toggle('filtered',filtered);
-  if(!ids.length){ box.innerHTML='<div class="tw-empty">'+(LIB.order.length?'Không có bài nào khớp.':'Chưa có bài nào. Bấm “Bài mới” để bắt đầu.')+'</div>'; return; }
+  var drafts=hubTab==='drafts', base=drafts?draftIds():doneIds();
+  var q=hubQ.trim().toLowerCase(), filtered=!!q||hubLv!=='all'||hubCat!=='all';
+  var ids=base.filter(function(id){ var x=LIB.lessons[id]; return x&&(hubLv==='all'||x.level===hubLv)&&(hubCat==='all'||(hubCat==='none'?!x.cat:hubCat==='exam'?!!(x.examOn&&RD.parseExam(x.examText)):x.cat===hubCat))&&(!q||String(x.title||'').toLowerCase().indexOf(q)>=0); });
+  box.classList.toggle('filtered',filtered||drafts);
+  if(!ids.length){ box.innerHTML='<div class="tw-empty">'+(base.length?'Không có bài nào khớp.':drafts?'Chưa có bài nào đang soạn. Bấm “Bài mới” để bắt đầu.':'Chưa có bài nào soạn xong. Vào “Soạn bài đọc”, soạn bài rồi bấm “Hoàn tất” để đưa bài vào đây.')+'</div>'; return; }
   box.innerHTML=ids.map(function(id){ var x=LIB.lessons[id], I=RR.info(cleanLessonOf(x)), pos=pubIds().indexOf(id);
-    return '<div class="tw-row'+(x.hidden?' off':'')+'" data-id="'+esc(id)+'"'+(filtered?'':' draggable="true"')+'>'+
-      '<span class="tw-grip" aria-hidden="true">'+svg('grip')+'</span>'+
-      '<span class="tw-no">'+(pos>=0?pos+1:'–')+'</span>'+RR.thumb(x,'width:52px;flex:none')+
-      '<div class="tw-ri"><b>'+esc(x.title||'Bài chưa đặt tên')+(id===L.id?' <i class="tw-cur">Đang soạn</i>':'')+'</b><span>'+(x.cat?'<i class="tw-lv tw-cat">'+esc(RR.CATS[x.cat])+'</i>':'<i class="tw-lv tw-nocat">Chưa phân loại</i>')+(I.exam?'<i class="tw-lv tw-exq">Có đề · '+I.exam+' câu</i>':'')+(x.level?'<i class="tw-lv">'+esc(x.level)+'</i>':'')+I.minutes+' phút · '+I.questions+' câu hỏi · '+I.notes+' ô ghi chú'+(x.updated?' · '+fmtDate(x.updated):'')+'</span></div>'+
-      '<label class="tw-sw" title="Hiện trong kho lớp"><input type="checkbox" data-pub'+(x.hidden?'':' checked')+'><i></i><span>Kho lớp</span></label>'+
-      '<button type="button" class="tw-btn" data-act2="edit">Soạn</button>'+
+    var meta=(x.cat?'<i class="tw-lv tw-cat">'+esc(RR.CATS[x.cat])+'</i>':drafts?'':'<i class="tw-lv tw-nocat">Chưa phân loại</i>')+(I.exam?'<i class="tw-lv tw-exq">Có đề · '+I.exam+' câu</i>':'')+(x.level?'<i class="tw-lv">'+esc(x.level)+'</i>':'')+I.minutes+' phút · '+I.questions+' câu hỏi · '+I.notes+' ô ghi chú'+(x.updated?' · '+fmtDate(x.updated):'');
+    return '<div class="tw-row'+(x.hidden&&!drafts?' off':'')+(drafts?' draft':'')+'" data-id="'+esc(id)+'"'+(filtered||drafts?'':' draggable="true"')+'>'+
+      (drafts?'':'<span class="tw-grip" aria-hidden="true">'+svg('grip')+'</span><span class="tw-no">'+(pos>=0?pos+1:'–')+'</span>')+RR.thumb(x,'width:52px;flex:none')+
+      '<div class="tw-ri"><b>'+esc(x.title||'Bài chưa đặt tên')+(drafts&&id===L.id?' <i class="tw-cur">Đang mở</i>':'')+'</b><span>'+meta+'</span></div>'+
+      (drafts?'':'<label class="tw-sw" title="Hiện trong kho lớp"><input type="checkbox" data-pub'+(x.hidden?'':' checked')+'><i></i><span>Kho lớp</span></label>')+
+      (drafts?'<button type="button" class="tw-btn" data-act2="finish">'+svg('check')+'Hoàn tất</button><button type="button" class="tw-btn solid" data-act2="edit">'+svg('pen')+'Soạn tiếp</button>':'<button type="button" class="tw-btn" data-act2="edit">Soạn lại</button>')+
       '<span class="tw-more"><button type="button" class="tw-ib" data-more aria-label="Thêm thao tác" aria-haspopup="menu">'+svg('more')+'</button>'+
-      '<span class="tw-menu" role="menu"><button type="button" role="menuitem" data-act2="view">'+svg('eye')+'Xem như học viên</button><button type="button" role="menuitem" data-act2="dl">'+svg('download')+'Tải bài lẻ (.html)</button><button type="button" role="menuitem" data-act2="dup">'+svg('copy')+'Nhân bản</button>'+
-      (filtered?'':'<button type="button" role="menuitem" data-act2="up">'+svg('up')+'Đưa lên</button><button type="button" role="menuitem" data-act2="down">'+svg('down')+'Đưa xuống</button>')+
+      '<span class="tw-menu" role="menu"><button type="button" role="menuitem" data-act2="view">'+svg('eye')+'Xem như học viên</button>'+(drafts?'':'<button type="button" role="menuitem" data-act2="dl">'+svg('download')+'Tải bài lẻ (.html)</button>')+'<button type="button" role="menuitem" data-act2="dup">'+svg('copy')+'Nhân bản</button>'+
+      (drafts?'':'<button type="button" role="menuitem" data-act2="undone">'+svg('pen')+'Chuyển về bản nháp</button>')+
+      (filtered||drafts?'':'<button type="button" role="menuitem" data-act2="up">'+svg('up')+'Đưa lên</button><button type="button" role="menuitem" data-act2="down">'+svg('down')+'Đưa xuống</button>')+
       '<button type="button" role="menuitem" class="danger" data-act2="del">'+svg('trash')+'Xoá bài</button></span></span></div>';
   }).join('');
 }
@@ -3723,8 +3739,9 @@ rrRoot.addEventListener('click',function(e){
   if(act==='edit') openForEdit(id);
   else if(act==='view'){ openForEdit(id); setMode('preview'); }
   else if(act==='dl'){ var x=cleanLessonOf(LIB.lessons[id]===L?L:LIB.lessons[id]), n=RD.slug(x.title)+'.html'; Promise.resolve(RD.download(RD.buildDoc(x,{}),n)).then(function(res){ rrCtl.toast(res==='declined'?'Đã huỷ lưu file':'Đã tải “'+n+'”'); }); }
+  else if(act==='finish'||act==='undone'){ var xx=LIB.lessons[id]; if(!xx) return; if(act==='finish'){ xx.done=true; delete xx.hidden; } else delete xx.done; if(L.id===id) L.done=xx.done; saveLib(); syncDone(); hubRefresh(); rrCtl.toast(act==='finish'?'Đã đưa bài vào kho bài đọc':'Đã chuyển bài về bản nháp'); }
   else if(act==='up'||act==='down') moveLesson(id,act==='up'?-1:1);
-  else if(act==='dup'){ var src=id===L.id?Object.assign({},L,{html:cleanHTML()}):LIB.lessons[id]; var c=JSON.parse(JSON.stringify(src)); c.id=uid('L'); c.title=(c.title||'Bài đọc')+' (bản sao)'; c.updated=Date.now(); LIB.lessons[c.id]=c; LIB.order.splice(LIB.order.indexOf(id)+1,0,c.id); saveLib(); hubRefresh(); rrCtl.toast('Đã nhân bản bài'); }
+  else if(act==='dup'){ var src=id===L.id?Object.assign({},L,{html:cleanHTML()}):LIB.lessons[id]; var c=JSON.parse(JSON.stringify(src)); c.id=uid('L'); c.title=(c.title||'Bài đọc')+' (bản sao)'; delete c.done; c.updated=Date.now(); LIB.lessons[c.id]=c; LIB.order.splice(LIB.order.indexOf(id)+1,0,c.id); saveLib(); hubRefresh(); rrCtl.toast('Đã nhân bản bài'); }
   else if(act==='del'){
     if(!b.dataset.arm){ b.dataset.arm='1'; b.lastChild.textContent='Bấm lần nữa để xoá'; setTimeout(function(){ if(b.isConnected){ delete b.dataset.arm; b.lastChild.textContent='Xoá bài'; } },3000); return; }
     if(LIB.order.length<=1){ rrCtl.toast('Cần giữ lại ít nhất một bài'); return; }
@@ -3739,7 +3756,7 @@ rrRoot.addEventListener('change',function(e){
   var id=e.target.closest('[data-id]').getAttribute('data-id'), x=LIB.lessons[id]; if(!x) return;
   if(e.target.checked) delete x.hidden; else x.hidden=true; saveLib(); renderRows();
   var em=rrRoot.querySelector('[data-tab="export"] em'); if(em) em.textContent=pubIds().length;
-  var hp=rrRoot.querySelector('.tw-head p'); if(hp) hp.textContent=LIB.order.length+' bài · '+pubIds().length+' bài đang hiện trong kho lớp';
+  var hp=rrRoot.querySelector('.tw-head p'); if(hp) hp.textContent=doneIds().length+' bài đã soạn xong · '+pubIds().length+' bài đang hiện trong kho lớp';
   rrCtl.toast(e.target.checked?'Đã đưa bài vào kho lớp':'Đã ẩn bài khỏi kho lớp');
 });
 rrRoot.addEventListener('input',function(e){
@@ -3810,8 +3827,13 @@ function loadUI(){
   lastElSig=null; lastNbSig=null;
   [['h1','title'],['h2','h1'],['h3','h2'],['h4','h3']].forEach(function(p){ $$(p[0]+':not([class])',ed).forEach(function(h){ h.className=RD.STYLE_META[p[1]].cls; }); });
   applyStyleCss(); renderStyleMenu(); renderStylesPane();
-  renderCodeUI(); renderCodesPane(); refresh();
+  renderCodeUI(); renderCodesPane(); refresh(); if(typeof syncDone==='function') syncDone();
 }
+function syncDone(){ var b=$('#done-btn'); if(!b) return; var d=!!(L&&L.done); b.classList.toggle('on',d); b.setAttribute('aria-pressed',String(d)); b.querySelector('span').textContent=d?'Đã hoàn tất':'Hoàn tất'; b.setAttribute('data-tip',d?'Bài đã nằm trong kho bài đọc. Bấm để chuyển về bản nháp':'Soạn xong, đưa bài vào kho bài đọc'); }
+$('#done-btn').addEventListener('click',function(){
+  if(L.done){ delete L.done; saveDraft(); syncDone(); return; }
+  L.done=true; delete L.hidden; saveDraft(); syncDone(); hubTab='lessons'; try{ localStorage.setItem('rls:hubtab','lessons'); }catch(e){} showHome('teacher'); setTimeout(function(){ if(rrCtl) rrCtl.toast('Đã đưa bài vào kho bài đọc'); },80);
+});
 loadUI(); topH();
 document.documentElement.style.setProperty('--tc',lastTc);
 var seenHelp=false; try{ seenHelp=!!localStorage.getItem(HKEY); }catch(e){}
