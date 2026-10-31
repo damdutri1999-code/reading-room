@@ -1272,6 +1272,11 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
 .rr-logo{text-decoration:none}
 @media (max-width:640px){.rr-share span{display:none}.rr-share{padding:9px 11px}}
 @media (max-width:760px){.rr-vh:has(.rr-share){padding-right:max(150px,env(safe-area-inset-right,0px))}}
+.rr-share{position:relative}
+.rr-share.ok{border-color:#34b07f;color:#34b07f}
+.rr-copied{position:absolute;right:0;top:calc(100% + 10px);white-space:nowrap;background:#1f2547;color:#fff;font:600 12.5px/1 var(--rr-ui);padding:9px 12px;border-radius:9px;box-shadow:0 10px 24px -10px rgba(0,0,0,.5);opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .2s,transform .2s;z-index:30}
+.rr-copied::before{content:"";position:absolute;right:20px;top:-5px;width:10px;height:10px;background:#1f2547;transform:rotate(45deg)}
+.rr-share.ok .rr-copied{opacity:1;transform:none}
 </style>
 <style id="code-style"></style>
 <style id="style-css"></style>
@@ -2421,7 +2426,7 @@ RR.init=function(opts){
   main.addEventListener('click',function(e){
     var sb=e.target.closest('[data-share]'); if(sb&&opts.share&&current){
       var url=opts.share(current), ttl=(current.title||'Bài đọc');
-      var done=function(ok){ toast(ok?'Đã sao chép link bài đọc':'Hãy chép link trên thanh địa chỉ'); };
+      var done=function(ok){ var bub=sb.querySelector('.rr-copied'); if(!bub){ bub=document.createElement('span'); bub.className='rr-copied'; bub.setAttribute('role','status'); sb.appendChild(bub); } bub.textContent=ok?'Đã copy link':'Hãy chép link trên thanh địa chỉ'; sb.classList.add('ok'); clearTimeout(sb._t); sb._t=setTimeout(function(){ sb.classList.remove('ok'); },2400); };
       if(navigator.share&&matchMedia('(pointer:coarse)').matches){ navigator.share({title:ttl,url:url}).catch(function(){}); }
       else RD.copy(url).then(done);
       return; }
