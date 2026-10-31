@@ -1165,7 +1165,15 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
 .rr-lcard .err{min-height:18px;font:500 13px/1.4 var(--rr-ui);color:#e5484d}
 .rr-lgo{height:48px;border:0;border-radius:12px;background:var(--rr-accent);color:var(--rr-accent-fg);font:700 16px var(--rr-ui);cursor:pointer}
 .rr-lgo:disabled{opacity:.6;cursor:wait}
-.rr-who{display:flex;align-items:center;gap:10px;font:500 13px var(--rr-ui);color:var(--rr-muted)}
+.rr-who{margin-left:auto;display:flex;align-items:center;gap:10px;padding:4px 4px 4px 4px;border-radius:999px;border:1px solid var(--rr-line);background:color-mix(in srgb,var(--rr-fg) 5%,transparent)}
+.rr-who .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--rr-accent);color:var(--rr-accent-fg);font:700 14px var(--rr-ui);font-style:normal}
+.rr-who .nm{display:flex;flex-direction:column;gap:2px;line-height:1}
+.rr-who .nm small{font:500 10.5px var(--rr-ui);color:var(--rr-muted)}
+.rr-who .nm b{font:600 13px var(--rr-ui);color:var(--rr-fg);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rr-out{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:0;border-radius:999px;background:color-mix(in srgb,var(--rr-fg) 9%,transparent);color:var(--rr-fg);font:500 13px var(--rr-ui);cursor:pointer}
+.rr-out:hover{background:color-mix(in srgb,#e5484d 18%,transparent);color:#e5484d}
+@media (min-width:761px){.rr-vh:has(.rr-who){padding-right:max(350px,env(safe-area-inset-right,0px))}}
+@media (max-width:760px){.rr-who{margin-left:0}.rr-who .nm{display:none}.rr-out span{display:none}.rr-out{padding:0 9px}}
 
 .rr-use{display:flex;align-items:center;gap:12px;margin-top:22px;font:500 14px/1.3 var(--rr-ui);color:var(--rr-muted)}
 .rr-use[hidden]{display:none}
@@ -2258,7 +2266,7 @@ RR.init=function(opts){
     if(view==='home') main.innerHTML=homeHtml();
     else if(view==='lib'){ main.innerHTML=libHtml(); renderLib(); }
     else if(view==='teacher'&&opts.gate&&!opts.gate.ok()){ main.innerHTML=loginHtml(); var li=main.querySelector('[name=u]'); if(li&&!li.value) setTimeout(function(){ try{ li.focus({preventScroll:true}); }catch(e){} },60); }
-    else if(view==='teacher'){ var who=opts.gate?'<span class="rr-who">'+esc(opts.gate.name())+'<button type="button" class="rr-lbtn" data-logout>Đăng xuất</button></span>':''; main.innerHTML='<section class="rr-view">'+header('Chào thầy cô',who)+'<div class="rr-gut" data-teacher></div></section>'; opts.teacher(main.querySelector('[data-teacher]'),ctl); }
+    else if(view==='teacher'){ var nm=opts.gate?String(opts.gate.name()||'').split('@')[0]:'', who=opts.gate?'<span class="rr-who"><i class="av" aria-hidden="true">'+esc((nm.charAt(0)||'G').toUpperCase())+'</i><span class="nm"><small>Đang đăng nhập</small><b>'+esc(nm)+'</b></span><button type="button" class="rr-out" data-logout aria-label="Đăng xuất"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>Đăng xuất</span></button></span>':''; main.innerHTML='<section class="rr-view">'+header(nm?'Xin chào, '+nm:'Xin chào',who)+'<div class="rr-gut" data-teacher></div></section>'; opts.teacher(main.querySelector('[data-teacher]'),ctl); }
     else if(view==='read'&&current){
       main.innerHTML=readHtml(current);
       var vh=main.querySelector('.rr-vh'); root.style.setProperty('--rr-vh',(vh?vh.offsetHeight:64)+'px');
