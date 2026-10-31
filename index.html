@@ -1164,7 +1164,7 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
 @media (max-width:640px){.rr-themes button span{display:none}.rr-themes button{padding:0 10px}}
 
 .rr-main{position:relative;z-index:1}
-.rr-view{min-height:100vh;animation:rrIn .55s ease both}
+.rr-view{min-height:100vh;animation:rrIn .55s ease backwards}
 @keyframes rrIn{from{opacity:0;transform:translateY(12px)}}
 .rr-gut{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
 [data-th="notebook"] .rr-gut{padding-left:max(104px,env(safe-area-inset-left,0px))}
@@ -1421,7 +1421,8 @@ html.rd-dr-open .rr-themes{right:calc(min(410px,100vw) + 14px + env(safe-area-in
 .rr-share.rr-fsb{margin-left:auto}.rr-fsb+.rr-share{margin-left:8px}
 .rr-read.rr-fs{position:fixed;inset:0;z-index:1000;overflow:auto;background:var(--rr-bg);--rr-vh:0px;padding-top:56px}
 .rr-read.rr-fs>.rr-vh{display:none}
-.rr-read.rr-fs [data-reader]{zoom:var(--fsz,1.2);max-width:none;margin:0 auto}
+.rr-read.rr-fs [data-reader]{max-width:none;margin:0 auto}
+.rr-read.rr-fs .rd-wrap{zoom:var(--fsz,1.2)}
 .rr-read.rr-fs .rd-wrap{max-width:min(1700px,100%)!important;margin-right:auto!important}
 .rr-read.rr-fs .rd-progress{top:0!important}
 html.rr-fs-on .rr-themes,html.rr-fs-on .rr-theme-bar{display:none!important}
@@ -1433,8 +1434,10 @@ html.rr-fs-on{overflow:hidden}
 @media (max-width:640px){.rr-fsb span{display:none}}
 /* Toàn màn hình + task đọc hiểu: bài đọc và thanh theme dịch sang trái, không bị panel che */
 @media (min-width:1280px){
-  html.rd-ex-open .rr-read.rr-fs .rd-wrap{margin-right:424px!important}
-  html.rd-ex-open .rr-fsbar{right:calc(410px * var(--fsz,1.2) + 14px)}
+  html.rd-ex-open .rr-main{padding-right:424px;transition:padding-right .45s cubic-bezier(.2,.8,.2,1)}
+  html.rd-ex-open .rr-main .rd.qopen .rd-wrap{margin-right:auto;max-width:100%}
+  html.rd-ex-open .rr-read.rr-fs .rd-wrap{margin-right:calc(424px / var(--fsz,1.2))!important}
+  html.rd-ex-open .rr-fsbar{right:calc(410px + 14px)}
 }
 
 .rr-fh{font:600 12px var(--rr-ui);letter-spacing:.05em;text-transform:uppercase;color:var(--rr-muted);margin:18px 2px 10px}
