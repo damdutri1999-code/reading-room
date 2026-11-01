@@ -4300,8 +4300,14 @@ function sharedIds(){ return doneIds().filter(function(id){ return LIB.lessons[i
 function backupDue(){ if(!LIB.order.length) return false; return !LIB.lastBackup||(Date.now()-LIB.lastBackup)>=7*864e5; }
 function exportTheme(){ return LIB.app.theme||(rrCtl&&rrCtl.theme())||curTheme(); }
 function libFileName(){ return RD.slug(LIB.app.file||((LIB.app.name||'reading-room')+'-kho-bai'))+'.html'; }
+var arDone=false, arBusy=false;
+function autoRestore(force){
+  if(arBusy||(arDone&&!force)||!clReady()||!isOwnerRole()) return; arBusy=true;
+  clRestore().then(function(n){ arBusy=false; arDone=true; if(n){ try{ hubRefresh(); }catch(_){} try{ rrCtl.toast('Đã tải '+n+' bài từ Supabase về thiết bị này'); }catch(_){} } autoPub('',true); },
+    function(e){ arBusy=false; var st=e&&e.status; var m=(st===404||/Could not find the function/i.test(String(e&&e.message||'')))?'Chưa có hàm load_private/save_private trên Supabase nên không lấy được bài từ máy khác. Hãy chạy file SQL mới trong SQL Editor.':clErr(e); try{ rrCtl.toast(m); }catch(_){} });
+}
 function renderTeacherHub(box){
-  hubBox=box;
+  hubBox=box; autoRestore();
   if(!hubTabs().some(function(t){ return t[0]===hubTab; })) hubTab='lessons';
   box.innerHTML='<div class="tw"><nav class="tw-side" role="tablist" aria-orientation="vertical" aria-label="Chức năng giáo viên">'+
     '<button type="button" class="tw-new" data-hub="new">'+svg('plus')+'<span>Bài mới</span></button>'+
@@ -4475,7 +4481,7 @@ function clErr(e){
 function sharedLessons(){ var by=authName(); return sharedIds().map(function(id){ var x0=LIB.lessons[id], x=withFo(cleanLessonOf(id===L.id?L:x0),x0,underChung); if(x) x.by=by; return x; }).filter(Boolean); }
 function privPayload(){
   changed(true); var ls={};
-  LIB.order.forEach(function(i){ var x=LIB.lessons[i]; if(x&&x.done&&!x.trashed) ls[i]=JSON.parse(JSON.stringify(x)); });
+  LIB.order.forEach(function(i){ var x=LIB.lessons[i]; if(x&&!x.trashed) ls[i]=JSON.parse(JSON.stringify(x)); });
   var fo={}; Object.keys(LIB.folders).forEach(function(k){ if(!LIB.folders[k].system) fo[k]=LIB.folders[k]; });
   return {v:1,at:Date.now(),lessons:ls,folders:fo,order:LIB.order.filter(function(i){ return ls[i]; })};
 }
