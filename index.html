@@ -794,6 +794,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 
 <style>.dv-tin{width:100%;box-sizing:border-box;height:38px;border:1px solid var(--rr-line);border-radius:10px;background:transparent;color:var(--rr-fg);padding:0 12px;font:500 14px var(--rr-ui);margin:8px 0 2px}.dv-tin:focus{outline:2px solid var(--rr-accent,#7c8cff);outline-offset:1px}.dv-tchips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px;max-height:150px;overflow:auto}.dv-tl{font:600 12px var(--rr-ui);opacity:.65;margin-right:2px}.dv-tc{height:28px;padding:0 12px;border-radius:999px;border:1px solid var(--rr-line);background:transparent;color:var(--rr-fg);font:500 13px var(--rr-ui);cursor:pointer}.dv-tc:hover{background:color-mix(in srgb,var(--rr-fg) 8%,transparent)}.dv-tc.on{background:color-mix(in srgb,#2fbf8f 24%,transparent);border-color:#2fbf8f}
 .dv-c5{min-width:0;overflow:hidden}.dv-c5 .dv-b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}
+.dv-dlg.wide .dv-tg{margin-top:12px}.dv-dlg.wide .dv-tg .dv-tl{display:block;margin-bottom:6px}.dv-dlg.wide .dv-tchips{margin-top:0}.dv-dlg.wide .dv-tin{margin:0 0 8px}
 </style>
 <style id="rd-css">
 :root{--rd-bg:#f4f6f8;--rd-paper:#ffffff;--rd-ink:#182132;--rd-muted:#5d6779;--rd-line:#dde2ea;--rd-accent:#2a49d6;--rd-accent-soft:#e6eaff;--rd-note:#fff7d6;--rd-note-ink:#5a4500;--rd-student:#0e9f6e;--rd-student-soft:#e3f6ee;--rd-read:'Literata',Georgia,'Times New Roman',serif;--rd-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -5043,6 +5044,34 @@ function dvPicker(items,mode){
   m.addEventListener('keydown',function(e){ if(e.key==='Escape'){ e.stopPropagation(); m.remove(); } });
 }
 var CEFR=['A1','A1-A2','A2','A2-B1','B1','B1-B2','B2','B2-C1','C1','C1-C2','C2','IELTS'];
+function dvTags(items){
+  var ls=items.filter(function(it){ return it.k==='l'; }); if(!ls.length) return;
+  var F=['cat','level','topic'], val={}, touched={}, mixed={};
+  F.forEach(function(f){ var c=ls.map(function(it){ return it.o[f]||''; }); if(c.every(function(v){ return v===c[0]; })) val[f]=c[0]; else { val[f]=''; mixed[f]=1; } });
+  var m=document.createElement('div'); m.className='dv-modal';
+  function chip(f,v,t){ return '<button type="button" class="dv-tc'+(!touched[f]&&mixed[f]?'':(val[f]===v?' on':''))+'" data-f="'+f+'" data-v="'+esc(v)+'">'+esc(t)+'</button>'; }
+  function draw(keep){ var tl=topicList(), tv=m.querySelector('.dv-tin'), cv=tv?tv.value:null;
+    m.innerHTML='<div class="dv-dlg wide" role="dialog" aria-modal="true" aria-label="Gắn thẻ"><h4>Gắn thẻ cho '+(ls.length>1?ls.length+' bài':'bài đọc')+'</h4>'+
+     '<div class="dv-tg"><span class="dv-tl">Loại bài</span><div class="dv-tchips">'+Object.keys(RR.CATS).map(function(k){ return chip('cat',k,RR.CATS[k]); }).join('')+'</div></div>'+
+     '<div class="dv-tg"><span class="dv-tl">Level CEFR</span><div class="dv-tchips">'+CEFR.map(function(t){ return chip('level',t,t); }).join('')+'</div></div>'+
+     '<div class="dv-tg"><span class="dv-tl">Chủ đề</span><input type="text" class="dv-tin" maxlength="40" value="'+esc(val.topic)+'" placeholder="'+(mixed.topic&&!touched.topic?'Nhiều giá trị khác nhau':'Gõ chủ đề mới hoặc chọn bên dưới')+'" aria-label="Chủ đề">'+(tl.length?'<div class="dv-tchips">'+tl.map(function(t){ return chip('topic',t,t); }).join('')+'</div>':'')+'</div>'+
+     '<div class="dv-dlg-b"><span class="sp"></span><button type="button" class="tw-btn" data-dvm="cancel">Huỷ</button><button type="button" class="tw-btn solid" data-dvm="ok">Lưu</button></div></div>';
+    if(cv!=null&&keep){ m.querySelector('.dv-tin').value=cv; } }
+  draw(); rrRoot.querySelector('[data-dv]').appendChild(m); m.querySelector('.dv-tin').focus();
+  function norm(v){ v=String(v||'').replace(/\s+/g,' ').trim(); if(v){ var ex=topicList().filter(function(t){ return t.toLowerCase()===v.toLowerCase(); })[0]; if(ex) v=ex; } return v; }
+  function save(){ var tin=m.querySelector('.dv-tin').value; if(norm(tin)!==val.topic||touched.topic){ if(!(mixed.topic&&!touched.topic&&!tin.trim())){ val.topic=norm(tin); touched.topic=1; } }
+    if(!touched.cat&&!touched.level&&!touched.topic){ m.remove(); return; }
+    ls.forEach(function(it){ F.forEach(function(f){ if(!touched[f]) return; if(val[f]) it.o[f]=val[f]; else delete it.o[f]; if(L.id===it.id) L[f]=val[f]; }); dvTouch(it); });
+    saveLib(); m.remove(); dvRefresh(); try{ hubRefresh2(); }catch(_){}
+    var msg='Đã cập nhật thẻ cho '+ls.length+' bài'; if(ls.some(function(it){ return it.o.done; })) autoPub(msg); else dvSnack(msg); }
+  m.addEventListener('click',function(e){ var c=e.target.closest('[data-f]'); if(c){ var f=c.getAttribute('data-f'), v=c.getAttribute('data-v'); var tin=m.querySelector('.dv-tin').value;
+      if(f==='topic'){ val.topic=v; touched.topic=1; m.querySelector('.dv-tin').value=v; } else { val[f]=(val[f]===v&&touched[f])?'':v; touched[f]=1; }
+      if(f!=='topic') val.topic=norm(tin)===val.topic?val.topic:(touched.topic?val.topic:val.topic);
+      draw(true); m.querySelector('.dv-tin').value=(f==='topic'?v:tin); return; }
+    var b=e.target.closest('[data-dvm]'); if(!b&&e.target!==m) return; if(b&&b.getAttribute('data-dvm')==='ok') save(); else m.remove(); });
+  m.addEventListener('input',function(e){ if(e.target.classList.contains('dv-tin')){ val.topic=norm(e.target.value); touched.topic=1; m.querySelectorAll('.dv-tc[data-f=topic]').forEach(function(x){ x.classList.toggle('on',x.getAttribute('data-v')===val.topic); }); } });
+  m.addEventListener('keydown',function(e){ if(e.key==='Escape'){ e.stopPropagation(); m.remove(); } else if(e.key==='Enter'&&e.target.classList.contains('dv-tin')){ e.preventDefault(); e.stopPropagation(); save(); } });
+}
 function dvLevel(items){
   var ls=items.filter(function(it){ return it.k==='l'; }); if(!ls.length) return;
   var cur=ls.map(function(it){ return it.o.level||''; }), same=cur.every(function(v){ return v===cur[0]; });
@@ -5092,7 +5121,7 @@ function dvCtxItems(sel){
   L1.push('-');
   L1.push({a:'rename',t:'Đổi tên',ic:'pen',k:'F2',dis:!one});
   L1.push({a:'moveto',t:'Di chuyển đến…',ic:'move'});
-  if(anyL.length){ L1.push({a:'topic',t:'Đặt chủ đề (Topic)…',ic:'pen'}); L1.push({a:'level',t:'Đặt level CEFR…',ic:'pen'}); }
+  if(anyL.length) L1.push({a:'tags',t:'Gắn thẻ: loại · level · chủ đề…',ic:'pen'});
   if(anyL.length) L1.push({a:'linkto',t:'Thêm vào thư mục khác (không nhân bản)',ic:'link'});
   if(anyL.length&&DV.sec==='my'&&DV.cur&&!DV.q) L1.push({a:'unlink',t:'Bỏ khỏi thư mục này',ic:'x'});
   L1.push({a:'dup',t:'Nhân đôi thành bài mới',ic:'copy',k:'Ctrl + D'});
@@ -5125,8 +5154,7 @@ function dvDo(a,sel){
     case 'unlink': dvUnlink(s); break;
     case 'dup': if(s.length) dvDup(s); break;
     case 'moveto': if(s.length) dvPicker(s); break;
-    case 'topic': if(s.length) dvTopic(s); break;
-    case 'level': if(s.length) dvLevel(s); break;
+    case 'tags': case 'topic': case 'level': if(s.length) dvTags(s); break;
     case 'copy': if(s.length) dvCopyClip(s,'copy'); break;
     case 'cut': if(s.length) dvCopyClip(s,'cut'); break;
     case 'paste': dvPaste(); break;
