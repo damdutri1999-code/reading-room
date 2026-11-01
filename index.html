@@ -1534,6 +1534,8 @@ html.rr-fs-on{overflow:hidden}
 .rr-fth button[aria-checked="true"]{background:var(--rr-accent);color:var(--rr-accent-fg)}
 @media (max-width:760px){.rr-fth button span{display:none}}
 </style>
+
+<style>.rr-ttsb[aria-pressed=true]{background:var(--rr-accent);color:var(--rr-accent-fg);border-color:var(--rr-accent)}.rr-fsbar [data-tts]{display:inline-flex;align-items:center;gap:6px}.rr-fsbar [data-tts][aria-pressed=true]{background:var(--rr-accent);color:var(--rr-accent-fg)}</style>
 <style id="code-style"></style>
 <style id="style-css"></style>
 
@@ -2357,7 +2359,7 @@ RD.mount = function(root, lesson, init, opts){
     function tUnits(){ return Array.prototype.slice.call(art.querySelectorAll('.rd-blk')).filter(function(b){ return !b.classList.contains('rd-nb')&&!b.closest('.rd-card')&&plainText(b).trim(); }); }
     function tSplit(t){ t=t.replace(/\s+/g,' ').trim(); var m=t.match(/[^.!?…]+(?:[.!?…]+["'”’)\]]*|$)\s*/g)||[t], out=[]; m.forEach(function(x){ x=x.trim(); if(!x) return; while(x.length>230){ var k=x.lastIndexOf(',',230); if(k<80) k=x.lastIndexOf(' ',230); if(k<1) k=230; out.push(x.slice(0,k+1).trim()); x=x.slice(k+1).trim(); } if(x) out.push(x); }); var ch=[], cur=''; out.forEach(function(x){ if(cur&&(cur+' '+x).length>280){ ch.push(cur); cur=x; } else cur=cur?cur+' '+x:x; }); if(cur) ch.push(cur); return ch; }
     function tMark(){ art.querySelectorAll('.tts-now').forEach(function(e){ e.classList.remove('tts-now'); }); var u=tt.units[tt.idx]; if(u){ u.classList.add('tts-now'); var r=u.getBoundingClientRect(); if(r.top<170||r.bottom>innerHeight-90) u.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); } posEl.textContent='Đoạn '+(tt.units.length?tt.idx+1:0)+'/'+tt.units.length; }
-    function tUI(){ bar2.classList.toggle('playing',tt.play); var pb=bar2.querySelector('[data-t=play]'); pb.setAttribute('aria-label',tt.play?'Tạm dừng':'Phát'); tbtn.setAttribute('aria-pressed',String(tt.open)); }
+    function tUI(){ bar2.classList.toggle('playing',tt.play); var pb=bar2.querySelector('[data-t=play]'); pb.setAttribute('aria-label',tt.play?'Tạm dừng':'Phát'); tbtn.setAttribute('aria-pressed',String(tt.open)); document.querySelectorAll('[data-tts]').forEach(function(x){ x.setAttribute('aria-pressed',String(tt.open)); }); }
     function tStop(){ tt.tok++; tt.play=false; try{ SS.cancel(); }catch(_){} tUI(); }
     function tSay(){
       var tok=++tt.tok; try{ SS.cancel(); }catch(_){}
@@ -2738,7 +2740,7 @@ RR.init=function(opts){
     if(!list.length){ box.innerHTML=folderMode?(subs.length?'':'<div class="rr-empty">Thư mục này chưa có bài đọc.</div>'):'<div class="rr-empty">Không có bài nào khớp. Thử từ khoá khác hoặc chọn “Tất cả”.</div>'; return; }
     box.innerHTML=rowHtml(list);
   }
-  function readHtml(L){ var fsb='<button type="button" class="rr-share rr-fsb" data-fs aria-label="Đọc toàn màn hình" title="Đọc toàn màn hình (F)"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span>Toàn màn hình</span></button>', sb=fsb+(opts.share?'<button type="button" class="rr-share" data-share aria-label="Chia sẻ bài đọc này" title="Chia sẻ bài đọc này"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Chia sẻ</span></button>':''); return '<section class="rr-view rr-read">'+header(L.title||'Bài đọc',sb,'lib','Kho bài đọc')+'<div data-reader></div></section>'; }
+  function readHtml(L){ var fsb='<button type="button" class="rr-share rr-fsb" data-fs aria-label="Đọc toàn màn hình" title="Đọc toàn màn hình (F)"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span>Toàn màn hình</span></button>', sb=(window.speechSynthesis&&window.SpeechSynthesisUtterance?'<button type="button" class="rr-share rr-ttsb" data-tts aria-pressed="false" aria-label="Nghe bài đọc" title="Nghe bài đọc (giọng đọc của thiết bị)"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg><span>Nghe</span></button>':'')+fsb+(opts.share?'<button type="button" class="rr-share" data-share aria-label="Chia sẻ bài đọc này" title="Chia sẻ bài đọc này"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>Chia sẻ</span></button>':''); return '<section class="rr-view rr-read">'+header(L.title||'Bài đọc',sb,'lib','Kho bài đọc')+'<div data-reader></div></section>'; }
   var loginMode='in', loginOk='';
   function loginHtml(){
     var up=loginMode==='up';
@@ -2804,7 +2806,7 @@ RR.init=function(opts){
   function fsEnter(){
     var sec=fsSec(); if(!sec||fsOn()) return;
     sec.classList.add('rr-fs'); document.documentElement.classList.add('rr-fs-on');
-    var bar=document.createElement('div'); bar.className='rr-fsbar'; bar.innerHTML='<span class="rr-fth" role="radiogroup" aria-label="Chọn theme">'+[['stage','Sân khấu',IC.stage],['notebook','Vở ghi',IC.nb],['constellation','Chòm sao',IC.star]].map(function(t){ return '<button type="button" role="radio" data-fth="'+t[0]+'" aria-checked="'+(th===t[0])+'" title="'+t[1]+'">'+t[2]+'<span>'+t[1]+'</span></button>'; }).join('')+'</span><button type="button" data-fsx class="x" aria-label="Thoát toàn màn hình" title="Thoát (Esc)">✕ Thoát</button>';
+    var bar=document.createElement('div'); bar.className='rr-fsbar'; bar.innerHTML='<span class="rr-fth" role="radiogroup" aria-label="Chọn theme">'+[['stage','Sân khấu',IC.stage],['notebook','Vở ghi',IC.nb],['constellation','Chòm sao',IC.star]].map(function(t){ return '<button type="button" role="radio" data-fth="'+t[0]+'" aria-checked="'+(th===t[0])+'" title="'+t[1]+'">'+t[2]+'<span>'+t[1]+'</span></button>'; }).join('')+'</span>'+(window.speechSynthesis&&window.SpeechSynthesisUtterance?'<button type="button" data-tts aria-label="Nghe bài đọc" title="Nghe bài đọc"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg><span>Nghe</span></button>':'')+'<button type="button" data-fsx class="x" aria-label="Thoát toàn màn hình" title="Thoát (Esc)">✕ Thoát</button>';
     sec.appendChild(bar); fsApply();
     try{ var r=sec.requestFullscreen&&sec.requestFullscreen(); if(r&&r.catch) r.catch(function(){}); }catch(err){}
   }
@@ -2821,6 +2823,7 @@ RR.init=function(opts){
     else if((e.key==='-'||e.key==='_')&&!e.ctrlKey&&!e.metaKey){ fsZ=Math.max(.9,+(fsZ-.1).toFixed(2)); fsApply(); }
   });
   main.addEventListener('click',function(e){
+    var tb=e.target.closest('[data-tts]'); if(tb){ var sec2=tb.closest('.rr-read')||main, rb=sec2.querySelector('.rd-tts-btn'); if(rb){ rb.click(); var on2=rb.getAttribute('aria-pressed')==='true'; sec2.querySelectorAll('[data-tts]').forEach(function(x){ x.setAttribute('aria-pressed',String(on2)); }); } return; }
     if(e.target.closest('[data-fs]')){ fsEnter(); return; }
     if(e.target.closest('[data-fsx]')){ fsExit(); return; }
     var ft=e.target.closest('[data-fth]'); if(ft){ th=ft.getAttribute('data-fth'); try{ localStorage.setItem('rr:theme',th); }catch(err){} html.setAttribute('data-th',th); main.querySelectorAll('[data-fth]').forEach(function(x){ x.setAttribute('aria-checked',String(x===ft)); }); root.querySelectorAll('.rr-themes button').forEach(function(x){ x.setAttribute('aria-checked',String(x.getAttribute('data-th')===th)); }); return; }
