@@ -795,6 +795,10 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 <style>.dv-tin{width:100%;box-sizing:border-box;height:38px;border:1px solid var(--rr-line);border-radius:10px;background:transparent;color:var(--rr-fg);padding:0 12px;font:500 14px var(--rr-ui);margin:8px 0 2px}.dv-tin:focus{outline:2px solid var(--rr-accent,#7c8cff);outline-offset:1px}.dv-tchips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px;max-height:150px;overflow:auto}.dv-tl{font:600 12px var(--rr-ui);opacity:.65;margin-right:2px}.dv-tc{height:28px;padding:0 12px;border-radius:999px;border:1px solid var(--rr-line);background:transparent;color:var(--rr-fg);font:500 13px var(--rr-ui);cursor:pointer}.dv-tc:hover{background:color-mix(in srgb,var(--rr-fg) 8%,transparent)}.dv-tc.on{background:color-mix(in srgb,#2fbf8f 24%,transparent);border-color:#2fbf8f}
 .dv-c5{min-width:0;overflow:hidden}.dv-c5 .dv-b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}
 .dv-dlg.wide .dv-tg{margin-top:12px}.dv-dlg.wide .dv-tg .dv-tl{display:block;margin-bottom:6px}.dv-dlg.wide .dv-tchips{margin-top:0}.dv-dlg.wide .dv-tin{margin:0 0 8px}
+.kp{display:inline-flex;align-items:center;justify-content:space-between;gap:8px;height:34px;max-width:190px;min-width:130px;padding:0 10px 0 12px;border:1px solid var(--rr-line);border-radius:10px;background:transparent;color:var(--rr-fg);font:500 12.5px/1 var(--rr-ui);cursor:pointer}.kp:hover{background:color-mix(in srgb,var(--rr-fg) 6%,transparent)}.kp[aria-expanded=true]{border-color:var(--rr-accent);box-shadow:0 0 0 1px var(--rr-accent)}.kp:focus-visible{outline:2px solid var(--rr-accent);outline-offset:2px}.kp .kp-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kp .kp-c{flex:none;opacity:.65;transition:transform .15s}.kp[aria-expanded=true] .kp-c{transform:rotate(180deg)}
+.kp-pop{position:fixed;z-index:200;max-height:min(340px,60vh);overflow:auto;padding:6px;border:1px solid var(--rr-line);border-radius:12px;background:var(--rr-bg);color:var(--rr-fg);box-shadow:0 18px 40px -12px rgba(0,0,0,.45);font-family:var(--rr-ui)}.kp-h{font:600 11.5px var(--rr-ui);opacity:.6;padding:6px 10px 8px}
+.kp-o{display:flex;align-items:center;gap:10px;width:100%;min-height:34px;border:0;border-radius:8px;background:none;color:inherit;font:500 13px var(--rr-ui);text-align:left;cursor:pointer;padding-right:10px}.kp-o:hover{background:color-mix(in srgb,var(--rr-fg) 8%,transparent)}.kp-o span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kp-o em{font:400 11px var(--rr-ui);opacity:.55;font-style:normal}
+.kp-k{width:18px;height:18px;border:1.5px solid color-mix(in srgb,var(--rr-fg) 35%,transparent);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:#fff}.kp-o.on .kp-k{background:var(--rr-accent);border-color:var(--rr-accent)}
 </style>
 <style id="rd-css">
 :root{--rd-bg:#f4f6f8;--rd-paper:#ffffff;--rd-ink:#182132;--rd-muted:#5d6779;--rd-line:#dde2ea;--rd-accent:#2a49d6;--rd-accent-soft:#e6eaff;--rd-note:#fff7d6;--rd-note-ink:#5a4500;--rd-student:#0e9f6e;--rd-student-soft:#e3f6ee;--rd-read:'Literata',Georgia,'Times New Roman',serif;--rd-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -4155,6 +4159,33 @@ function growSub(){ ['#i-sub','#i-title'].forEach(function(q){ var s=$(q); s.sty
 $('#i-title').addEventListener('input',function(e){ L.title=e.target.value.replace(/\n/g,' '); growSub(); saveDraft(); });
 $('#i-sub').addEventListener('input',function(e){ L.subtitle=e.target.value; growSub(); saveDraft(); });
 $('#i-level').addEventListener('change',function(e){ L.level=e.target.value; saveDraft(); });
+/* ---------- Chọn kho (dropdown nhiều lựa chọn) thay cho công tắc Kho chung ---------- */
+function khoName(f){ return f===CH?'Kho chung':((LIB.folders[f]||{}).name||'Thư mục'); }
+function khoLabel(x){ var fs=fl(x).filter(function(f){ return LIB.folders[f]&&!LIB.folders[f].trashed; }); if(!fs.length) return 'Chưa vào kho'; return khoName(fs[0])+(fs.length>1?' +'+(fs.length-1):''); }
+function khoBtn(x){ return '<button type="button" class="kp" data-kp="'+esc(x.id||'')+'" aria-haspopup="listbox" aria-expanded="false" title="Chọn kho cho bài này"><span class="kp-t">'+esc(khoLabel(x))+'</span><svg class="kp-c" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>'; }
+function khoClose(){ var o=rrRoot.querySelector('.kp-pop'); if(o){ var b=rrRoot.querySelector('.kp[aria-expanded="true"]'); if(b) b.setAttribute('aria-expanded','false'); o.remove(); } }
+function khoOpen(btn){
+  var id=btn.getAttribute('data-kp'), x=LIB.lessons[id]; if(!x) return;
+  if(rrRoot.querySelector('.kp-pop')){ var same=btn.getAttribute('aria-expanded')==='true'; khoClose(); if(same) return; }
+  var pop=document.createElement('div'); pop.className='kp-pop'; pop.setAttribute('role','listbox'); pop.setAttribute('aria-multiselectable','true');
+  function rows(){ var h='<div class="kp-h">Kho / thư mục chứa bài này</div>';
+    (function walk(par,dep){ Object.keys(LIB.folders).map(function(i){ return LIB.folders[i]; }).filter(function(f){ return (f.parent||'')===par&&!f.trashed; }).sort(function(a,b){ if(a.id===CH) return -1; if(b.id===CH) return 1; return String(a.name).localeCompare(String(b.name),'vi'); }).forEach(function(f){
+      var on=hasF(x,f.id); h+='<button type="button" role="option" aria-selected="'+on+'" class="kp-o'+(on?' on':'')+'" data-kf="'+esc(f.id)+'" style="padding-left:'+(10+dep*16)+'px"><i class="kp-k">'+(on?'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>':'')+'</i><span>'+esc(khoName(f.id))+'</span>'+(f.id===CH?'<em>mọi người đọc được</em>':'')+'</button>'; walk(f.id,dep+1); }); })('',0);
+    return h; }
+  pop.innerHTML=rows(); rrRoot.appendChild(pop); btn.setAttribute('aria-expanded','true');
+  var r=btn.getBoundingClientRect(), pw=Math.max(240,r.width), ph=pop.offsetHeight;
+  var left=Math.min(Math.max(8,r.right-pw),innerWidth-pw-8), top=r.bottom+6; if(top+ph>innerHeight-8&&r.top-ph-6>8) top=r.top-ph-6;
+  pop.style.cssText='left:'+left+'px;top:'+top+'px;min-width:'+pw+'px';
+  pop.addEventListener('click',function(e){ var o=e.target.closest('[data-kf]'); if(!o) return; var f=o.getAttribute('data-kf');
+    if(f===CH) setChung(x,!hasF(x,CH)); else if(hasF(x,f)) remF(x,f); else addF(x,f);
+    x.updated=Date.now(); saveLib(); pop.innerHTML=rows(); var t=btn.querySelector('.kp-t'); if(t) t.textContent=khoLabel(x);
+    var hp2=rrRoot.querySelector('.tw-head p'); if(hp2&&hubTab==='lessons') hp2.textContent=paneLessonsSub();
+    try{ hubRefresh2(); }catch(_){}
+    autoPub('Đã cập nhật kho của bài'); });
+  pop.addEventListener('keydown',function(e){ if(e.key==='Escape'){ khoClose(); btn.focus(); } });
+}
+document.addEventListener('mousedown',function(e){ if(!e.target.closest||e.target.closest('.kp-pop')||e.target.closest('.kp')) return; khoClose(); },true);
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') khoClose(); });
 function topicList(){ var m={}; LIB.order.forEach(function(i){ var x=LIB.lessons[i]; if(x&&x.topic&&!x.trashed) m[x.topic]=1; }); return Object.keys(m).sort(function(a,b){ return a.localeCompare(b,'vi'); }); }
 function fillTopics(){ var dl=$('#topic-list'); if(dl) dl.innerHTML=topicList().map(function(t){ return '<option value="'+esc(t)+'">'; }).join(''); }
 $('#i-topic').addEventListener('focus',fillTopics);
@@ -4295,7 +4326,7 @@ function paneLessons(){
   var ids=doneIds(), pub=pubIds().length;
   return paneHead('Bài đọc của thầy',paneLessonsSub())+
     (ids.length>3?hubTools(ids):'')+
-    (ids.length>1?'<p class="tw-hint">Kéo <span class="tw-grip-i">'+svg('grip')+'</span> để sắp thứ tự bài. <b>Kho chung</b>: bật thì bài nằm trong thư mục KHO TÀI LIỆU CHUNG và mọi người đọc được; bài nào thầy muốn giữ riêng thì để tắt. Muốn xếp bài vào nhiều thư mục, dùng tab Quản lý bài.</p>':'')+
+    (ids.length>1?'<p class="tw-hint">Kéo <span class="tw-grip-i">'+svg('grip')+'</span> để sắp thứ tự bài. Bấm ô <b>kho</b> bên phải mỗi bài để chọn bài nằm ở những kho nào (chọn được nhiều kho). Chọn <b>Kho chung</b> thì bài nằm trong thư mục KHO TÀI LIỆU CHUNG và mọi người đọc được; bài nào thầy muốn giữ riêng thì không chọn kho chung.</p>':'')+
     '<div class="tw-list" data-rows></div>';
 }
 function paneDrafts(){
@@ -4315,7 +4346,7 @@ function renderRows(){
     return '<div class="tw-row'+(drafts?' draft':'')+'" data-id="'+esc(id)+'"'+(filtered||drafts?'':' draggable="true"')+'>'+
       (drafts?'':'<span class="tw-grip" aria-hidden="true">'+svg('grip')+'</span><span class="tw-no">'+(pos>=0?pos+1:'–')+'</span>')+RR.thumb(x,'width:52px;flex:none')+
       '<div class="tw-ri"><b>'+esc(x.title||'Bài chưa đặt tên')+(drafts&&id===L.id?' <i class="tw-cur">Đang mở</i>':'')+'</b><span>'+meta+'</span></div>'+
-      (drafts?'':'<span class="tw-sws"><label class="tw-sw" title="Chia sẻ bài này vào kho chung cho mọi người"><input type="checkbox" data-share'+(x.shared?' checked':'')+'><i></i><span>Kho chung</span></label></span>')+
+      (drafts?'':'<span class="tw-sws">'+khoBtn(x)+'</span>')+
       (drafts?'<button type="button" class="tw-btn" data-act2="finish">'+svg('check')+'Hoàn tất</button><button type="button" class="tw-btn solid" data-act2="edit">'+svg('pen')+'Soạn tiếp</button>':'<button type="button" class="tw-btn" data-act2="edit">Soạn lại</button>')+
       '<span class="tw-more"><button type="button" class="tw-ib" data-more aria-label="Thêm thao tác" aria-haspopup="menu">'+svg('more')+'</button>'+
       '<span class="tw-menu" role="menu"><button type="button" role="menuitem" data-act2="view">'+svg('eye')+'Xem như học viên</button>'+(drafts?'':'<button type="button" role="menuitem" data-act2="dl">'+svg('download')+'Tải bài lẻ (.html)</button>')+'<button type="button" role="menuitem" data-act2="dup">'+svg('copy')+'Nhân bản</button>'+
@@ -4614,6 +4645,7 @@ rrRoot.addEventListener('click',function(e){
     saveLib(); hubRefresh(); autoPub('Đã xoá bài');
   }
 });
+rrRoot.addEventListener('click',function(e){ var kb=e.target.closest&&e.target.closest('.kp'); if(kb){ e.preventDefault(); e.stopPropagation(); khoOpen(kb); } },true);
 rrRoot.addEventListener('change',function(e){
   if(e.target.id==='bk-file'){ var f=e.target.files[0]; if(f) readBackup(f); e.target.value=''; return; }
   if(e.target.hasAttribute('data-share')){
@@ -4882,7 +4914,7 @@ function dvInfo(){
       h='<div class="dv-ip"><span class="dv-fold big">'+dvIc('folder')+'</span></div><h4>'+esc(it.name)+'</h4><dl><dt>Loại</dt><dd>Thư mục</dd><dt>Vị trí</dt><dd>'+esc(dvLoc(it))+'</dd><dt>Nội dung</dt><dd>'+ls+' bài · '+kids+' thư mục con</dd><dt>Chủ sở hữu</dt><dd>'+esc(ownerName())+' · Owner</dd><dt>Tạo lúc</dt><dd>'+fmtDate(it.o.created)+'</dd></dl>'; }
     else { var x=it.o, I=RR.info(cleanLessonOf(x));
       h='<div class="dv-ip"><span class="dv-th big">'+RR.thumb(x,'width:100%;height:100%')+'</span></div><h4>'+esc(it.name)+'</h4><dl><dt>Loại</dt><dd>Bài đọc'+(x.cat?' · '+esc(RR.CATS[x.cat]):'')+(x.level?' · '+esc(x.level):'')+'</dd><dt>Trạng thái</dt><dd>'+(x.done?'Đã hoàn tất':'Bản nháp')+'</dd><dt>Chủ đề</dt><dd>'+(x.topic?esc(x.topic):'–')+' <button type="button" class="tw-btn" style="height:24px;padding:0 8px;font-size:12px;margin-left:6px" data-dva="topic">'+(x.topic?'Sửa':'Thêm')+'</button></dd><dt>Nội dung</dt><dd>'+I.minutes+' phút · '+I.questions+' câu hỏi · '+I.notes+' ô ghi chú</dd><dt>Nằm trong</dt><dd>'+esc(dvLoc(it))+'</dd><dt>Chủ sở hữu</dt><dd>'+esc(ownerName())+' · Owner</dd><dt>Sửa đổi</dt><dd>'+(x.updated?fmtDate(x.updated):'–')+'</dd></dl>'+
-        (x.done&&DV.sec!=='trash'?'<div class="dv-sws"><label class="tw-sw"><input type="checkbox" data-dvsw="chung"'+(x.shared?' checked':'')+'><i></i><span>Kho chung</span></label></div>':'');
+        (x.done&&DV.sec!=='trash'?'<div class="dv-sws"><span class="dv-muted">Kho</span>'+khoBtn(x)+'</div>':'');
     }
   } else if(s.length>1){ h='<h4>'+s.length+' mục đã chọn</h4><p class="dv-muted">Chọn một mục để xem chi tiết.</p>'; }
   else { var p=folderPath(DV.cur), items=dvAll(); h='<div class="dv-ip"><span class="dv-fold big">'+dvIc('folder')+'</span></div><h4>'+esc(DV.sec==='my'?(p.length?p[p.length-1].name:'Tất cả bài đọc'):({recent:'Gần đây',loose:'Bài chưa phân',starred:'Có gắn dấu sao',trash:'Thùng rác'}[DV.sec]))+'</h4><dl><dt>Chủ sở hữu</dt><dd>'+esc(ownerName())+' · Owner</dd><dt>Số mục</dt><dd>'+items.length+'</dd></dl><p class="dv-muted">Chọn một bài hoặc thư mục để xem chi tiết.</p>'; }
