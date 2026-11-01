@@ -4303,7 +4303,7 @@ function libFileName(){ return RD.slug(LIB.app.file||((LIB.app.name||'reading-ro
 var arDone=false, arBusy=false;
 function autoRestore(force){
   if(arBusy||(arDone&&!force)||!clReady()||!isOwnerRole()) return; arBusy=true;
-  clRestore().then(function(n){ arBusy=false; arDone=true; if(n){ try{ hubRefresh(); }catch(_){} try{ rrCtl.toast('Đã tải '+n+' bài từ Supabase về thiết bị này'); }catch(_){} } autoPub('',true); },
+  clRestore().then(function(n){ arBusy=false; arDone=true; if(n){ try{ hubRefresh(); }catch(_){} try{ rrCtl.toast('Đã đồng bộ '+n+' bài từ kho online'); }catch(_){} } autoPub('',true); },
     function(e){ arBusy=false; var st=e&&e.status; var m=(st===404||/Could not find the function/i.test(String(e&&e.message||'')))?'Chưa có hàm load_private/save_private trên Supabase nên không lấy được bài từ máy khác. Hãy chạy file SQL mới trong SQL Editor.':clErr(e); try{ rrCtl.toast(m); }catch(_){} });
 }
 function renderTeacherHub(box){
