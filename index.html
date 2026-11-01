@@ -2354,7 +2354,7 @@ RD.mount = function(root, lesson, init, opts){
     function ttsHint(){ var cur=tt.voices.filter(function(v){ return (v.voiceURI||v.name)===tt.voice; })[0], hint=bar2.querySelector('.rd-tts-tip'); if(hint) hint.hidden=!!(cur&&vScore(cur)>=90); }
     ttsVoices(); if(SS.addEventListener) on(SS,'voiceschanged',ttsVoices);
     function tUnits(){ return Array.prototype.slice.call(art.querySelectorAll('.rd-blk')).filter(function(b){ return !b.classList.contains('rd-nb')&&!b.closest('.rd-card')&&plainText(b).trim(); }); }
-    function tSplit(t){ t=t.replace(/\s+/g,' ').trim(); var m=t.match(/[^.!?…]+(?:[.!?…]+["'”’)\]]*|$)\s*/g)||[t], out=[]; m.forEach(function(x){ x=x.trim(); if(!x) return; while(x.length>230){ var k=x.lastIndexOf(',',230); if(k<80) k=x.lastIndexOf(' ',230); if(k<1) k=230; out.push(x.slice(0,k+1).trim()); x=x.slice(k+1).trim(); } if(x) out.push(x); }); return out; }
+    function tSplit(t){ t=t.replace(/\s+/g,' ').trim(); var m=t.match(/[^.!?…]+(?:[.!?…]+["'”’)\]]*|$)\s*/g)||[t], out=[]; m.forEach(function(x){ x=x.trim(); if(!x) return; while(x.length>230){ var k=x.lastIndexOf(',',230); if(k<80) k=x.lastIndexOf(' ',230); if(k<1) k=230; out.push(x.slice(0,k+1).trim()); x=x.slice(k+1).trim(); } if(x) out.push(x); }); var ch=[], cur=''; out.forEach(function(x){ if(cur&&(cur+' '+x).length>280){ ch.push(cur); cur=x; } else cur=cur?cur+' '+x:x; }); if(cur) ch.push(cur); return ch; }
     function tMark(){ art.querySelectorAll('.tts-now').forEach(function(e){ e.classList.remove('tts-now'); }); var u=tt.units[tt.idx]; if(u){ u.classList.add('tts-now'); var r=u.getBoundingClientRect(); if(r.top<90||r.bottom>innerHeight-130) u.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); } posEl.textContent='Đoạn '+(tt.units.length?tt.idx+1:0)+'/'+tt.units.length; }
     function tUI(){ bar2.classList.toggle('playing',tt.play); var pb=bar2.querySelector('[data-t=play]'); pb.setAttribute('aria-label',tt.play?'Tạm dừng':'Phát'); tbtn.setAttribute('aria-pressed',String(tt.open)); }
     function tStop(){ tt.tok++; tt.play=false; try{ SS.cancel(); }catch(_){} tUI(); }
@@ -2363,10 +2363,13 @@ RD.mount = function(root, lesson, init, opts){
       var u=tt.units[tt.idx]; if(!u){ tt.play=false; tUI(); return; }
       if(!tt.sents.length) tt.sents=tSplit(plainText(u)); tMark(); tt.play=true; tUI();
       if(tt.si>=tt.sents.length){ tt.idx++; tt.si=0; tt.sents=[]; if(tt.idx>=tt.units.length){ tt.idx=0; tt.play=false; tMark(); tUI(); toast('Đã đọc hết bài'); return; } tSay(); return; }
-      var ut=new SpeechSynthesisUtterance(tt.sents[tt.si]); ut.rate=tt.rate; var vo=tt.voices.filter(function(v){ return (v.voiceURI||v.name)===tt.voice; })[0]; if(vo){ ut.voice=vo; ut.lang=vo.lang; } else ut.lang='en-US';
-      ut.onend=function(){ if(tok!==tt.tok) return; tt.si++; var lastS=tt.si>=tt.sents.length; setTimeout(function(){ if(tok!==tt.tok) return; tSay(); },lastS?520:190); };
-      ut.onerror=function(e){ if(tok!==tt.tok) return; if(e&&(e.error==='canceled'||e.error==='interrupted')) return; tt.play=false; tUI(); toast('Không đọc được trên thiết bị này'); };
-      SS.speak(ut);
+      var vo=tt.voices.filter(function(v){ return (v.voiceURI||v.name)===tt.voice; })[0], last=tt.sents.length-1;
+      for(var k=tt.si;k<=last;k++){ (function(k){
+        var ut=new SpeechSynthesisUtterance(tt.sents[k]); ut.rate=tt.rate; if(vo){ ut.voice=vo; ut.lang=vo.lang; } else ut.lang='en-US';
+        ut.onstart=function(){ if(tok===tt.tok) tt.si=k; };
+        ut.onend=function(){ if(tok!==tt.tok||k!==last) return; tt.si=tt.sents.length; setTimeout(function(){ if(tok!==tt.tok) return; tSay(); },380); };
+        ut.onerror=function(e){ if(tok!==tt.tok) return; if(e&&(e.error==='canceled'||e.error==='interrupted')) return; tt.play=false; tUI(); toast('Không đọc được trên thiết bị này'); };
+        SS.speak(ut); })(k); }
     }
     function tGo(i){ tt.idx=Math.max(0,Math.min(tt.units.length-1,i)); tt.si=0; tt.sents=[]; if(tt.play) tSay(); else tMark(); }
     function tOpen(o){ tt.open=o; bar2.hidden=!o; R.classList.toggle('tts-on',o); if(o){ tt.units=tUnits(); if(tt.idx>=tt.units.length) tt.idx=0; tt.si=0; tt.sents=[]; tSay(); } else { tStop(); art.querySelectorAll('.tts-now').forEach(function(e){ e.classList.remove('tts-now'); }); } tUI(); }
