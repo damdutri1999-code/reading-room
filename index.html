@@ -799,6 +799,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .kp-pop{position:fixed;z-index:200;max-height:min(340px,60vh);overflow:auto;padding:6px;border:1px solid var(--rr-line);border-radius:12px;background:var(--rr-bg);color:var(--rr-fg);box-shadow:0 18px 40px -12px rgba(0,0,0,.45);font-family:var(--rr-ui)}.kp-h{font:600 11.5px var(--rr-ui);opacity:.6;padding:6px 10px 8px}
 .kp-o{display:flex;align-items:center;gap:10px;width:100%;min-height:34px;border:0;border-radius:8px;background:none;color:inherit;font:500 13px var(--rr-ui);text-align:left;cursor:pointer;padding-right:10px}.kp-o:hover{background:color-mix(in srgb,var(--rr-fg) 8%,transparent)}.kp-o span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kp-o em{font:400 11px var(--rr-ui);opacity:.55;font-style:normal}
 .kp-k{width:18px;height:18px;border:1.5px solid color-mix(in srgb,var(--rr-fg) 35%,transparent);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:#fff}.kp-o.on .kp-k{background:var(--rr-accent);border-color:var(--rr-accent)}
+.tw-warnb{margin:0 0 14px;padding:12px 14px;border-radius:12px;border:1px solid #d9534f;background:color-mix(in srgb,#d9534f 14%,transparent);color:var(--rr-fg);font:13.5px/1.5 var(--rr-ui)}
 </style>
 <style id="rd-css">
 :root{--rd-bg:#f4f6f8;--rd-paper:#ffffff;--rd-ink:#182132;--rd-muted:#5d6779;--rd-line:#dde2ea;--rd-accent:#2a49d6;--rd-accent-soft:#e6eaff;--rd-note:#fff7d6;--rd-note-ink:#5a4500;--rd-student:#0e9f6e;--rd-student-soft:#e3f6ee;--rd-read:'Literata',Georgia,'Times New Roman',serif;--rd-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -4304,15 +4305,17 @@ var arDone=false, arBusy=false;
 function autoRestore(force){
   if(arBusy||(arDone&&!force)||!clReady()||!isOwnerRole()) return; arBusy=true;
   clRestore().then(function(n){ arBusy=false; arDone=true; if(n){ try{ hubRefresh(); }catch(_){} try{ rrCtl.toast('Đã đồng bộ '+n+' bài từ kho online'); }catch(_){} } autoPub('',true); },
-    function(e){ arBusy=false; arDone=true; if(e&&e.found){ try{ hubRefresh(); }catch(_){} } var st=e&&e.status; var m=(st===404||/Could not find the function/i.test(String(e&&e.message||'')))?'Chưa có hàm load_private/save_private trên Supabase nên không lấy được bài từ máy khác. Hãy chạy file SQL mới trong SQL Editor.'+(e&&e.found?' Đã lấy lại '+e.found+' bài từ Kho chung.':''):clErr(e); try{ rrCtl.toast(m); }catch(_){} });
+    function(e){ arBusy=false; arDone=true; if(e&&e.found){ try{ hubRefresh(); }catch(_){} } var st=e&&e.status; var m=(st===404||/Could not find the function/i.test(String(e&&e.message||'')))?'Chưa có hàm load_private/save_private trên Supabase nên không lấy được bài từ máy khác. Hãy chạy file SQL mới trong SQL Editor.'+(e&&e.found?' Đã lấy lại '+e.found+' bài từ Kho chung.':''):clErr(e); if(st===404||/Could not find the function/i.test(String(e&&e.message||''))){ cl().privErr='Chưa chạy SQL mới (save_private/load_private) trên Supabase.'; saveLib(); try{ hubRefresh(); }catch(_){} } try{ rrCtl.toast(m); }catch(_){} });
 }
 function renderTeacherHub(box){
   hubBox=box; autoRestore();
+  var warn=(cl().privErr?'<div class="tw-warnb" role="alert"><b>Bài của thầy CHƯA được lưu lên Supabase, hiện chỉ nằm trong trình duyệt của máy này.</b> '+esc(cl().privErr)+' Sau khi chạy SQL, bấm <b>Đồng bộ lại ngay</b> ở tab Sao lưu.</div>':'');
   if(!hubTabs().some(function(t){ return t[0]===hubTab; })) hubTab='lessons';
   box.innerHTML='<div class="tw"><nav class="tw-side" role="tablist" aria-orientation="vertical" aria-label="Chức năng giáo viên">'+
     '<button type="button" class="tw-new" data-hub="new">'+svg('plus')+'<span>Bài mới</span></button>'+
     hubTabs().map(function(t){ return '<button type="button" role="tab" class="tw-tab" data-tab="'+t[0]+'" aria-selected="'+(t[0]===hubTab)+'">'+svg(t[1])+'<span>'+t[2]+'</span>'+(t[0]==='lessons'?'<em>'+doneIds().length+'</em>':t[0]==='drafts'?'<em>'+draftIds().length+'</em>':t[0]==='export'?'<em>'+pubIds().length+'</em>':t[0]==='backup'&&backupDue()?'<i class="tw-dot" title="Nên sao lưu"></i>':'')+'</button>'; }).join('')+
-    '</nav><div class="tw-main" data-pane role="tabpanel"></div></div>';
+    '</nav><div class="tw-main" data-pane role="tabpanel">'+'</div></div>'+'';
+  if(warn) box.insertAdjacentHTML('afterbegin',warn);
   renderPane();
 }
 function setHubTab(t){ hubTab=t; try{ localStorage.setItem('rls:hubtab',t); }catch(e){} if(hubBox){ hubBox.querySelectorAll('.tw-tab').forEach(function(b){ b.setAttribute('aria-selected',String(b.getAttribute('data-tab')===t)); }); renderPane(); var m=hubBox.querySelector('.tw-main'); if(m&&m.getBoundingClientRect().top<0) m.scrollIntoView({block:'start'}); } }
