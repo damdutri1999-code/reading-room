@@ -4304,7 +4304,7 @@ var arDone=false, arBusy=false;
 function autoRestore(force){
   if(arBusy||(arDone&&!force)||!clReady()||!isOwnerRole()) return; arBusy=true;
   clRestore().then(function(n){ arBusy=false; arDone=true; if(n){ try{ hubRefresh(); }catch(_){} try{ rrCtl.toast('Đã đồng bộ '+n+' bài từ kho online'); }catch(_){} } autoPub('',true); },
-    function(e){ arBusy=false; var st=e&&e.status; var m=(st===404||/Could not find the function/i.test(String(e&&e.message||'')))?'Chưa có hàm load_private/save_private trên Supabase nên không lấy được bài từ máy khác. Hãy chạy file SQL mới trong SQL Editor.':clErr(e); try{ rrCtl.toast(m); }catch(_){} });
+    function(e){ arBusy=false; arDone=true; if(e&&e.found){ try{ hubRefresh(); }catch(_){} } var st=e&&e.status; var m=(st===404||/Could not find the function/i.test(String(e&&e.message||'')))?'Chưa có hàm load_private/save_private trên Supabase nên không lấy được bài từ máy khác. Hãy chạy file SQL mới trong SQL Editor.'+(e&&e.found?' Đã lấy lại '+e.found+' bài từ Kho chung.':''):clErr(e); try{ rrCtl.toast(m); }catch(_){} });
 }
 function renderTeacherHub(box){
   hubBox=box; autoRestore();
@@ -4486,13 +4486,23 @@ function privPayload(){
   return {v:1,at:Date.now(),lessons:ls,folders:fo,order:LIB.order.filter(function(i){ return ls[i]; })};
 }
 function clRestore(){
-  return authToken().then(function(tok){ return clCall('load_private',{},tok); }).then(function(d){
+  var privE=null;
+  return authToken().then(function(tok){ return clCall('load_private',{},tok); }).catch(function(e){ privE=e; return null; }).then(function(d){
     if(!d||!d.lessons) return 0; var n=0;
     Object.keys(d.folders||{}).forEach(function(k){ if(!LIB.folders[k]) LIB.folders[k]=d.folders[k]; });
     (d.order||Object.keys(d.lessons)).forEach(function(i){ var x=d.lessons[i]; if(!x) return; var cur=LIB.lessons[i];
       if(!cur){ LIB.lessons[i]=x; LIB.order.push(i); n++; }
       else if((x.updated||0)>(cur.updated||0)&&!(L&&L.id===i)){ LIB.lessons[i]=x; n++; } });
     migrateLib(); saveLib(); return n;
+  }).then(function(n){
+    /* Dự phòng: bài đã ra Kho chung nhưng chưa có bản riêng trên Supabase thì lấy lại từ Kho chung */
+    return clCall('get_shared',{}).then(function(r){
+      var by=authName(), add=0;
+      ((r&&r.lessons)||[]).forEach(function(c){ if(!c||!c.id||LIB.lessons[c.id]) return; if(c.by&&by&&c.by!==by) return;
+        var x={id:c.id,title:c.title||'Bài đọc',subtitle:c.subtitle||'',level:c.level||'',topic:c.topic||'',cat:c.cat||'',examOn:!!c.examOn,examText:c.examText||'',examOpen:!!c.examOpen,examCheck:c.examCheck!==false,codes:c.codes||clone(CODES),styles:c.styles,html:c.html||'',elicits:c.elicits||{},notes:c.notes||{},done:true,shared:true,folders:[CH],updated:Date.now(),created:Date.now()};
+        LIB.lessons[x.id]=x; LIB.order.push(x.id); add++; });
+      if(add){ migrateLib(); saveLib(); } if(privE){ privE.found=add; throw privE; } return n+add;
+    },function(e2){ if(privE) throw privE; return n; });
   });
 }
 function clPayload(){ changed(true); return {app:Object.assign({},LIB.app,{theme:exportTheme()}), lessons:[], shared:sharedLessons(), sfolders:foMap(underChung), at:Date.now()}; }
