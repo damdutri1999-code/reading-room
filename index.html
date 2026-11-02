@@ -2451,20 +2451,21 @@ RD.mount = function(root, lesson, init, opts){
       for(var k=tt.si;k<=last;k++){ (function(k){
         var ut=new SpeechSynthesisUtterance(tt.sents[k]); ut.rate=tt.rate; if(vo){ ut.voice=vo; ut.lang=vo.lang; } else ut.lang='en-US';
         var gotB=false, est=0, cs=tt.starts[k]||0;
-        function estStep(pos){ if(tok!==tt.tok||gotB) return; var txt=tt.sents[k], m=/\S+/g, w, words=[]; while((w=m.exec(txt))) words.push({i:w.index,l:w[0].length}); var wi=0; (function nx(){ if(tok!==tt.tok||gotB||wi>=words.length) return; tWordAt(k,cs+words[wi].i); var d=(60/(150*tt.rate))*Math.min(1.9,Math.max(.55,words[wi].l/4.6))*1000; wi++; est=setTimeout(nx,d); })(); }
-        ut.onboundary=function(e){ if(tok!==tt.tok) return; if(e&&e.name&&e.name!=='word') return; gotB=true; clearTimeout(est); tWordAt(k,cs+(e.charIndex||0)); };
-        ut.onstart=function(){ if(tok!==tt.tok) return; tt.si=k; tHide(); setTimeout(function(){ if(tok===tt.tok&&!gotB) estStep(); },700); };
+        function estStep(pos){ if(tok!==tt.tok||gotB) return; var txt=tt.sents[k], m=/\S+/g, w, words=[]; while((w=m.exec(txt))) words.push({i:w.index,l:w[0].length}); var wi=0; (function nx(){ if(tok!==tt.tok||gotB||wi>=words.length) return; tWordAt(k,cs+words[wi].i); tt.wOff=words[wi].i; var d=(60/(150*tt.rate))*Math.min(1.9,Math.max(.55,words[wi].l/4.6))*1000; wi++; est=setTimeout(nx,d); })(); }
+        ut.onboundary=function(e){ if(tok!==tt.tok) return; if(e&&e.name&&e.name!=='word') return; gotB=true; clearTimeout(est); tt.wOff=e.charIndex||0; tWordAt(k,cs+(e.charIndex||0)); };
+        ut.onstart=function(){ if(tok!==tt.tok) return; tt.si=k; tt.wOff=0; tHide(); setTimeout(function(){ if(tok===tt.tok&&!gotB) estStep(); },700); };
         ut.onend=function(){ if(tok!==tt.tok||k!==last) return; tt.si=tt.sents.length; setTimeout(function(){ if(tok!==tt.tok) return; tSay(); },380); };
         ut.onerror=function(e){ if(tok!==tt.tok) return; if(e&&(e.error==='canceled'||e.error==='interrupted')) return; tt.play=false; tUI(); toast('Không đọc được trên thiết bị này'); };
         SS.speak(ut); })(k); }
     }
+    function tCut(){ var k=tt.si, s=tt.sents[k], o=tt.wOff||0; tt.wOff=0; if(s==null||o<=0) return; while(o>0&&!/\s/.test(s.charAt(o-1))) o--; if(o<=0||o>=s.length) return; tt.starts[k]=(tt.starts[k]||0)+o; tt.sents[k]=s.slice(o); }
     function tGo(i){ tt.idx=Math.max(0,Math.min(tt.units.length-1,i)); tt.si=0; tt.sents=[]; if(tt.play) tSay(); else tMark(); }
     function tOpen(o){ tt.open=o; bar2.hidden=!o; R.classList.toggle('tts-on',o); if(o){ tt.units=tUnits(); if(tt.idx>=tt.units.length) tt.idx=0; tt.si=0; tt.sents=[]; tSay(); } else { tStop(); art.querySelectorAll('.tts-now').forEach(function(e){ e.classList.remove('tts-now'); }); } tUI(); }
     on(tbtn,'click',function(){ tOpen(!tt.open); });
     on(bar2,'click',function(e){ var b=e.target.closest('[data-t]'); if(!b||b.tagName==='SELECT') return; var a=b.getAttribute('data-t');
       if(a==='play'){ if(tt.play) tStop(); else tSay(); } else if(a==='prev'){ tGo(tt.idx-(tt.si>0?0:1)); } else if(a==='next'){ tGo(tt.idx+1); } else if(a==='close'){ tOpen(false); } });
-    on(rateS,'change',function(){ tt.rate=parseFloat(rateS.value)||1; try{ localStorage.setItem('rd:tts:rate',String(tt.rate)); }catch(_){} if(tt.play){ tSay(); } });
-    on(voiceS,'change',function(){ tt.voice=voiceS.value; ttsHint(); try{ localStorage.setItem('rd:tts:voice',tt.voice); }catch(_){} if(tt.play){ tt.sents=tt.sents; tSay(); } });
+    on(rateS,'change',function(){ tt.rate=parseFloat(rateS.value)||1; try{ localStorage.setItem('rd:tts:rate',String(tt.rate)); }catch(_){} if(tt.play){ tCut(); tSay(); } });
+    on(voiceS,'change',function(){ tt.voice=voiceS.value; ttsHint(); try{ localStorage.setItem('rd:tts:voice',tt.voice); }catch(_){} if(tt.play){ tCut(); tSay(); } });
     on(art,'click',function(e){ if(!tt.open) return; var sel=getSelection(); if(sel&&!sel.isCollapsed) return; if(e.target.closest('a,button,textarea,input,.el,.rd-card,.rd-nb')) return; var b=e.target.closest('.rd-blk'); if(!b) return; var i=tt.units.indexOf(b); if(i<0) return; tt.idx=i; tt.si=0; tt.sents=[]; tSay(); });
     on(window,'pagehide',function(){ try{ SS.cancel(); }catch(_){} });
     cleanup.push(function(){ try{ SS.cancel(); }catch(_){} });
