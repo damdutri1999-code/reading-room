@@ -1545,10 +1545,18 @@ html.rr-fs-on{overflow:hidden}
 
 <style>.rr-ttsb[aria-pressed=true]{background:var(--rr-accent);color:var(--rr-accent-fg);border-color:var(--rr-accent)}.rr-fsbar [data-tts]{display:inline-flex;align-items:center;gap:6px}.rr-fsbar [data-tts][aria-pressed=true]{background:var(--rr-accent);color:var(--rr-accent-fg)}</style>
 
-<style>.rr-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:22px;max-width:640px}.rr-stats[hidden]{display:none}
+<style>.rr-stats{display:grid;grid-template-columns:minmax(0,1.75fr) repeat(4,minmax(0,1fr));gap:10px;margin-top:22px;max-width:900px}.rr-stats[hidden]{display:none}
 .rr-stats>div{padding:12px 14px;border-radius:14px;border:1px solid var(--rr-line);background:color-mix(in srgb,var(--rr-fg) 5%,transparent);display:flex;flex-direction:column;gap:4px;min-width:0}
 .rr-stats b{font:700 20px/1.15 var(--rr-ui);color:var(--rr-fg);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.rr-stats span{font:500 12px/1.3 var(--rr-ui);color:var(--rr-muted)}
-@media (max-width:640px){.rr-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}</style>
+.rr-stats>.rr-ut{flex-direction:row;align-items:center;gap:14px;padding:14px 18px;border-color:color-mix(in srgb,var(--rr-accent) 60%,var(--rr-line));background:linear-gradient(135deg,color-mix(in srgb,var(--rr-accent) 22%,transparent),color-mix(in srgb,var(--rr-accent) 6%,transparent));box-shadow:0 10px 30px -12px color-mix(in srgb,var(--rr-accent) 70%,transparent)}
+.rr-ut .ring{position:relative;width:70px;height:70px;flex:none}
+.rr-ut .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.rr-ut circle{fill:none;stroke-width:4.2}.rr-ut .bg{stroke:color-mix(in srgb,var(--rr-fg) 16%,transparent)}
+.rr-ut .fg{stroke:var(--rr-accent);stroke-linecap:round;animation:rr-use-in 1.1s cubic-bezier(.2,.8,.2,1) both}
+.rr-ut .ring i{position:absolute;inset:0;display:grid;place-items:center;font:700 15px/1 var(--rr-ui);font-style:normal;color:var(--rr-fg);font-variant-numeric:tabular-nums}
+.rr-ut .n{display:flex;flex-direction:column;gap:3px;min-width:0}.rr-ut .n b{font-size:34px;line-height:1}.rr-ut .n span{font-size:12.5px}
+@media (prefers-reduced-motion:reduce){.rr-ut .fg{animation:none}}
+@media (max-width:760px){.rr-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.rr-stats>.rr-ut{grid-column:1/-1}}</style>
 <style id="code-style"></style>
 <style id="style-css"></style>
 
@@ -2704,15 +2712,19 @@ RR.init=function(opts){
     try{ if(!sessionStorage.getItem('rr:visit')){ sessionStorage.setItem('rr:visit','1'); T.send('track_visit',{}); } }catch(e){ T.send('track_visit',{}); }
   }
   function fmtDur(sec){ sec=Math.max(0,Math.round(sec||0)); var h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60; if(h) return h+' giờ '+(m?m+' phút':''); if(m) return m+' phút'+(s&&m<10?' '+s+' giây':''); return s+' giây'; }
-  function statsInner(j){ var v=+j.visits||0, o=+j.opens||0, sc=+j.secs||0, avg=o?sc/o:0;
+  var statVal=null, useVal=null, useN=null;
+  function pct(p){ return (p<10&&p>0?p.toFixed(1).replace('.0',''):String(Math.round(p)))+'%'; }
+  function useTile(){ var p=useVal, C=2*Math.PI*15.9155, d=(Math.min(100,Math.max(0,p))/100*C).toFixed(2);
+    return '<div class="rr-ut"><div class="ring"><svg viewBox="0 0 40 40" aria-hidden="true"><circle class="bg" cx="20" cy="20" r="15.9155"/><circle class="fg" cx="20" cy="20" r="15.9155" style="stroke-dasharray:'+d+' '+C.toFixed(2)+'"/></svg><i>'+pct(p)+'</i></div><div class="n">'+(useN!=null?'<b>'+useN+'</b><span>bài đọc trong kho</span>':'<b>'+pct(p)+'</b><span>dung lượng kho đã dùng</span>')+'</div></div>'; }
+  function statTiles(j){ var v=+j.visits||0, o=+j.opens||0, sc=+j.secs||0, avg=o?sc/o:0;
     return '<div><b>'+v.toLocaleString('vi-VN')+'</b><span>Lượt truy cập</span></div><div><b>'+o.toLocaleString('vi-VN')+'</b><span>Lượt mở bài</span></div><div><b>'+esc(fmtDur(sc))+'</b><span>Tổng thời lượng đọc</span></div><div><b>'+esc(fmtDur(avg))+'</b><span>Trung bình mỗi bài</span></div>'; }
-  var statVal=null;
-  function statsHtml(){ return opts.stats?'<div class="rr-stats" data-stats'+(statVal?'':' hidden')+' role="group" aria-label="Thống kê truy cập">'+(statVal?statsInner(statVal):'')+'</div>':''; }
+  function tiles(){ return (useVal!=null?useTile():'')+(statVal?statTiles(statVal):''); }
+  function statsHtml(){ if(!opts.stats&&!opts.usage) return ''; var h=tiles(); return '<div class="rr-stats" data-stats'+(h?'':' hidden')+' role="group" aria-label="Thống kê">'+h+'</div>'; }
+  function paint(){ var el=main.querySelector('[data-stats]'); if(!el) return; var h=tiles(); el.innerHTML=h; el.hidden=!h; }
   function fillStats(){ if(!opts.stats||view!=='home') return;
-    var put=function(){ var el=main.querySelector('[data-stats]'); if(el&&statVal){ el.innerHTML=statsInner(statVal); el.hidden=false; } };
-    if(statVal){ put(); return; }
+    if(statVal){ paint(); return; }
     var p; try{ p=opts.stats(); }catch(e){ return; }
-    Promise.resolve(p).then(function(j){ if(j&&typeof j==='object'&&('visits' in j)){ statVal=j; put(); } }).catch(function(){}); }
+    Promise.resolve(p).then(function(j){ if(j&&typeof j==='object'&&('visits' in j)){ statVal=j; paint(); } }).catch(function(){}); }
   function app(){ return opts.app(); }
   function lessons(){ return opts.lessons()||[]; }
   function roles(){
@@ -2721,15 +2733,12 @@ RR.init=function(opts){
     return '<div class="rr-roles'+(opts.teacher?'':' one')+'">'+s+t+'</div>';
   }
   function meta(){ var ls=lessons(), lv={}; ls.forEach(function(L){ if(L.level) lv[L.level]=1; }); var lvs=Object.keys(lv).sort(); return '<div class="rr-meta"><span>'+ls.length+' bài đọc</span>'+(lvs.length?'<span>'+esc(lvs.length>1?lvs[0]+' – '+lvs[lvs.length-1]:lvs[0])+'</span>':'')+'<span>Có câu hỏi dẫn dắt và ô ghi chú</span></div>'; }
-  var useVal=null, useN=null;
-  function useHtml(){ return '<div class="rr-use" data-use'+(useVal==null?' hidden':'')+'>'+(useVal==null?'':useInner(useVal))+'</div>'; }
-  function useInner(p){ var C=2*Math.PI*15.9155, d=(Math.min(100,Math.max(0,p))/100*C).toFixed(2); return '<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="bg" cx="20" cy="20" r="15.9155"/><circle class="fg" cx="20" cy="20" r="15.9155" style="stroke-dasharray:'+d+' '+C.toFixed(2)+'"/></svg><span>'+(useN!=null?'Hiện tại kho chung đang có <b>'+useN+'</b> bài đọc · <b>':'Hiện tại kho tài liệu đang <b>')+(p<10&&p>0?p.toFixed(1).replace('.0',''):Math.round(p))+'%</b> đầy</span>'; }
+  function useHtml(){ return ''; }
   function fillUse(){
     if(!opts.usage||view!=='home') return;
-    var put=function(){ var el=main.querySelector('[data-use]'); if(el&&useVal!=null){ el.innerHTML=useInner(useVal); el.hidden=false; } };
-    if(useVal!=null){ put(); return; }
+    if(useVal!=null){ paint(); return; }
     var p; try{ p=opts.usage(); }catch(e){ return; }
-    Promise.resolve(p).then(function(j){ if(j&&j.limit>0&&j.used>=0){ useVal=j.used/j.limit*100; useN=(typeof j.lessons==='number')?j.lessons:null; put(); } }).catch(function(){});
+    Promise.resolve(p).then(function(j){ if(j&&j.limit>0&&j.used>=0){ useVal=j.used/j.limit*100; useN=(typeof j.lessons==='number')?j.lessons:null; paint(); } }).catch(function(){});
   }
   function homeHtml(){
     var A=app();
