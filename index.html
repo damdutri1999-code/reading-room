@@ -307,6 +307,8 @@ textarea{resize:vertical}
 .aihint:hover{background:var(--accent-soft)}
 .aihint svg.i{color:var(--accent);margin-top:1px}
 .aihint b{color:var(--accent)}
+.ip-vi{margin-top:6px;font:400 12.5px/1.55 var(--ui);color:var(--muted);padding-left:10px;border-left:2px solid var(--line)}.ip-vi b{font:700 9.5px/1 var(--ui);letter-spacing:.08em;color:var(--accent);margin-right:6px}
+#ed [data-vi]{position:relative}#ed [data-vi]::after{content:'VI';position:absolute;right:-6px;top:2px;font:700 9px/1 var(--ui);letter-spacing:.08em;color:var(--accent);background:var(--accent-soft);padding:3px 5px;border-radius:5px;pointer-events:none;user-select:none}
 .ip-info{font-size:12.5px;line-height:1.5;color:var(--ink);background:var(--accent-soft);border-radius:9px;padding:8px 10px;margin-bottom:4px}
 .ip-txt .hl{background:var(--hl);border-radius:.2em;padding:0 .08em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .ip-txt .el{background-image:linear-gradient(var(--accent),var(--accent));background-repeat:no-repeat;background-position:0 100%;background-size:100% 2px}
@@ -1187,7 +1189,27 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 @media (max-width:1279px){html.rd-ex-open .rd-tts{left:50%;right:auto;transform:translateX(-50%);width:min(760px,calc(100vw - 20px))}}
 .rr-read.rr-fs .rd-tts{top:68px;z-index:1090}.rd-solo .rd-tts,.preview .rd-tts{top:calc(var(--rr-vh,0px) + 74px)}
 @media (max-width:560px){.rd-tts-l{font-size:11px}.rd-tts-pos{min-width:0}.rd-tts-s.v{max-width:110px}}
-::highlight(rd-tts-word){color:#3b4de0;font-weight:600}.rd-tts-dot{position:fixed;z-index:63;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#3b4de0;box-shadow:0 0 0 3px rgba(59,77,224,.18);pointer-events:none;transition:left .12s ease,top .12s ease;animation:rdHop .5s ease-in-out infinite alternate}.rd-tts-dot[hidden]{display:none}@keyframes rdHop{to{transform:translateY(-3px)}}@media (prefers-reduced-motion:reduce){.rd-tts-dot{animation:none;transition:none}}</style>
+::highlight(rd-tts-word){color:#3b4de0;font-weight:600}.rd-tts-dot{position:fixed;z-index:63;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#3b4de0;box-shadow:0 0 0 3px rgba(59,77,224,.18);pointer-events:none;transition:left .12s ease,top .12s ease;animation:rdHop .5s ease-in-out infinite alternate}.rd-tts-dot[hidden]{display:none}@keyframes rdHop{to{transform:translateY(-3px)}}@media (prefers-reduced-motion:reduce){.rd-tts-dot{animation:none;transition:none}}
+/* ---- Bản dịch tiếng Việt: stage = bong bóng tối (F), notebook = giấy ghi chú vàng (B), constellation = giấy ghi chú hồng (B) ---- */
+.rd-vi{grid-column:1;min-width:0;padding:2px 0 6px}
+@media (min-width:1080px){.rd-row > .rd-vi{grid-column:2;grid-row:calc(var(--n,1) + 1)}}
+.rd-vi-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid color-mix(in srgb,var(--rd-accent) 50%,transparent);background:transparent;color:var(--rd-accent);border-radius:999px;padding:6px 12px;font:600 12px/1 var(--rd-ui);cursor:pointer;margin:2px 0 0}
+.rd-vi-btn svg{stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+.rd-vi-btn[aria-expanded=true]{background:var(--rd-accent);color:var(--rd-paper,#fff)}.rd-vi-btn[aria-expanded=true] svg{transform:rotate(180deg)}
+.rd-vi-btn:focus-visible{outline:2px solid var(--rd-accent);outline-offset:3px}
+.rd-vi-t{position:relative;margin:12px 0 4px;padding:12px 15px 13px;border-radius:12px;background:#1f2547;color:#e9ecfb;font:400 13.5px/1.65 var(--rd-ui);box-shadow:0 14px 26px -16px rgba(0,0,0,.6);animation:rdViIn .25s ease both}
+.rd-vi-t::before{content:"";position:absolute;left:26px;top:-5px;width:10px;height:10px;background:#1f2547;transform:rotate(45deg)}
+.rd-vi-t[hidden]{display:none}
+@keyframes rdViIn{from{opacity:0;transform:translateY(-4px)}}
+@media (prefers-reduced-motion:reduce){.rd-vi-t{animation:none}}
+:is([data-th="notebook"],[data-th="constellation"]) .rd-vi-btn{border:0;background:#fff3a8;color:#3b2f00;box-shadow:0 4px 10px -6px rgba(0,0,0,.45);font-weight:600}
+:is([data-th="notebook"],[data-th="constellation"]) .rd-vi-btn[aria-expanded=true]{background:#ffe96b;color:#3b2f00}
+:is([data-th="notebook"],[data-th="constellation"]) .rd-vi-t{max-width:94%;border-radius:2px;background:#fff3a8;color:#3b2f00;font:400 17px/1.45 'Patrick Hand','Be Vietnam Pro',system-ui,sans-serif;transform:rotate(-.5deg);box-shadow:0 10px 18px -12px rgba(0,0,0,.5);padding:12px 16px 13px}
+:is([data-th="notebook"],[data-th="constellation"]) .rd-vi-t::before{left:22px;top:-8px;width:58px;height:16px;background:rgba(255,236,150,.85);transform:rotate(-3deg);box-shadow:0 1px 2px rgba(0,0,0,.12);border-radius:0}
+[data-th="constellation"] .rd-vi-btn{background:#ffd6e0;color:#4a1426}[data-th="constellation"] .rd-vi-btn[aria-expanded=true]{background:#ffb8cb;color:#4a1426}
+[data-th="constellation"] .rd-vi-t{background:#ffd6e0;color:#4a1426}[data-th="constellation"] .rd-vi-t::before{background:rgba(255,226,235,.9)}
+.rd-vi-all[aria-pressed=true]{background:var(--rd-accent);border-color:var(--rd-accent);color:var(--rd-paper,#fff)}
+</style>
 <style id="rr-css">
 /* Reading Room shell: home, library, teacher hub and themed reading. Everything is scoped under .rr and uses --rr-* tokens so it never touches the Studio editor */
 :root{--rr-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--rr-read:'Literata',Georgia,'Times New Roman',serif;--rr-hand:'Patrick Hand','Pangolin','Be Vietnam Pro',system-ui,sans-serif;--mx:50%;--my:35%}
@@ -2010,7 +2032,7 @@ RD.mount = function(root, lesson, init, opts){
     '<h1 class="rd-title">'+esc(lesson.title||'Bài đọc')+'</h1>'+
     (lesson.subtitle?'<p class="rd-sub">'+esc(lesson.subtitle)+'</p>':'')+
     '<div class="rd-bar"><div class="rd-legend" role="group" aria-label="Mã màu">'+chips+'</div>'+
-    '<div class="rd-tools"><span class="rd-zoom" role="group" aria-label="Cỡ chữ"><span class="rd-zwrap"><button type="button" class="rd-btn rd-zv" aria-haspopup="listbox" aria-expanded="false" title="Chọn mức phóng to"><span class="rd-zt">100%</span><svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="rd-zmenu" role="listbox" aria-label="Mức phóng to" hidden></div></span></span><button type="button" class="rd-btn rd-focus-btn" aria-pressed="false">Tập trung</button><button type="button" class="rd-btn rd-nohl-btn" aria-pressed="false" title="Xem bài đọc thuần, không có highlight nào">Không highlight</button><button type="button" class="rd-btn rd-tts-btn" aria-pressed="false" title="Nghe bài đọc (giọng đọc của thiết bị)" hidden>Nghe</button>'+
+    '<div class="rd-tools"><span class="rd-zoom" role="group" aria-label="Cỡ chữ"><span class="rd-zwrap"><button type="button" class="rd-btn rd-zv" aria-haspopup="listbox" aria-expanded="false" title="Chọn mức phóng to"><span class="rd-zt">100%</span><svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="rd-zmenu" role="listbox" aria-label="Mức phóng to" hidden></div></span></span><button type="button" class="rd-btn rd-focus-btn" aria-pressed="false">Tập trung</button><button type="button" class="rd-btn rd-nohl-btn" aria-pressed="false" title="Xem bài đọc thuần, không có highlight nào">Không highlight</button><button type="button" class="rd-btn rd-vi-all" aria-pressed="false" title="Hiện hoặc ẩn bản dịch tiếng Việt của mọi đoạn" hidden>Bản dịch</button><button type="button" class="rd-btn rd-tts-btn" aria-pressed="false" title="Nghe bài đọc (giọng đọc của thiết bị)" hidden>Nghe</button>'+
     ''+(lesson.exam&&lesson.exam.groups&&lesson.exam.groups.length?'<span class="rd-mode" role="group" aria-label="Chế độ học"><button type="button" class="rd-btn rd-mode-read" aria-pressed="true">Đọc kỹ</button><button type="button" class="rd-btn rd-exam-btn" aria-pressed="false">Task đọc hiểu <span class="rd-count rd-ex-n">'+lesson.exam.count+'</span></button></span>':'')+'<button type="button" class="rd-btn rd-work-btn">Bài làm <span class="rd-count">0</span></button></div></div>'+
     '<p class="rd-tip">'+(window.matchMedia&&matchMedia('(hover:none)').matches?'Chạm giữ một từ rồi kéo để chọn cụm từ cần ghi chú. Chạm vào ô màu để ẩn hoặc hiện từng loại.':'Bôi đen một cụm từ để ghi chú lên bài. Bấm vào ô màu để ẩn hoặc hiện từng loại.')+'</p></header>'+
     '<article class="rd-text"></article></div>'+
@@ -2044,7 +2066,8 @@ RD.mount = function(root, lesson, init, opts){
     if(lab<Math.ceil(bp.length/2)) bp.forEach(function(b,i){ if(i<26) b.setAttribute('data-pl',String.fromCharCode(65+i)); });
   }
   // Each paragraph sits in its own row: notes column (left) + text (right)
-  blocks.forEach(function(b){ if(b.classList.contains('nb')) return; var row=h('div','rd-row'); art.insertBefore(row,b); row.appendChild(b); });
+  blocks.forEach(function(b){ if(b.classList.contains('nb')) return; var row=h('div','rd-row'); art.insertBefore(row,b); row.appendChild(b);
+    var vt=b.getAttribute('data-vi'); if(vt&&vt.trim()){ var vw=h('div','rd-vi'); vw.innerHTML='<button type="button" class="rd-vi-btn" aria-expanded="false"><span class="vl">Hiện bản dịch Việt</span><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><p class="rd-vi-t" lang="vi" hidden></p>'; vw.querySelector('.rd-vi-t').textContent=vt.trim(); row.appendChild(vw); } });
   function rowSpan(row){
     if(!row||!row.classList.contains('rd-row')) return;
     var nl=0, el=0;
@@ -2367,6 +2390,16 @@ RD.mount = function(root, lesson, init, opts){
   on(R,'keydown',function(e){ if(e.key==='Escape'&&!zmenu.hidden){ zOpen(false); zbtn.focus(); } });
   var fbtn=$('.rd-focus-btn');
   on(fbtn,'click',function(){ var o=!R.classList.contains('focus'); R.classList.toggle('focus',o); fbtn.setAttribute('aria-pressed',String(o)); toast(o?'Chế độ tập trung: chỉ sáng đoạn đang đọc':'Đã tắt chế độ tập trung'); });
+  /* ---------- Bản dịch tiếng Việt dưới mỗi đoạn ---------- */
+  (function(){
+    var vws=Array.prototype.slice.call(art.querySelectorAll('.rd-vi')), all=$('.rd-vi-all'); if(!vws.length) return;
+    if(all) all.hidden=false;
+    function setV(w,o){ var b=w.querySelector('.rd-vi-btn'), t=w.querySelector('.rd-vi-t'); b.setAttribute('aria-expanded',String(o)); b.querySelector('.vl').textContent=o?'Ẩn bản dịch':'Hiện bản dịch Việt'; t.hidden=!o; }
+    function sync(){ var n=vws.filter(function(w){ return !w.querySelector('.rd-vi-t').hidden; }).length; if(all) all.setAttribute('aria-pressed',String(n===vws.length)); }
+    on(art,'click',function(e){ var b=e.target.closest&&e.target.closest('.rd-vi-btn'); if(!b) return; var w=b.parentNode; setV(w,b.getAttribute('aria-expanded')!=='true'); sync(); });
+    on(all,'click',function(){ var o=all.getAttribute('aria-pressed')!=='true'; vws.forEach(function(w){ setV(w,o); }); sync(); try{ localStorage.setItem('rd:viall',o?'1':'0'); }catch(_){} toast(o?'Đã hiện bản dịch của mọi đoạn':'Đã ẩn bản dịch'); });
+    try{ if(localStorage.getItem('rd:viall')==='1'){ vws.forEach(function(w){ setV(w,true); }); sync(); } }catch(_){}
+  })();
   var hbtn=$('.rd-nohl-btn');
   function setNoHl(o,say){ R.classList.toggle('nohl',o); if(hbtn) hbtn.setAttribute('aria-pressed',String(o)); try{ localStorage.setItem('rd:nohl',o?'1':'0'); }catch(_){} if(say) toast(o?'Đã tắt mọi màu color-code: chỉ còn chữ thuần':'Đã bật lại highlight'); }
   on(hbtn,'click',function(){ setNoHl(!R.classList.contains('nohl'),true); });
@@ -4976,15 +5009,21 @@ function promptColor(){
   var codes=L.codes.map(function(c){ return '['+c.id+']…[/'+c.id+']  =  '+c.label+'. '+(CODE_RULE[c.id]||CODE_HINT[c.id]||''); }).join('\n');
   return 'THẺ MÀU (tên thẻ viết thường, mở bằng [tên], đóng bằng [/tên]):\n'+codes+'\n\n'+
   'QUY TẮC TÔ MÀU\n'+
-  '- Giữ nguyên 100% chữ gốc: không sửa, không thêm, không bớt, không dịch, không đổi dấu câu. Chỉ chèn thẻ.\n'+
+  '- Giữ nguyên 100% chữ gốc tiếng Anh: không sửa, không thêm, không bớt, không đổi dấu câu. Chỉ chèn thẻ màu. (Bản dịch tiếng Việt chỉ nằm ở dòng [vi: …] riêng, xem mục BẢN DỊCH TIẾNG VIỆT bên dưới.)\n'+
   '- Phân tích bài trước khi tô: tìm chủ đề, ý chính từng đoạn, từ khoá, signpost, ví dụ và dẫn chứng.\n'+
   '- Mỗi thẻ mở phải có thẻ đóng cùng tên. Thẻ không được bắc qua ranh giới giữa hai đoạn (mỗi đoạn tự đóng đủ thẻ của mình).\n'+
   '- Có thể lồng thẻ nhỏ vào thẻ lớn, ví dụ signal hoặc key nằm trong main hoặc evidence. Không lồng hai thẻ cùng loại; đóng thẻ theo thứ tự ngược với thứ tự mở.\n'+
   '- Không tô màu cho tiêu đề. Không tô cả đoạn bằng một thẻ duy nhất nếu đoạn có nhiều ý.\n'+
   '- Mỗi đoạn văn cách nhau MỘT dòng trống. Giữ đúng số đoạn và thứ tự đoạn của bài gốc.\n'+
   '- Tiêu đề và heading đặt đầu dòng: "# Tiêu đề bài", "> Phụ đề" (nếu bài có), "## Heading 1", "### Heading 2". Có thể dùng **đậm**, *nghiêng* nếu bài gốc có.\n\n'+
-  'VÍ DỤ ĐOẠN ĐÃ TÔ:\n'+
-  '[main]Rest helps our bodies feel better.[/main] After a busy day, we may feel [key]tired[/key]. [signal]For example[/signal], [evidence]a student who rests after studying may have more energy later.[/evidence]\n';
+  'BẢN DỊCH TIẾNG VIỆT (bắt buộc)\n'+
+  '- Với MỖI đoạn văn thường của bài (không phải tiêu đề, phụ đề, heading), thêm MỘT dòng riêng ngay bên dưới đoạn đó, KHÔNG có dòng trống ở giữa, theo đúng dạng:  [vi: bản dịch tiếng Việt của đoạn ngay phía trên]\n'+
+  '- Dịch tự nhiên, đúng nghĩa, đủ ý, văn phong rõ ràng cho học viên; giữ nguyên tên riêng, số liệu và thuật ngữ cần giữ. Dịch cả đoạn thành một dòng liền, không xuống dòng.\n'+
+  '- Bản dịch KHÔNG chứa thẻ màu và không chứa dấu ngoặc vuông [ ] ở bên trong.\n'+
+  '- Mỗi đoạn dịch tương ứng đúng một đoạn gốc; không gộp, không tách, không bỏ sót đoạn nào.\n\n'+
+  'VÍ DỤ ĐOẠN ĐÃ TÔ KÈM BẢN DỊCH:\n'+
+  '[main]Rest helps our bodies feel better.[/main] After a busy day, we may feel [key]tired[/key]. [signal]For example[/signal], [evidence]a student who rests after studying may have more energy later.[/evidence]\n'+
+  '[vi: Nghỉ ngơi giúp cơ thể chúng ta cảm thấy khỏe hơn. Sau một ngày bận rộn, chúng ta có thể thấy mệt. Chẳng hạn, một học sinh nghỉ ngơi sau khi học có thể có nhiều năng lượng hơn sau đó.]\n';
 }
 function aiPrompt(){
   return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh. Công cụ của giáo viên đọc kết quả của bạn bằng chương trình, nên phải đúng định dạng dưới đây.\n\n'+
@@ -5245,26 +5284,29 @@ function guess(text,i,prev,detect){
   if(text.length<=70&&words<=10&&!endP&&/^[\p{Lu}\d"“]/u.test(text)) return {style:'h1',text:text};
   return {style:'normal',text:text};
 }
+var VI_RE=/^\[(?:vi|vie|vn|dịch|dich|bản dịch|ban dich)\s*[:=]\s*([\s\S]*?)\]\s*$/i;
 function parseText(t){
-  var detect=$('#imp-detect').checked, join=$('#imp-join').checked;
+  var detect=$('#imp-detect').checked, join=$('#imp-join').checked, viOf={};
   t=t.replace(/\r\n?/g,'\n').replace(/ /g,' ').replace(/[ \t]+/g,' ');
   var paras=[];
   if(join){
     t.split(/\n\s*\n/).forEach(function(g){
-      var lines=g.split('\n').map(function(s){ return s.trim(); }).filter(Boolean), buf=[];
+      var lines=g.split('\n').map(function(s){ return s.trim(); }).filter(Boolean), buf=[], viM=null;
+      lines=lines.filter(function(l){ var m=VI_RE.exec(l); if(m){ viM=m[1].trim(); return false; } return true; });
       lines.forEach(function(l,idx){
         var head=/^(#{1,4}\s|>\s|\[note)/i.test(l)||(l.length<=70&&!/[.!?;:,]$/.test(l)&&(idx===0||/[.!?:"”]$/.test(lines[idx-1]))&&lines.length>1&&idx<lines.length-1&&/^[\p{Lu}\d]/u.test(l)&&l.split(' ').length<=10);
         if(head&&idx===0){ paras.push(l); return; }
         buf.push(l);
       });
       if(buf.length) paras.push(buf.join(' ').replace(/(\w)- (\w)/g,'$1$2'));
+      if(viM&&paras.length) viOf[paras.length-1]=viM;
     });
-  } else paras=t.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  } else t.split('\n').map(function(s){ return s.trim(); }).filter(Boolean).forEach(function(l){ var m=VI_RE.exec(l); if(m){ if(paras.length) viOf[paras.length-1]=m[1].trim(); } else paras.push(l); });
   var out=[], prev=null, tagged=hasTags(t);
   paras.forEach(function(p,i){
     var g=guess(p,i,prev,detect&&!tagged); prev=g.style;
     if(g.style==='note'){ out.push({style:'note',html:esc(g.text),text:g.text}); return; }
-    var h=parseInline(g.text); out.push({style:g.style,html:h,text:plainOf(h)});
+    var h=parseInline(g.text), ob={style:g.style,html:h,text:plainOf(h)}; if(viOf[i]&&g.style==='normal') ob.vi=viOf[i]; out.push(ob);
   });
   return out;
 }
@@ -5272,8 +5314,8 @@ function renderImp(){
   var list=$('#imp-list');
   $('#imp-count').textContent=impBlocks.length;
   if(!impBlocks.length){ list.innerHTML='<div class="ip-empty">Văn bản sẽ hiện ở đây sau khi bạn dán hoặc chọn tệp.</div>'; return; }
-  var nEl=Object.keys(impEls).length, nNb=impBlocks.filter(function(b){ return b.style==='note'; }).length, nHl=impBlocks.reduce(function(s,b){ return s+(b.html.split('class="hl"').length-1); },0);
-  var head=impLesson?'<div class="ip-info"><b>File xuất từ Studio</b> · nạp nguyên bài “'+esc(impLesson.title||'')+'”, giữ mã màu, kiểu chữ, câu hỏi và ô ghi chú.</div>':((nHl||nEl||nNb)?'<div class="ip-info">Đã nhận <b>'+nHl+'</b> cụm tô màu, <b>'+nEl+'</b> câu hỏi elicit, <b>'+nNb+'</b> ô ghi chú.</div>':'');
+  var nEl=Object.keys(impEls).length, nNb=impBlocks.filter(function(b){ return b.style==='note'; }).length, nHl=impBlocks.reduce(function(s,b){ return s+(b.html.split('class="hl"').length-1); },0), nVi=impBlocks.filter(function(b){ return b.vi; }).length;
+  var head=impLesson?'<div class="ip-info"><b>File xuất từ Studio</b> · nạp nguyên bài “'+esc(impLesson.title||'')+'”, giữ mã màu, kiểu chữ, câu hỏi và ô ghi chú.</div>':((nHl||nEl||nNb||nVi)?'<div class="ip-info">Đã nhận <b>'+nHl+'</b> cụm tô màu, <b>'+nEl+'</b> câu hỏi elicit, <b>'+nNb+'</b> ô ghi chú'+(nVi?', <b>'+nVi+'</b> đoạn có bản dịch tiếng Việt':'')+'.</div>':'');
   var cols=Object.keys(impMap);
   if(cols.length&&!impLesson){
     var opts=function(sel){ return '<option value=""'+(!sel?' selected':'')+'>Không tô nền</option>'+L.codes.map(function(c){ return '<option value="'+esc(c.id)+'"'+(sel===c.id?' selected':'')+'>Tô nền: '+esc(c.label)+'</option>'; }).join(''); };
@@ -5284,7 +5326,7 @@ function renderImp(){
   }
   list.innerHTML=head+impBlocks.slice(0,300).map(function(b,i){
     if(b.style==='note') return '<div class="ip-row"><span class="ip-tag ip-note">Take note</span><div class="ip-txt ip-nb">'+b.html+'</div></div>';
-    return '<div class="ip-row"><button type="button" class="ip-tag" data-i="'+i+'" data-s="'+b.style+'" aria-label="Đổi kiểu, hiện là '+PS_NAME[b.style]+'"'+(impLesson?' disabled':'')+'>'+PS_NAME[b.style]+'</button><div class="ip-txt" style="'+inlineStyle(b.style,17)+'">'+b.html+'</div></div>'; }).join('')+(impBlocks.length>300?'<div class="ip-empty">… và '+(impBlocks.length-300)+' đoạn nữa</div>':'');
+    return '<div class="ip-row"><button type="button" class="ip-tag" data-i="'+i+'" data-s="'+b.style+'" aria-label="Đổi kiểu, hiện là '+PS_NAME[b.style]+'"'+(impLesson?' disabled':'')+'>'+PS_NAME[b.style]+'</button><div class="ip-txt" style="'+inlineStyle(b.style,17)+'">'+b.html+(b.vi?'<div class="ip-vi"><b>VI</b>'+esc(b.vi)+'</div>':'')+'</div></div>'; }).join('')+(impBlocks.length>300?'<div class="ip-empty">… và '+(impBlocks.length-300)+' đoạn nữa</div>':'');
 }
 $('#imp-list').addEventListener('change',function(e){ var s=e.target.closest('[data-map]'), k=e.target.closest('[data-keep]'); if(s) impMap[s.getAttribute('data-map')].hl=s.value||null; else if(k) impMap[k.getAttribute('data-keep')].tc=k.checked; else return; applyMap(); renderImp(); });
 $('#imp-list').addEventListener('click',function(e){ var t=e.target.closest('button.ip-tag'); if(!t||impLesson) return; var b=impBlocks[+t.getAttribute('data-i')]; b.style=CYCLE[(CYCLE.indexOf(b.style)+1)%CYCLE.length]; renderImp(); });
@@ -5458,7 +5500,7 @@ function applyMap(){
 function blocksHtml(bl){
   return bl.map(function(b){
     if(b.style==='note'){ var nid=uid('n'); L.notes[nid]={prompt:b.text}; return '<div class="nb" contenteditable="false" data-nb="'+nid+'"><span class="nb-tag">Take note</span><span class="nb-p">'+esc(b.text)+'</span></div>'; }
-    var m=RD.STYLE_META[b.style]||RD.STYLE_META.normal; return '<'+m.tag+(m.cls?' class="'+m.cls+'"':'')+'>'+b.html+'</'+m.tag+'>';
+    var m=RD.STYLE_META[b.style]||RD.STYLE_META.normal; return '<'+m.tag+(m.cls?' class="'+m.cls+'"':'')+(b.vi?' data-vi="'+esc(b.vi)+'"':'')+'>'+b.html+'</'+m.tag+'>';
   }).join('');
 }
 /* Prompt for AI */
@@ -5559,6 +5601,7 @@ function cleanHTML(){
   c.querySelectorAll('.tc').forEach(function(e){ var v=e.getAttribute('data-tc'); if(/^#[0-9a-f]{6}$/i.test(v||'')) e.setAttribute('style','color:'+v); else unwrap(e); });
   c.querySelectorAll('font,span:not([class])').forEach(unwrap);
   c.querySelectorAll('mark.hl').forEach(function(m){ if(!m.textContent) m.remove(); });
+  var pvVi=''; Array.prototype.forEach.call(c.children,function(e){ var v=e.getAttribute&&e.getAttribute('data-vi'); if(v){ if(v===pvVi||!e.textContent.trim()) e.removeAttribute('data-vi'); pvVi=v; } else pvVi=''; });
   RD.normalize(c);
   return c.innerHTML;
 }
