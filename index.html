@@ -1224,6 +1224,7 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-lk-hw{font:700 22px/1.15 var(--lk-head);letter-spacing:.005em;overflow-wrap:anywhere}
 [data-th="notebook"] .rd-lk-hw,[data-th="constellation"] .rd-lk-hw{font-weight:400;font-size:27px}
 .rd-lk-pos{font:600 10.5px/1 var(--rd-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--lk-acc);border:1px solid color-mix(in srgb,var(--lk-acc) 55%,transparent);padding:3px 6px;border-radius:5px}
+.rd-lk-lvl{font:700 10.5px/1 var(--rd-ui);letter-spacing:.04em;padding:3px 7px;border-radius:5px;background:var(--lk-acc);color:var(--lk-bg)}
 .rd-lk-ib{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1px solid var(--lk-line);background:transparent;color:var(--lk-ink);cursor:pointer;padding:0;flex:none}
 .rd-lk-ib:hover{background:var(--lk-soft)}.rd-lk-ib[data-lk=x]{border:0}
 .rd-lk-ib svg,.rd-lk-sp svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -2436,7 +2437,7 @@ RD.mount = function(root, lesson, init, opts){
   })();
   /* ---------- Tra từ khi bấm vào một từ: từ điển mở + dịch miễn phí, không dùng AI ---------- */
   (function(){
-    var DK='rd:dict:v2', FK='rd:fav:v1', mem={}, fav={}, pop=null, cur=null, rafL=0, seq=0;
+    var DK='rd:dict:v4', FK='rd:fav:v1', mem={}, fav={}, pop=null, cur=null, rafL=0, seq=0;
     try{ mem=JSON.parse(localStorage.getItem(DK))||{}; }catch(_){ mem={}; }
     try{ fav=JSON.parse(localStorage.getItem(FK))||{}; }catch(_){ fav={}; }
     function saveMem(){ try{ var ks=Object.keys(mem); if(ks.length>300) ks.slice(0,ks.length-300).forEach(function(k){ delete mem[k]; }); localStorage.setItem(DK,JSON.stringify(mem)); }catch(_){} }
@@ -2459,6 +2460,7 @@ RD.mount = function(root, lesson, init, opts){
     }
     function cands(w){
       var c=[w]; function add(s){ if(s&&s.length>=2&&c.indexOf(s)<0) c.push(s); }
+      if(w.indexOf('-')>0){ add(w.replace(/-/g,'')); w=w.replace(/-/g,''); }
       if(/ies$/.test(w)&&w.length>4) add(w.slice(0,-3)+'y');
       if(/(ches|shes|sses|xes|zes)$/.test(w)) add(w.slice(0,-2));
       if(/s$/.test(w)&&!/ss$/.test(w)) add(w.slice(0,-1));
@@ -2481,6 +2483,25 @@ RD.mount = function(root, lesson, init, opts){
         (m.synonyms||[]).concat(((m.definitions||[])[0]||{}).synonyms||[]).forEach(function(s){ if(syn.length<6&&syn.indexOf(s)<0) syn.push(s); }); }); });
       return {head:e.word,ipa:ipa,means:means,syn:syn};
     }
+    var POSN={n:'noun',v:'verb',adj:'adjective',adv:'adverb'};
+    function fetchDm(list,i){ i=i||0; if(i>=list.length) return Promise.resolve(null);
+      return getJ('https://api.datamuse.com/words?sp='+encodeURIComponent(list[i])+'&md=dpr&ipa=1&max=1').then(function(a){
+        var it=a&&a[0]; if(!it||String(it.word).toLowerCase()!==list[i]||!(it.defs&&it.defs.length)) return fetchDm(list,i+1);
+        var means=[], seen={}; it.defs.forEach(function(x){ var p=String(x).split('\t'), pos=POSN[p[0]]||'', def=p[1]||p[0]; if(means.length<3&&!seen[pos]){ seen[pos]=1; means.push({pos:pos||'word',def:def,ex:''}); } });
+        var ipa=[]; (it.tags||[]).forEach(function(t){ var m=/^ipa_pron:(.+)$/.exec(t); if(m&&!ipa.length) ipa.push({k:'US',t:'/'+m[1]+'/',a:''}); });
+        return getJ('https://api.datamuse.com/words?rel_syn='+encodeURIComponent(it.word)+'&max=6').then(function(sy){ return (sy||[]).map(function(z){ return z.word; }); },function(){ return []; }).then(function(syn){ return {head:it.word,ipa:ipa,means:means,syn:syn}; });
+      }); }
+    var SUF=['ational','ations','ation','itions','ition','ments','ment','nesses','ness','ities','ity','ings','ing','ously','ous','ively','ive','ably','able','ibly','ible','ally','ical','ials','ial','als','al','ized','izes','ize','ised','ise','ers','er','ors','or','ies','ied','ed','es','s','ly','y','e'].sort(function(a,b){ return b.length-a.length; });
+    function stemOf(w){ for(var i=0;i<SUF.length;i++){ var x=SUF[i]; if(w.length-x.length>=4&&w.slice(-x.length)===x) return w.slice(0,-x.length); } return w; }
+    function band(f){ return f==null?'':f>=40?'Phổ biến':f>=10?'Khá phổ biến':f>=2?'Ít gặp':'Hiếm'; }
+    /* từ cùng họ + độ phổ biến: một lượt hỏi Datamuse theo gốc từ, không dùng AI */
+    function fetchFam(head){
+      var h=String(head||'').toLowerCase(); if(h.length<4||!/^[a-z]+$/.test(h)) return Promise.resolve({fam:[],freq:null});
+      return getJ('https://api.datamuse.com/words?sp='+encodeURIComponent(stemOf(h))+'*&md=pf&max=60').then(function(a){
+        var m={}; (a||[]).forEach(function(it){ var w=String(it.word||'').toLowerCase(); if(!/^[a-z]+$/.test(w)) return; var pos='', f=null; (it.tags||[]).forEach(function(t){ if(!pos&&/^(n|v|adj|adv)$/.test(t)) pos=t; var mm=/^f:([\d.]+)/.exec(t); if(mm) f=parseFloat(mm[1]); }); m[w]={pos:pos,f:f}; });
+        function infl(w){ if(!/(s|d|ing)$/.test(w)) return false; var bs=[w.slice(0,-1),w.slice(0,-2),w.slice(0,-3),w.slice(0,-3)+'e']; if(/ies$/.test(w)) bs.push(w.slice(0,-3)+'y'); return bs.some(function(b){ return b.length>=3&&(b===h||m[b]); }); }
+        var fam=Object.keys(m).filter(function(w){ return w!==h&&m[w].pos&&!infl(w); }).sort(function(x,y){ return (m[y].f||0)-(m[x].f||0); }).slice(0,6).map(function(w){ return {w:w,pos:m[w].pos}; });
+        return {fam:fam,freq:m[h]?m[h].f:null}; }); }
     function fetchDict(list,i){ i=i||0; if(i>=list.length) return Promise.resolve(null); return getJ('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(list[i])).then(parseDict,function(e){ if(e&&e.status===404) return null; throw e; }).then(function(r){ return r||fetchDict(list,i+1); }); }
     function fetchVn(w){ return getJ('https://api.mymemory.translated.net/get?langpair=en%7Cvi&q='+encodeURIComponent(w)).then(function(j){
       if(!j||+j.responseStatus!==200) return []; var out=[], seen={}; function put(s){ s=String(s||'').trim(); var l=s.toLowerCase(); if(!s||l===w||/MYMEMORY|\bhttp/i.test(s)||seen[l]||out.length>=3) return; seen[l]=1; out.push(s); }
@@ -2488,11 +2509,12 @@ RD.mount = function(root, lesson, init, opts){
       if(!out.length&&j.responseData) put(j.responseData.translatedText); return out; }); }
     function lookup(key){
       if(mem[key]&&mem[key].ok) return Promise.resolve(mem[key]);
-      var d=fetchDict(cands(key)).catch(function(){ return undefined; }), v=fetchVn(key).catch(function(){ return undefined; });
+      var d=fetchDict(cands(key)).catch(function(){ return undefined; }).then(function(r){ if(r) return r; return fetchDm(cands(key)).then(function(x){ return x||r; },function(){ return r; }); }), v=fetchVn(key).catch(function(){ return undefined; });
       return Promise.all([d,v]).then(function(a){ var dd=a[0], vv=a[1];
         if(dd===undefined&&vv===undefined) throw new Error('net');
-        var res={ok:1,key:key,head:(dd&&dd.head)||key,ipa:(dd&&dd.ipa)||[],means:(dd&&dd.means)||[],syn:(dd&&dd.syn)||[],vn:vv||[]};
-        if(dd||(vv&&vv.length)){ mem[key]=res; saveMem(); } return res; });
+        var res={ok:1,key:key,head:(dd&&dd.head)||key,ipa:(dd&&dd.ipa)||[],means:(dd&&dd.means)||[],syn:(dd&&dd.syn)||[],vn:vv||[],partial:dd===undefined,fam:[],band:''};
+        return (dd?fetchFam(res.head).then(function(f){ res.fam=f.fam; res.band=band(f.freq); return 1; },function(){ return 0; }):Promise.resolve(1)).then(function(okF){
+          if(!res.partial&&okF&&(dd||(vv&&vv.length))){ mem[key]=res; saveMem(); } return res; }); });
     }
     /* phát âm: giọng đọc của thiết bị trước, file âm thanh của từ điển nếu không có */
     function pickVoice(lang){ var SSx=window.speechSynthesis; if(!SSx||!SSx.getVoices) return null; var vs=(SSx.getVoices()||[]).filter(function(v){ return String(v.lang||'').replace('_','-').toLowerCase()===lang.toLowerCase(); });
@@ -2508,18 +2530,22 @@ RD.mount = function(root, lesson, init, opts){
       var spk='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
       var heart='<button type="button" class="rd-lk-ib heart" data-lk="fav" aria-pressed="'+(!!fav[c.key])+'" aria-label="Lưu từ này"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.2-9A5.3 5.3 0 0 1 12 6.6 5.3 5.3 0 0 1 21.2 12c-2.2 4.4-9.2 9-9.2 9z"/></svg></button>';
       var x='<button type="button" class="rd-lk-ib" data-lk="x" aria-label="Đóng"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>';
-      var h='<div class="rd-lk-row"><span class="rd-lk-hw">'+esc(cur.raw)+'</span>'+(st.data&&st.data.means.slice(0,2).map(function(m){ return '<span class="rd-lk-pos">'+esc(m.pos)+'</span>'; }).join(''))+'<span class="rd-lk-fill"></span>'+(st.data?heart:'')+x+'</div>';
+      var h='<div class="rd-lk-row"><span class="rd-lk-hw">'+esc(cur.raw)+'</span>'+(st.data&&st.data.means.slice(0,2).map(function(m){ return '<span class="rd-lk-pos">'+esc(m.pos)+'</span>'; }).join(''))+(st.data&&st.data.band?'<span class="rd-lk-lvl" title="Độ phổ biến ước tính từ kho văn bản tiếng Anh, không phải bậc CEFR">'+esc(st.data.band)+'</span>':'')+'<span class="rd-lk-fill"></span>'+(st.data?heart:'')+x+'</div>';
       if(st.loading) return h+'<p class="rd-lk-load"><i></i><i></i><i></i> Đang tra từ…</p>';
       if(st.err) return h+'<p class="rd-lk-en">Chưa tra được từ này. Kiểm tra mạng rồi thử lại.</p><div class="rd-lk-row"><button type="button" class="rd-lk-sp" data-lk="say" data-lang="en-US">'+spk+'Nghe từ</button><button type="button" class="rd-lk-sp" data-lk="retry">Thử lại</button></div>';
       var d=st.data, o=h;
       if(d.head.toLowerCase()!==cur.key) o+='<div class="rd-lk-src">từ gốc: <b>'+esc(d.head)+'</b></div>';
       var ip=d.ipa.length?d.ipa:[{k:'US',t:'',a:''},{k:'UK',t:'',a:''}];
+      var noIpa=!d.ipa.some(function(p){ return p.t; });
       o+='<div class="rd-lk-row">'+ip.map(function(p){ return '<button type="button" class="rd-lk-sp" data-lk="say" data-lang="'+(p.k==='UK'?'en-GB':'en-US')+'" data-audio="'+esc(p.a)+'" aria-label="Nghe giọng '+(p.k==='UK'?'Anh':'Mỹ')+'">'+spk+p.k+(p.t?' <span class="rd-lk-ipa">'+esc(p.t)+'</span>':'')+'</button>'; }).join('')+'</div>';
+      if(noIpa) o+='<span class="rd-lk-src">Chưa có phiên âm IPA cho từ này. Bấm nút để nghe.</span>';
       if(d.vn.length) o+='<div class="rd-lk-vn">'+esc(d.vn[0])+(d.vn.length>1?'<small>'+esc(d.vn.slice(1).join(' · '))+'</small>':'')+'</div>';
       d.means.slice(0,2).forEach(function(m){ o+='<div class="rd-lk-m"><span class="rd-lk-lab">'+esc(m.pos)+'</span><div class="rd-lk-en">'+esc(m.def)+'</div>'+(m.ex?'<p class="rd-lk-ex">'+esc(m.ex)+'</p>':'')+'</div>'; });
-      if(!d.means.length&&!d.vn.length) o+='<p class="rd-lk-en">Từ điển chưa có từ này.</p>';
+      if(!d.means.length&&!d.vn.length&&!d.partial) o+='<p class="rd-lk-en">Từ điển chưa có từ này.</p>';
       if(d.syn.length) o+='<div class="rd-lk-m"><span class="rd-lk-lab">Đồng nghĩa</span><div class="rd-lk-chips">'+chips(d.syn)+'</div></div>';
-      o+='<span class="rd-lk-src">Từ điển mở. Nghĩa Việt là bản dịch tự động, có thể chưa sát nghĩa trong bài.</span>';
+      if(d.fam&&d.fam.length) o+='<div class="rd-lk-m"><span class="rd-lk-lab">Từ cùng họ</span><div class="rd-lk-chips">'+d.fam.map(function(x){ return '<span class="rd-lk-chip">'+esc(x.w)+' ('+esc(x.pos)+')</span>'; }).join('')+'</div></div>';
+      if(d.partial) o+='<div class="rd-lk-row"><span class="rd-lk-en">Chưa tải được định nghĩa.</span><button type="button" class="rd-lk-sp" data-lk="retry">Tải lại</button></div>';
+      o+='<span class="rd-lk-src">Từ điển mở. Nghĩa Việt là bản dịch tự động, có thể chưa sát nghĩa trong bài. Độ phổ biến là ước tính, không phải bậc CEFR.</span>';
       return o;
     }
     function place(){
