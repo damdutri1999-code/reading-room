@@ -4552,7 +4552,7 @@ RR.init=function(opts){
   main.addEventListener('input',function(e){ if(e.target.hasAttribute('data-q')){ libQ=e.target.value; renderLib(); } });
   var onMove=function(e){ html.style.setProperty('--mx',e.clientX+'px'); html.style.setProperty('--my',e.clientY+'px'); };
   document.addEventListener('pointermove',onMove,{passive:true});
-  var ctl={ go:go, toast:toast, view:function(){ return view; }, refresh:function(){ render(); }, open:function(id){ var L=lessons().filter(function(x){ return x.id===id; })[0]; if(L){ current=L; go('read'); } }, theme:function(){ return th; }, show:function(v){ root.hidden=false; go(v||'home'); }, hide:function(){ if(reader){ try{ reader.destroy(); }catch(e){} reader=null; } root.hidden=true; if(opts.mode==='studio') pushNav('#/edit'); } };
+  var ctl={ qr:function(u,t,k){ qrOpen(u,t,k); }, go:go, toast:toast, view:function(){ return view; }, refresh:function(){ render(); }, open:function(id){ var L=lessons().filter(function(x){ return x.id===id; })[0]; if(L){ current=L; go('read'); } }, theme:function(){ return th; }, show:function(v){ root.hidden=false; go(v||'home'); }, hide:function(){ if(reader){ try{ reader.destroy(); }catch(e){} reader=null; } root.hidden=true; if(opts.mode==='studio') pushNav('#/edit'); } };
   RR.checkHand();
   if(opts.mode!=='studio'){ var p0=parseHash(location.hash); if(p0){ view=p0.v; if(p0.L) current=p0.L; if(p0.v==='lib'&&p0.F) libF=p0.F; } pushNav(null,true); }
   render();
@@ -6770,6 +6770,7 @@ var DVI={
   link:'<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   keyboard:'<rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>',
+  qr:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20h1"/>',
   upfolder:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v3"/>',
   cut:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',
   paste:'<path d="M8 4h8v3H8z"/><path d="M16 5h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/>'
@@ -6798,6 +6799,7 @@ function dvTop(){
   var sortLbl={name:'Tên',mod:'Sửa đổi',kind:'Trạng thái'}[DV.sort];
   el.innerHTML=crumbs+'<div class="dv-tools">'+
     '<label class="dv-search">'+svg('search')+'<input data-dvq placeholder="Tìm trong Quản lý bài  ( / )" value="'+esc(DV.q)+'" aria-label="Tìm"></label>'+
+    (DV.sec==='my'&&DV.cur&&!DV.q&&underChung(DV.cur)?'<button type="button" class="dv-ib" data-dva="fsharecur" title="Chia sẻ thư mục này (copy link)" aria-label="Chia sẻ thư mục này">'+dvIc('link')+'</button><button type="button" class="dv-ib" data-dva="fqrcur" title="Mã QR của thư mục này" aria-label="Mã QR của thư mục này">'+dvIc('qr')+'</button>':'')+
     (DV.sec==='my'&&DV.cur&&!DV.q?'<button type="button" class="dv-ib" data-dva="up" title="Lên thư mục cha (Alt + ↑)" aria-label="Lên thư mục cha">'+dvIc('upfolder')+'</button>':'')+
     '<button type="button" class="dv-ib dv-sortb" data-dva="sortmenu" title="Sắp xếp">'+svg('up')+'<span>'+sortLbl+' '+(DV.dir>0?'↑':'↓')+'</span></button>'+
     '<span class="dv-seg" role="group" aria-label="Kiểu xem"><button type="button" class="dv-ib'+(DV.view==='grid'?' on':'')+'" data-dva="vgrid" title="Dạng lưới" aria-pressed="'+(DV.view==='grid')+'">'+dvIc('grid')+'</button><button type="button" class="dv-ib'+(DV.view==='list'?' on':'')+'" data-dva="vlist" title="Dạng danh sách" aria-pressed="'+(DV.view==='list')+'">'+dvIc('rows')+'</button></span>'+
@@ -6856,7 +6858,7 @@ function dvSelUI(){
     if(n){ var tr=DV.sec==='trash';
       bar.innerHTML='<button type="button" class="dv-ib" data-dva="clear" aria-label="Bỏ chọn" title="Bỏ chọn (Esc)">'+svg('x')+'</button><b>Đã chọn '+n+' mục</b><span class="sp"></span>'+
        (tr?'<button type="button" class="dv-act" data-dva="restore">'+dvIc('restore')+'Khôi phục</button><button type="button" class="dv-act danger" data-dva="delforever">'+svg('trash')+'Xóa vĩnh viễn</button>':
-       (n===1?'<button type="button" class="dv-act" data-dva="open">'+svg('pen')+'Mở</button>':'')+'<button type="button" class="dv-act" data-dva="moveto">'+dvIc('move')+'Di chuyển</button><button type="button" class="dv-act" data-dva="dup">'+svg('copy')+'Tạo bản sao</button><button type="button" class="dv-act danger" data-dva="trash">'+svg('trash')+'Thùng rác</button>')+'</div>'; }
+       (n===1?'<button type="button" class="dv-act" data-dva="open">'+svg('pen')+'Mở</button>':'')+(n===1&&dvSelItems()[0]&&dvSelItems()[0].k==='f'?'<button type="button" class="dv-act" data-dva="fshare">'+dvIc('link')+'Chia sẻ</button>':'')+'<button type="button" class="dv-act" data-dva="moveto">'+dvIc('move')+'Di chuyển</button><button type="button" class="dv-act" data-dva="dup">'+svg('copy')+'Tạo bản sao</button><button type="button" class="dv-act danger" data-dva="trash">'+svg('trash')+'Thùng rác</button>')+'</div>'; }
   }
   dvInfo();
 }
@@ -6994,6 +6996,14 @@ function dvShareLink(it){
   if(!x.done||!x.shared){ dvSnack('Hãy hoàn tất bài và bật “Kho chung” trước khi chia sẻ.'); return; }
   var url=khoLink('chung')+'#/read/'+encodeURIComponent(x.id); RD.copy(url).then(function(ok){ dvSnack(ok?'Đã copy link bài đọc':'Hãy chép link: '+url); });
 }
+function dvShareFolder(it,mode){
+  if(!it||it.k!=='f') return;
+  if(!underChung(it.id)){ dvSnack('Thư mục này không nằm trong Kho chung nên học viên chưa xem được. Hãy chuyển nó vào Kho chung trước.'); return; }
+  var base=khoLink('chung'); if(!base){ dvSnack('Chưa có link Kho chung. Hãy bật đồng bộ kho trước.'); return; }
+  var url=it.id===CH?base+'#/lib':base+'#/lib/'+encodeURIComponent(it.id), nm=it.id===CH?'Kho chung':(it.name||'Thư mục');
+  if(mode==='fqr'){ if(rrCtl&&rrCtl.qr) rrCtl.qr(url,nm,'f'); else dvSnack('Hãy chép link: '+url); return; }
+  RD.copy(url).then(function(ok){ dvSnack(ok?'Đã copy link thư mục “'+nm+'”':'Hãy chép link: '+url); });
+}
 function dvDownload(it){ var x=cleanLessonOf(it.o===L?L:it.o), n=RD.slug(x.title)+'.html'; Promise.resolve(RD.download(RD.buildDoc(x,{}),n)).then(function(res){ dvSnack(res==='declined'?'Đã hủy lưu file':'Đã tải “'+n+'”'); }); }
 function dvCopyClip(items,mode){ DV.clip={keys:items.map(function(it){ return dvKey(it.k,it.id); }),mode:mode}; dvSnack(mode==='cut'?'Đã cắt '+items.length+' mục. Mở thư mục đích rồi bấm Ctrl + V.':'Đã sao chép '+items.length+' mục. Mở thư mục đích rồi bấm Ctrl + V.'); }
 function dvPaste(){
@@ -7118,6 +7128,7 @@ function dvCtxItems(sel){
     else L1.push({a:'finish',t:'Hoàn tất (lưu lên Supabase)',ic:'check'});
     if(l1) { L1.push({a:'share',t:'Copy link bài đọc',ic:'link',dis:!(l1.done&&l1.shared)}); L1.push({a:'dl',t:'Tải xuống (.html)',ic:'download'}); }
   }
+  if(one&&sel[0].k==='f'){ var fok=underChung(sel[0].id); L1.push('-'); L1.push({a:'fshare',t:'Copy link thư mục',ic:'link',dis:!fok}); L1.push({a:'fqr',t:'Hiện mã QR thư mục',ic:'link',dis:!fok}); }
   L1.push('-'); L1.push({a:'info',t:'Chi tiết',ic:'info',k:'Alt + Enter'}); if(!sel.some(function(i){ return i.k==='f'&&i.o.system; })) L1.push({a:'trash',t:'Chuyển vào thùng rác',ic:'trash',danger:true,k:'Delete'});
   return L1;
 }
@@ -7149,6 +7160,7 @@ function dvDo(a,sel){
     case 'finish': dvFinish(s,false); break;
     case 'undone': dvFinish(s,true); break;
     case 'share': dvShareLink(s[0]); break;
+    case 'fshare': case 'fqr': if(s.length===1) dvShareFolder(s[0],a==='fqr'?'fqr':'f'); break;
     case 'dl': if(s[0]&&s[0].k==='l') dvDownload(s[0]); break;
     case 'info': DV.info=!DV.info; dvTop(); dvInfo(); break;
     case 'trash': s=s.filter(function(i){ return !(i.k==='f'&&i.o.system); }); if(s.length) dvTrash(s); else dvSnack('Thư mục KHO TÀI LIỆU CHUNG là thư mục mặc định, không xoá được.'); break;
@@ -7161,6 +7173,8 @@ function dvDo(a,sel){
     case 'selectall': var ks=dvAll().map(function(i){ return dvKey(i.k,i.id); }); dvSetSel(ks,ks[0]||null); break;
     case 'vgrid': case 'vlist': DV.view=a==='vgrid'?'grid':'list'; try{ localStorage.setItem('rls:dv:view',DV.view); }catch(e){} dvTop(); dvArea(); break;
     case 'dir': DV.dir=-DV.dir; dvTop(); dvArea(); break;
+    case 'fsharecur': dvShareFolder(dvGet('f:'+DV.cur),'f'); break;
+    case 'fqrcur': dvShareFolder(dvGet('f:'+DV.cur),'fqr'); break;
     case 'up': var p=folderPath(DV.cur); if(DV.sec==='my'&&p.length) dvGo('my',p.length>1?p[p.length-2].id:''); break;
     case 'clear': dvSetSel([],null); break;
     case 'help': dvHelp(); break;
