@@ -786,7 +786,10 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .dv-b{font:600 10.5px/1 var(--rr-ui);font-style:normal;padding:4px 7px;border-radius:999px;background:color-mix(in srgb,var(--rr-fg) 10%,transparent)}
 .dv-b.b1{background:color-mix(in srgb,#2e9e5b 25%,transparent)}.dv-b.b2{background:color-mix(in srgb,#3b82f6 25%,transparent)}.dv-b.b0{background:color-mix(in srgb,#f59e0b 25%,transparent)}
 .dv-ren{width:100%;font:inherit;color:var(--rr-fg);background:var(--rr-bg);border:2px solid var(--rr-accent);border-radius:6px;padding:3px 6px;outline:0}
-.dv-lh,.dv-row{display:grid;grid-template-columns:minmax(0,1fr) 100px 110px 70px 120px 100px;gap:10px;align-items:center;padding:0 12px}
+.dv-lh,.dv-row{display:grid;grid-template-columns:minmax(0,1fr) 100px 110px 70px 120px 100px 70px 72px 72px;gap:10px;align-items:center;padding:0 12px}
+.dv-c6{font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums}
+.dv-lh .dv-c6{text-align:right}
+@media (max-width:1000px){.dv-c6{display:none}.dv-lh,.dv-row{grid-template-columns:minmax(0,1fr) 100px 110px 70px 120px 100px}}
 .dv-lh{font:600 12px var(--rr-ui);opacity:.65;height:32px;border-bottom:1px solid var(--rr-line)}
 .dv-row{height:46px;border-radius:8px;border:1px solid transparent;font:13.5px var(--rr-ui);cursor:default;user-select:none}
 .dv-row:hover{background:color-mix(in srgb,var(--rr-fg) 5%,transparent)}
@@ -6849,11 +6852,11 @@ function dvArea(){
     var msg=DV.q?'Không tìm thấy mục nào khớp.':DV.sec==='trash'?'Thùng rác trống.':DV.sec==='starred'?'Chưa có mục nào gắn dấu sao. Bấm chuột phải vào một bài hoặc thư mục để gắn.':DV.sec==='loose'?'Không còn bài nào chưa phân. Bài hoàn tất mới sẽ hiện ở đây cho tới khi thầy xếp vào thư mục.':DV.sec==='recent'?'Chưa có bài nào.':'Thư mục này trống. Bấm chuột phải để tạo thư mục hoặc bài mới.';
     h='<div class="dv-empty">'+dvIc(DV.sec==='trash'?'trash':'folder')+'<p>'+msg+'</p></div>';
   } else if(list){
-    h='<div class="dv-lh" aria-hidden="true"><span>Tên</span><span>Chủ sở hữu</span><span>'+(DV.sec==='trash'?'Vị trí cũ':'Sửa đổi')+'</span><span>Level</span><span>Chủ đề</span><span>Trạng thái</span></div><div class="dv-list" role="listbox" aria-multiselectable="true">';
+    h='<div class="dv-lh" aria-hidden="true"><span>Tên</span><span>Chủ sở hữu</span><span>'+(DV.sec==='trash'?'Vị trí cũ':'Sửa đổi')+'</span><span>Level</span><span>Chủ đề</span><span>Trạng thái</span><span class="dv-c6" title="Số lượt mở bài">Lượt đọc</span><span class="dv-c6" title="Thời lượng đọc trung bình mỗi lượt">TB/lượt</span><span class="dv-c6" title="Tổng thời lượng đọc">Tổng</span></div><div class="dv-list" role="listbox" aria-multiselectable="true">';
     items.forEach(function(it){ var key=dvKey(it.k,it.id), s=DV.sel.indexOf(key)>=0;
       h+='<div class="dv-it dv-row'+(s?' sel':'')+'" role="option" aria-selected="'+s+'" data-dvk="'+key+'" draggable="'+(DV.sec==='trash'||DV.ren===key?'false':'true')+'"'+(it.k==='f'&&DV.sec!=='trash'?' data-dvdrop="'+esc(it.id)+'"':'')+'>'+
         '<span class="dv-c1">'+(it.k==='f'?dvIc('folder','fi'):'<span class="dv-mini">'+RR.thumb(it.o,'width:100%;height:100%')+'</span>')+dvNameHtml(it)+(it.o.starred?dvIc('star','st'):'')+'</span>'+
-        '<span class="dv-c2">'+esc(ownerName())+'</span><span class="dv-c3">'+(DV.sec==='trash'?esc(dvLoc(it)):(it.t?fmtDate(it.t):'–'))+'</span><span class="dv-c5">'+(it.k==='l'&&it.o.level&&DV.sec!=='trash'?'<i class="dv-b b2" title="Level CEFR">'+esc(it.o.level)+'</i>':'')+'</span><span class="dv-c5">'+(it.k==='l'&&it.o.topic&&DV.sec!=='trash'?'<i class="dv-b bt" title="Topic">'+esc(it.o.topic)+'</i>':'')+'</span><span class="dv-c4">'+dvBadges(it,true)+'</span></div>'; });
+        '<span class="dv-c2">'+esc(ownerName())+'</span><span class="dv-c3">'+(DV.sec==='trash'?esc(dvLoc(it)):(it.t?fmtDate(it.t):'–'))+'</span><span class="dv-c5">'+(it.k==='l'&&it.o.level&&DV.sec!=='trash'?'<i class="dv-b b2" title="Level CEFR">'+esc(it.o.level)+'</i>':'')+'</span><span class="dv-c5">'+(it.k==='l'&&it.o.topic&&DV.sec!=='trash'?'<i class="dv-b bt" title="Topic">'+esc(it.o.topic)+'</i>':'')+'</span><span class="dv-c4">'+dvBadges(it,true)+'</span>'+dvLsCells(it)+'</div>'; });
     h+='</div>';
   } else {
     var fo=items.filter(function(i){ return i.k==='f'; }), fl=items.filter(function(i){ return i.k==='l'; });
@@ -6879,6 +6882,13 @@ function dvSelUI(){
   dvInfo();
 }
 var LSM=null, LSM_AT=0, LSM_BUSY=false, LSM_FAIL=false;
+function dvSec(sec){ sec=Math.max(0,Math.round(sec||0)); var h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), r=sec%60; if(h) return h+'g'+(m?' '+m+'p':''); if(m) return m+'p'+(r&&m<10?' '+r+'s':''); return r+'s'; }
+function dvLsCells(it){
+  if(it.k!=='l'||DV.sec==='trash'||!x0cloud()||LSM_FAIL) return '<span class="dv-c6"></span><span class="dv-c6"></span><span class="dv-c6"></span>';
+  if(!LSM){ lsFetchT(); return '<span class="dv-c6 dv-muted">…</span><span class="dv-c6"></span><span class="dv-c6"></span>'; }
+  var v=LSM[it.id]||{o:0,s:0}; if(!v.o&&!v.s) return '<span class="dv-c6 dv-muted">0</span><span class="dv-c6 dv-muted">–</span><span class="dv-c6 dv-muted">–</span>';
+  return '<span class="dv-c6"><b>'+v.o+'</b></span><span class="dv-c6">'+dvSec(v.o?v.s/v.o:0)+'</span><span class="dv-c6">'+dvSec(v.s)+'</span>';
+}
 function lsRows(id){
   if(!x0cloud()||LSM_FAIL) return '';
   if(!LSM){ lsFetchT(); return '<dt>Lượt đọc</dt><dd class="dv-muted">Đang tải…</dd>'; }
@@ -6888,7 +6898,7 @@ function lsRows(id){
 }
 function x0cloud(){ var c=cl(); return !!(c&&clUrl(c.url)&&c.key); }
 function lsFetchT(){ if(LSM_BUSY||!x0cloud()) return; LSM_BUSY=true;
-  clCall('get_lesson_stats',{}).then(function(j){ LSM_BUSY=false; if(Array.isArray(j)){ LSM={}; j.forEach(function(r){ LSM[r.id]={o:+r.opens||0,s:+r.secs||0}; }); LSM_AT=Date.now(); if(hubTab==='drive'&&DV.info) dvInfo(); } },function(){ LSM_BUSY=false; LSM_FAIL=true; }); }
+  clCall('get_lesson_stats',{}).then(function(j){ LSM_BUSY=false; if(Array.isArray(j)){ LSM={}; j.forEach(function(r){ LSM[r.id]={o:+r.opens||0,s:+r.secs||0}; }); LSM_AT=Date.now(); if(hubTab==='drive'){ if(DV.view==='list') dvArea(); if(DV.info) dvInfo(); } } },function(){ LSM_BUSY=false; LSM_FAIL=true; if(hubTab==='drive'&&DV.view==='list') dvArea(); }); }
 function dvInfo(){
   var el=rrRoot.querySelector('[data-dv-info]'); if(!el) return; el.hidden=!DV.info; if(!DV.info) return;
   var s=dvSelItems(), h='';
