@@ -453,6 +453,32 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .ex-acts{display:flex;flex-wrap:wrap;gap:6px}
 .ex-help{font-size:12.5px;color:var(--muted);line-height:1.55;border:1px dashed var(--line);border-radius:10px;padding:8px 12px}
 .ex-help summary{cursor:pointer;font-weight:600;color:var(--ink)}
+.rv{margin-top:6px;border:1px solid color-mix(in srgb,#6d4aff 30%,var(--line));border-radius:12px;background:var(--surface);padding:0 10px 10px}
+.rv>summary{cursor:pointer;font-weight:700;font-size:13px;padding:10px 0;list-style:none;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.rv>summary::-webkit-details-marker{display:none}
+.rv>summary::before{content:"▸";color:#6d4aff;transition:transform .15s}
+.rv[open]>summary::before{transform:rotate(90deg)}
+.rv-cnt{font-weight:500;font-size:12px;color:var(--muted)}
+.rv-note{margin:0 0 8px;font-size:12px;line-height:1.5;color:var(--muted)}
+.rv-bulk{margin:0 0 10px}
+.rv-q{padding:10px;border-radius:10px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 92%,#6d4aff 8%);margin-bottom:8px}
+.rv-h{display:flex;gap:8px;align-items:flex-start}
+.rv-n{flex:none;min-width:24px;height:24px;border-radius:999px;background:#6d4aff;color:#fff;font:700 12px/24px var(--ui);text-align:center}
+.rv-t{flex:1;font-size:12.5px;line-height:1.45}
+.rv-st{flex:none;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.rv-st.ai{background:#fef3c7;color:#92400e}.rv-st.ok{background:#dcfce7;color:#166534}.rv-st.no{background:#ffe4e6;color:#9f1239}.rv-st.gr{background:rgba(127,127,127,.15);color:var(--muted)}
+.rv-r{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end;margin-top:8px}
+.rv-r label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted);flex:1;min-width:120px}
+.rv-a{height:34px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 10px;font:600 13px var(--ui)}
+.rv-l{display:flex;flex-direction:column;gap:3px;margin-top:8px;font-size:11.5px;color:var(--muted)}
+.rv-e{width:100%;box-sizing:border-box;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:8px 10px;font:13px/1.5 var(--ui);resize:vertical;min-height:54px}
+.rv-loc{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.rv-lc{display:flex;gap:8px;align-items:center;font-size:12px;line-height:1.4;padding:6px 8px;border-radius:8px;border:1px solid var(--line)}
+.rv-lc.ok{border-color:#86efac;background:rgba(34,197,94,.08)}.rv-lc.bad{border-color:#fca5a5;background:rgba(239,68,68,.08)}
+.rv-lc span{flex:1;font-style:italic}.rv-lc em{font-size:11px;color:#b91c1c;font-style:normal;font-weight:600}
+.rv-x{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 4px}
+.rv-add{align-self:flex-start}
+
 .ex-help p{margin:8px 0 0}
 .imp-cat{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:12px;border:1.5px solid color-mix(in srgb,#6d4aff 40%,var(--line));background:color-mix(in srgb,#6d4aff 7%,var(--surface))}
 .modal:not(.as-start) .imp-cat{display:none}
@@ -1211,10 +1237,22 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-vi-all[aria-pressed=true]{background:var(--rd-accent);border-color:var(--rd-accent);color:var(--rd-paper,#fff)}
 
 /* ---- Tra từ: thẻ từ điển nảy ra từ chính từ được bấm (stage = tối xanh, notebook = giấy trắng mực xanh, constellation = xanh đêm vàng) ---- */
-:root{--lk-bg:#1f2547;--lk-ink:#e9ecfb;--lk-mut:#a9b2d6;--lk-acc:#8fa2ff;--lk-line:rgba(255,255,255,.14);--lk-soft:rgba(143,162,255,.16);--lk-sh:0 22px 44px -18px rgba(0,0,0,.65);--lk-head:var(--rd-ui,'Be Vietnam Pro',system-ui,sans-serif);--lk-r:14px;--lk-hl:rgba(143,162,255,.32)}
-[data-th="notebook"]{--lk-bg:#fffef9;--lk-ink:#2a2620;--lk-mut:#6b6254;--lk-acc:#1f3a8a;--lk-line:rgba(31,58,138,.22);--lk-soft:#fff3a8;--lk-sh:0 16px 30px -16px rgba(0,0,0,.45);--lk-head:'Patrick Hand','Be Vietnam Pro',system-ui,sans-serif;--lk-r:4px;--lk-hl:#fff3a8}
-[data-th="constellation"]{--lk-bg:#141a3d;--lk-ink:#eef1fb;--lk-mut:#b6bedf;--lk-acc:#ffe9a8;--lk-line:rgba(255,233,168,.22);--lk-soft:rgba(255,233,168,.14);--lk-sh:0 22px 44px -18px rgba(8,10,40,.8);--lk-head:'Patrick Hand','Be Vietnam Pro',system-ui,sans-serif;--lk-hl:rgba(255,233,168,.45)}
+:root{--lk-bg:#1f2547;--lk-ink:#e9ecfb;--lk-mut:#a9b2d6;--lk-acc:#8fa2ff;--lk-line:rgba(255,255,255,.14);--lk-soft:rgba(143,162,255,.16);--lk-sh:0 22px 44px -18px rgba(0,0,0,.65);--lk-head:var(--rd-ui,'Be Vietnam Pro',system-ui,sans-serif);--lk-r:14px;--lk-hl:rgba(143,162,255,.32);--loc-hl:rgba(255,196,48,.42);--loc-ul:#ffc430}
+[data-th="notebook"]{--lk-bg:#fffef9;--lk-ink:#2a2620;--lk-mut:#6b6254;--lk-acc:#1f3a8a;--lk-line:rgba(31,58,138,.22);--lk-soft:#fff3a8;--lk-sh:0 16px 30px -16px rgba(0,0,0,.45);--lk-head:'Patrick Hand','Be Vietnam Pro',system-ui,sans-serif;--lk-r:4px;--lk-hl:#fff3a8;--loc-hl:#ffe066;--loc-ul:#c98a00}
+[data-th="constellation"]{--lk-bg:#141a3d;--lk-ink:#eef1fb;--lk-mut:#b6bedf;--lk-acc:#ffe9a8;--lk-line:rgba(255,233,168,.22);--lk-soft:rgba(255,233,168,.14);--lk-sh:0 22px 44px -18px rgba(8,10,40,.8);--lk-head:'Patrick Hand','Be Vietnam Pro',system-ui,sans-serif;--lk-hl:rgba(255,233,168,.45);--loc-hl:rgba(255,214,102,.5);--loc-ul:#ffd666}
 ::highlight(rd-look){background-color:var(--lk-hl);color:inherit}
+::highlight(rd-loc){background-color:var(--loc-hl);color:inherit;text-decoration:underline;text-decoration-color:var(--loc-ul);text-decoration-thickness:2px}
+.rd-ex-xr{margin-top:10px}
+.rd-ex-xb{display:inline-flex;align-items:center;gap:7px;border:1.5px dashed var(--ex-line);background:transparent;color:var(--ex-d);font:600 12.5px/1 var(--rd-ui);padding:8px 12px;border-radius:9px;cursor:pointer;transition:background .15s,border-color .15s}
+.rd-ex-xb svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.rd-ex-xb:hover{border-color:var(--ex);background:var(--ex-soft)}
+.rd-ex-xb.on{border-style:solid;border-color:var(--ex);background:var(--ex-soft)}
+.rd-ex-xb.lock{opacity:.55}
+.rd-ex-xp{margin-top:8px;padding:11px 13px;border-radius:10px;background:var(--ex-soft);border-left:4px solid var(--ex);color:var(--ex-ink);font:13.5px/1.62 var(--rd-ui)}
+.rd-ex-xp p{margin:0}
+.rd-ex-loc{margin-top:9px;display:inline-flex;align-items:center;border:0;border-radius:8px;padding:8px 12px;background:var(--ex);color:var(--ex-on);font:600 12.5px/1 var(--rd-ui);cursor:pointer}
+.rd-ex-xp p + .rd-ex-loc{margin-top:10px}
+.rd-ex-loc.on{background:transparent;color:var(--ex-d);box-shadow:inset 0 0 0 1.5px var(--ex)}
 .rd-lk{position:fixed;z-index:1200;width:min(350px,calc(100vw - 16px));background:var(--lk-bg);color:var(--lk-ink);border:1px solid var(--lk-line);border-radius:var(--lk-r);box-shadow:var(--lk-sh);font-family:var(--rd-ui,'Be Vietnam Pro',system-ui,sans-serif);animation:lkPop .3s cubic-bezier(.2,1.35,.4,1) both}
 .rd-lk-in{max-height:min(72vh,560px);overflow:auto;padding:14px 16px 12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain;border-radius:inherit}
 .rd-lk::before{content:"";position:absolute;left:var(--ax,28px);top:-6px;width:11px;height:11px;background:var(--lk-bg);border-left:1px solid var(--lk-line);border-top:1px solid var(--lk-line);transform:rotate(45deg)}
@@ -1704,12 +1742,14 @@ html.rr-fs-on{overflow:hidden}
           <label class="chk"><input type="checkbox" id="ex-check" checked><span>Cho học viên tự chấm<small>Cần có đáp án. Học viên bấm “Chấm bài” sẽ thấy đúng/sai.</small></span></label>
           <textarea id="ex-text" rows="14" spellcheck="false" placeholder="Dán đề vào đây, ví dụ:&#10;&#10;Questions 1-3&#10;Write TRUE, FALSE or NOT GIVEN.&#10;1. Sleeper trains were common. [ĐA: TRUE]&#10;2. Flights are cheaper than trains.&#10;Answer: NOT GIVEN" aria-label="Nội dung đề bài"></textarea>
           <div id="ex-sum" class="ex-sum"></div>
+          <div id="ex-rv"></div>
           <div class="ex-acts"><button type="button" class="btn sm ghost" id="ex-sample"><i data-i="file"></i>Chèn đề mẫu</button><button type="button" class="btn sm ghost" data-prompt-ex><i data-i="sparkle"></i>Nhờ AI chuyển đề</button><button type="button" class="btn sm ghost" data-prompt-task><i data-i="sparkle"></i>Nhờ AI soạn task</button></div>
           <details class="ex-help"><summary>Cách ghi đề</summary>
 <p>Mỗi nhóm bắt đầu bằng dòng <b>Questions 1-5</b>, theo sau là dòng hướng dẫn.</p>
 <p>Câu hỏi viết <b>1.</b> <b>2.</b> … Đáp án: thêm <b>[ĐA: …]</b> cuối câu, hoặc dòng <b>Answer: …</b> ngay dưới câu.</p>
 <p>Trắc nghiệm: các lựa chọn <b>A.</b> <b>B.</b> <b>C.</b> nằm dưới câu. Nối tiêu đề: liệt kê <b>A.</b> <b>B.</b> … trước câu 1.</p>
-<p>Điền từ: dùng <b>____</b> cho chỗ trống. Nhiều đáp án chấp nhận được: ngăn bằng <b>/</b>.</p></details>
+<p>Điền từ: dùng <b>____</b> cho chỗ trống. Nhiều đáp án chấp nhận được: ngăn bằng <b>/</b>.</p>
+<p>Giải thích: thêm dòng <b>Giải thích: …</b> dưới câu (AI soạn thì ghi <b>Giải thích (AI): …</b>), và dòng <b>Vị trí: "đoạn chép nguyên văn từ bài"</b> để học viên bấm xem đáp án nằm ở đâu.</p></details>
         </div>
       </div>
       <div class="ppane" data-p="codes" hidden>
@@ -1997,23 +2037,25 @@ RD.parseExam = function(text){
   // AI hay chèn chữ Cyrillic giống Latin (А, Е, О…), ngoặc/dấu hai chấm full-width: đổi về dạng chuẩn
   var HG={'А':'A','В':'B','Е':'E','К':'K','М':'M','Н':'H','О':'O','Р':'P','С':'C','Т':'T','Х':'X','а':'a','е':'e','о':'o','р':'p','с':'c','х':'x','Ð':'Đ','［':'[','］':']','（':'(','）':')','：':':'};
   text=String(text||'').replace(/[АВЕКМНОРСТХаеорсхÐ［］（）：]/g,function(c){ return HG[c]; }).replace(/[\u200b-\u200d\ufeff]/g,'').replace(/\u00a0/g,' ');
-  var lines=String(text||'').replace(/\r/g,'').split('\n'), groups=[], g=null, it=null;
-  function newG(title,instr){ g={id:'g'+(groups.length+1), title:title||'', instr:instr||'', type:'', opts:[], items:[]}; groups.push(g); it=null; }
+  var lines=String(text||'').replace(/\r/g,'').split('\n'), groups=[], g=null, it=null, cur='';
+  function newG(title,instr){ g={id:'g'+(groups.length+1), title:title||'', instr:instr||'', type:'', opts:[], items:[]}; groups.push(g); it=null; cur=''; }
   lines.forEach(function(raw){
     var t=raw.trim(), m; if(!t) return;
     if((m=t.match(/^(?:questions?|câu(?:\s*hỏi)?)\s*(\d+)\s*(?:[-–—]|to|đến)?\s*(\d+)?\s*[:.·\-–—]?\s*(.*)$/i)) && /^(?:questions?|câu)/i.test(t)){
       newG('Questions '+m[1]+(m[2]?'–'+m[2]:''), m[3]||''); return; }
-    if((m=t.match(/^(\d+)\s*[.)]\s+(.+)$/))){ if(!g) newG('',''); it={n:+m[1], q:m[2], opts:[], ans:''}; g.items.push(it); return; }
-    if((m=t.match(/^(?:answer|ans|đáp án|đa)\s*[:：]\s*(.+)$/i)) && it){ it.ans=m[1].trim(); return; }
-    if((m=t.match(/^\(?([A-Ha-h]|[ivxIVX]{1,4})[.)]\s+(.+)$/))){
-      var o={k:m[1].toUpperCase(), t:m[2]};
+    if((m=t.match(/^(\d+)\s*[.)]\s+(.+)$/))){ if(!g) newG('',''); it={n:+m[1], q:m[2], opts:[], ans:'', exp:'', expAi:false, loc:[]}; cur=''; g.items.push(it); return; }
+    if((m=t.match(/^(?:answer|ans|đáp án|đa)\s*[:：]\s*(.+)$/i)) && it){ it.ans=m[1].trim(); cur=''; return; }
+    if(it && (m=t.match(/^(?:giải\s*thích|giai\s*thich|explanation|explain)\s*(\(\s*ai\s*\))?\s*[:：]\s*(.*)$/i))){ it.exp=m[2].trim(); it.expAi=!!m[1]; cur='exp'; return; }
+    if(it && (m=t.match(/^(?:vị\s*trí|vi\s*tri|location|căn\s*cứ|can\s*cu)\s*[:：]\s*(.+)$/i))){ var lq=m[1].trim().replace(/^["“”„'‘’]+|["“”„'‘’]+$/g,'').trim(); if(lq) it.loc.push(lq); cur=''; return; }
+    if(cur!=='exp' && (m=t.match(/^\(?([A-Ha-h]|[ivxIVX]{1,4})[.)]\s+(.+)$/))){
+      cur=''; var o={k:m[1].toUpperCase(), t:m[2]};
       if(it && !(g&&g.opts.length&&!it.opts.length&&false)) it.opts.push(o); else { if(!g) newG('',''); g.opts.push(o); }
       return; }
     if(!g) newG('',''); 
-    if(it){ if(!it.opts.length) it.q+=' '+t; else it.opts[it.opts.length-1].t+=' '+t; }
+    if(it){ if(cur==='exp') it.exp+=(it.exp?' ':'')+t; else if(!it.opts.length) it.q+=' '+t; else it.opts[it.opts.length-1].t+=' '+t; }
     else g.instr+=(g.instr?' ':'')+t;
   });
-  var n=0, keyed=0;
+  var n=0, keyed=0, expl=0;
   groups.forEach(function(G){
     G.items.forEach(function(I){
       var m=I.q.match(/\s*[\[\(](?:ĐA|DA|ĐÁP ÁN|ans|answer)\s*[:：]\s*([^\]\)]+)[\]\)]\s*$/i); if(m){ I.ans=m[1].trim(); I.q=I.q.slice(0,m.index).trim(); }
@@ -2025,10 +2067,10 @@ RD.parseExam = function(text){
     else if(G.items.some(function(I){ return I.opts.length>1; })) G.type='mc';
     else if(/letter|paragraph/.test(txt)&&(function(){ var rm=/\b([A-Z])\s*(?:[-–—]|to)\s*([A-Z])\b/.exec(G.title+' '+G.instr); if(!rm||rm[2]<=rm[1]) return false; for(var c=rm[1].charCodeAt(0);c<=rm[2].charCodeAt(0);c++) G.opts.push({k:String.fromCharCode(c),t:'Paragraph '+String.fromCharCode(c)}); G.auto=true; return true; })()) G.type='match';
     else G.type='fill';
-    G.items.forEach(function(I){ n++; if(I.ans) keyed++; });
+    G.items.forEach(function(I){ n++; if(I.ans) keyed++; if(I.exp||I.loc.length) expl++; });
   });
   groups=groups.filter(function(G){ return G.items.length; });
-  return groups.length?{groups:groups, count:n, keyed:keyed}:null;
+  return groups.length?{groups:groups, count:n, keyed:keyed, expl:expl}:null;
 };
 RD.examNorm = function(v,type){
   v=String(v||'').trim().toLowerCase().replace(/[.\s]+$/,'').replace(/\s+/g,' ');
@@ -2719,6 +2761,43 @@ RD.mount = function(root, lesson, init, opts){
     function exAns(it){ return st.exam['q'+it.n]||''; }
     function exDone(){ var n=0; EX.groups.forEach(function(G){ G.items.forEach(function(I){ if(String(exAns(I)).trim()) n++; }); }); return n; }
     function exCls(G,I){ if(!canCheck||!I.ans||!String(exAns(I)).trim()) return ''; return RD.examOk(G.type,exAns(I),I.ans)?' ok':' bad'; }
+    var xOpen={}, locOn=null;
+    function lNorm(c){ c=c.toLowerCase(); if(c==='\u00a0'||c==='\t'||c==='\n'||c==='\r'||c==='\u200b') return ' '; if('“”„‟«»'.indexOf(c)>=0) return '"'; if('‘’‚‛′`´'.indexOf(c)>=0) return "'"; if(c==='–'||c==='—'||c==='‑') return '-'; return c; }
+    function lStr(t){ var o=[], sp=true; for(var i=0;i<t.length;i++){ var c=lNorm(t[i]); if(c===' '){ if(sp) continue; sp=true; o.push(' '); } else { sp=false; o.push(c); } } return o.join('').replace(/\s+$/,''); }
+    function locHay(){
+      var w=document.createTreeWalker(art,NodeFilter.SHOW_TEXT), n, out=[], map=[], sp=true, lastB=null;
+      while((n=w.nextNode())){
+        var pe=n.parentNode; if(pe&&pe.closest&&pe.closest('.rd-vi,.rd-card,.rd-nb,.nb,button,textarea,script,style')) continue;
+        var b=(pe&&pe.closest&&pe.closest('p,h1,h2,h3,h4,li,blockquote,div'))||art;
+        if(b!==lastB){ if(lastB!==null){ out.push('\n'); map.push(null); sp=true; } lastB=b; }
+        var v=n.nodeValue;
+        for(var i=0;i<v.length;i++){ var c=lNorm(v[i]); if(c===' '){ if(sp) continue; sp=true; } else sp=false; out.push(c); map.push({n:n,o:i}); }
+      }
+      return {s:out.join(''),map:map};
+    }
+    function locRanges(list){
+      var H=locHay(), out=[];
+      list.forEach(function(q){
+        var s0=lStr(q).replace(/^["'\s]+|["'\s]+$/g,'').replace(/[.…\s]+$/,''); if(!s0) return;
+        var i=H.s.indexOf(s0), len=s0.length;
+        if(i<0){ var wd=s0.split(' '); if(wd.length>=6){ var head=wd.slice(0,4).join(' '), tail=wd.slice(-4).join(' '), hi=H.s.indexOf(head); if(hi>=0){ var ti=H.s.indexOf(tail,hi); if(ti>=0&&ti+tail.length-hi<=s0.length*1.6+20){ i=hi; len=ti+tail.length-hi; } } } }
+        if(i<0) return;
+        var a=H.map[i], b=H.map[i+len-1]; if(!a||!b) return;
+        try{ var r=document.createRange(); r.setStart(a.n,a.o); r.setEnd(b.n,b.o+1); out.push(r); }catch(e){}
+      });
+      return out;
+    }
+    function locClear(){ locOn=null; try{ if(window.CSS&&CSS.highlights) CSS.highlights.delete('rd-loc'); }catch(_){} }
+    cleanup.push(function(){ try{ if(window.CSS&&CSS.highlights) CSS.highlights.delete('rd-loc'); }catch(_){} });
+    function locShow(n){
+      var f=exFind(n); if(!f||!f.I.loc||!f.I.loc.length) return false;
+      var rs=locRanges(f.I.loc); if(!rs.length){ toast('Không tìm thấy đoạn này trong bài'); return false; }
+      try{ if(window.CSS&&CSS.highlights&&window.Highlight){ var hl=new Highlight(); rs.forEach(function(r){ hl.add(r); }); CSS.highlights.set('rd-loc',hl); } }catch(_){}
+      locOn=n;
+      var rc=rs[0].getBoundingClientRect(), narrow=window.innerWidth<1280, y=window.scrollY+rc.top-Math.round(window.innerHeight*(narrow?.14:.3));
+      try{ window.scrollTo({top:Math.max(0,y),behavior:reduce?'auto':'smooth'}); }catch(_){ window.scrollTo(0,Math.max(0,y)); }
+      return true;
+    }
     function exItem(G,I){
       var a=exAns(I), c=exCls(G,I), ctl='';
       if(G.type==='tfng'||G.type==='ynng'){
@@ -2734,7 +2813,13 @@ RD.mount = function(root, lesson, init, opts){
         ctl='<input class="rd-ex-in" type="text" data-q="'+I.n+'" value="'+esc(a)+'" placeholder="Câu trả lời của em" autocomplete="off" spellcheck="false" aria-label="Đáp án câu '+I.n+'">';
       }
       var fb=(c===' bad')?'<p class="rd-ex-fb">Chưa đúng. Đọc lại bài và chọn lại nhé.</p>':(c===' ok'?'<p class="rd-ex-fb ok">Chính xác!</p>':'');
-      return '<div class="rd-ex-q'+c+'" data-n="'+I.n+'"><div class="rd-ex-qh"><span class="rd-ex-n">'+I.n+'</span><p>'+(G.type==='fill'?esc(I.q).replace(/_{2,}|…{2,}|\.{4,}/g,'<u></u>'):esc(I.q))+'</p>'+(c?'<span class="rd-ex-mark" aria-hidden="true">'+(c===' ok'?'✓':'✗')+'</span>':'')+'</div>'+ctl+fb+'</div>';
+      var xb='';
+      if(I.exp||(I.loc&&I.loc.length)){
+        var got=!!String(a).trim(), op=!!xOpen[I.n]&&got;
+        xb='<div class="rd-ex-xr"><button type="button" class="rd-ex-xb'+(op?' on':'')+(got?'':' lock')+'" data-xp="'+I.n+'" aria-expanded="'+op+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>Giải thích</button></div>';
+        if(op) xb+='<div class="rd-ex-xp">'+(I.exp?'<p>'+esc(I.exp)+'</p>':'')+((I.loc&&I.loc.length)?'<button type="button" class="rd-ex-loc'+(locOn===I.n?' on':'')+'" data-loc="'+I.n+'">'+(locOn===I.n?'Ẩn đoạn đã tô':'Xem đáp án trong bài')+'</button>':'')+'</div>';
+      }
+      return '<div class="rd-ex-q'+c+'" data-n="'+I.n+'"><div class="rd-ex-qh"><span class="rd-ex-n">'+I.n+'</span><p>'+(G.type==='fill'?esc(I.q).replace(/_{2,}|…{2,}|\.{4,}/g,'<u></u>'):esc(I.q))+'</p>'+(c?'<span class="rd-ex-mark" aria-hidden="true">'+(c===' ok'?'✓':'✗')+'</span>':'')+'</div>'+ctl+fb+xb+'</div>';
     }
     function exRender(keepFocus){
       var f=document.activeElement, fq=f&&f.getAttribute&&f.getAttribute('data-q'), pos=f&&f.selectionStart;
@@ -2755,7 +2840,7 @@ RD.mount = function(root, lesson, init, opts){
       document.documentElement.classList.toggle('rd-dr-open',o);
       document.documentElement.classList.toggle('rd-ex-open',o);
       linkClear(); setTimeout(function(){ prog(); },460);
-      if(o) exRender();
+      if(o) exRender(); else locClear();
     }
     on(exBtn,'click',function(){ exOpen(true); });
     on($('.rd-mode-read'),'click',function(){ exOpen(false); });
@@ -2779,8 +2864,10 @@ RD.mount = function(root, lesson, init, opts){
       var hd=e.target.closest('.rd-ex-hd'); if(hd){ var kk=hd.getAttribute('data-k'); pickK=(pickK===kk)?'':kk; exRender(); return; }
       var dr=e.target.closest('.rd-ex-drop'); if(dr){ if(pickK) exPut(dr.getAttribute('data-q'),pickK); return; }
       var o=e.target.closest('.rd-ex-o'); if(o){ var q='q'+o.getAttribute('data-q'), v=o.getAttribute('data-v'); st.exam[q]=(st.exam[q]===v)?'':v; save(); exRender(); return; }
+      var xp=e.target.closest('[data-xp]'); if(xp){ var qn=+xp.getAttribute('data-xp'), ff=exFind(qn); if(!ff||!String(exAns(ff.I)).trim()){ toast('Em chọn đáp án trước, rồi mở Giải thích nhé'); return; } xOpen[qn]=!xOpen[qn]; if(!xOpen[qn]&&locOn===qn) locClear(); exRender(); return; }
+      var lc=e.target.closest('[data-loc]'); if(lc){ var ln=+lc.getAttribute('data-loc'); if(locOn===ln) locClear(); else locShow(ln); exRender(); return; }
       var b=e.target.closest('[data-act]'); if(!b) return; var a=b.getAttribute('data-act');
-      if(a==='clear'){ if(!b.dataset.arm){ b.dataset.arm='1'; b.textContent='Bấm lần nữa để làm lại'; setTimeout(function(){ if(b.isConnected){ delete b.dataset.arm; b.textContent='Làm lại từ đầu'; } },2600); return; } st.exam={}; save(); exRender(); }
+      if(a==='clear'){ if(!b.dataset.arm){ b.dataset.arm='1'; b.textContent='Bấm lần nữa để làm lại'; setTimeout(function(){ if(b.isConnected){ delete b.dataset.arm; b.textContent='Làm lại từ đầu'; } },2600); return; } st.exam={}; xOpen={}; locClear(); save(); exRender(); }
     });
     on(exP,'keydown',function(e){ if(e.key==='Enter'&&e.target.classList.contains('rd-ex-in')){ e.preventDefault(); e.target.blur(); } });
     on(exP,'input',function(e){ var el=e.target; if(el.classList.contains('rd-ex-in')){ st.exam['q'+el.getAttribute('data-q')]=el.value; save(); var d=exDone(); exProg.textContent=d+'/'+EX.count+' câu'; var n=$('.rd-ex-n'); if(n) n.textContent=d?d+'/'+EX.count:EX.count; } });
@@ -5187,12 +5274,11 @@ function lessonBlocks(x){
 }
 /* Prompt: reformat an exam into the Studio format */
 function aiExamPrompt(){
-  return 'Bạn là trợ lý soạn đề Reading. Hãy chuyển đề bên dưới sang ĐÚNG định dạng văn bản sau, không thêm lời giải thích. Trả kết quả trong MỘT khối code (```text … ```).\n\n'+
-  'ĐỊNH DẠNG:\nQuestions 1-4\n<dòng hướng dẫn của nhóm, giữ nguyên bản gốc>\n1. Nội dung câu hỏi [ĐA: đáp án]\n2. Nội dung câu hỏi [ĐA: đáp án]\n\n'+
-  'QUY TẮC:\n- Mỗi nhóm câu hỏi bắt đầu bằng dòng “Questions a-b”, rồi tới dòng hướng dẫn.\n- True/False/Not Given hoặc Yes/No/Not Given: ghi đáp án là TRUE / FALSE / NOT GIVEN (hoặc YES / NO / NOT GIVEN).\n'+
-  '- Trắc nghiệm: các lựa chọn xuống dòng ngay dưới câu, dạng “A. …”, “B. …”; đáp án là chữ cái, ghi bằng dòng “Answer: B”.\n'+
-  '- Nối tiêu đề / nối thông tin: liệt kê danh sách “A. …”, “B. …” ngay dưới dòng hướng dẫn, TRƯỚC câu 1; đáp án của mỗi câu là một chữ cái.\n'+
-  '- Điền từ: chỗ trống viết ______ ; nhiều đáp án chấp nhận thì ngăn bằng dấu /.\n- Nếu đề không có đáp án thì bỏ phần [ĐA: …].\n\nĐỀ GỐC:\n<dán đề vào đây>';
+  return 'Bạn là trợ lý soạn đề Reading cho giáo viên tiếng Anh. Công cụ của giáo viên đọc kết quả của bạn bằng chương trình nên phải đúng định dạng. Hãy TÁCH đề IELTS Reading bên dưới và chuyển sang ĐÚNG định dạng task, kèm đáp án (tìm từ bài đọc), lời giải thích và vị trí đáp án trong bài. Trả kết quả trong MỘT khối code (```task … ```), không thêm lời dẫn hay chú thích ngoài khối.\n\n'+
+  IELTS_RULES+
+  'ĐỊNH DẠNG MẪU:\nQuestions 1-4\n<dòng hướng dẫn của nhóm, giữ nguyên bản gốc>\n1. Nội dung câu hỏi [ĐA: đáp án]\nGiải thích (AI): …\nVị trí: "…"\n2. Nội dung câu hỏi [ĐA: đáp án]\nGiải thích (AI): …\nVị trí: "…"\n\n'+
+  TASK_EXPL+'\n'+
+  '=== DỮ LIỆU ĐẦU VÀO ===\nDAP_AN_THAM_KHAO: <dán đáp án chính thức của đề nếu có>\nDE_GOC:\n<dán đề IELTS vào đây>\nBAI_DOC:\n<dán bài đọc vào đây>';
 }
 /* Prompt to hand to an AI */
 var CODE_RULE={
@@ -5289,6 +5375,24 @@ function aiElicitPrompt(){
   return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh.\n\nNHIỆM VỤ: đọc bài đọc ở cuối và soạn bộ câu hỏi elicit theo các tiêu chí dưới đây.\n\n'+EL_WHY+EL_CRITERIA+'\n'+EL_CHECK+'\n'+
   'ĐỊNH DẠNG TRẢ LỜI: chỉ một khối code ```json … ``` chứa JSON hợp lệ. Không thêm lời dẫn, lời kết hay chú thích; không chép lại bài đọc.\n\n'+EL_INPUT;
 }
+var TASK_EXPL=
+'GIẢI THÍCH VÀ VỊ TRÍ ĐÁP ÁN (bắt buộc cho MỌI câu)\n'+
+'- Ngay dưới mỗi câu (sau dòng Answer nếu có), thêm đúng hai loại dòng:\n'+
+'  Giải thích (AI): <1 đến 3 câu tiếng Việt>\n'+
+'  Vị trí: "<đoạn chép NGUYÊN VĂN từ bài đọc>"\n'+
+'- "Giải thích (AI)" viết bằng tiếng Việt cho học viên: nêu đáp án đúng là gì, bài đọc nói gì ở đâu (nêu nhãn đoạn nếu có) và vì sao đúng. Trắc nghiệm: nói thêm vì sao các lựa chọn còn lại sai. True/False/Not Given: nói rõ bài nói đúng như vậy (TRUE), nói ngược lại (FALSE) hay không đề cập (NOT GIVEN). Dịch theo ý, ngắn gọn; từ khoá tiếng Anh đặt trong ngoặc kép; không chép cả đoạn bài vào lời giải thích.\n'+
+'- "Vị trí" là câu hoặc cụm trong bài làm căn cứ: chép NGUYÊN VĂN (đúng từng chữ, chữ hoa/thường, dấu câu), không dịch, không viết lại, KHÔNG dùng dấu “…”, tối đa một câu. Căn cứ nằm ở hai chỗ thì viết hai dòng "Vị trí:". Matching Headings / Matching Information: chọn câu chủ đề hoặc chi tiết quyết định của đoạn đó. NOT GIVEN: chép câu gần nhất bàn về chủ đề được hỏi và nói rõ trong giải thích rằng bài không đề cập đúng thông tin ấy; nếu bài hoàn toàn không có chỗ liên quan thì bỏ dòng "Vị trí".\n'+
+'- Mỗi lời giải thích và mỗi "Vị trí" nằm trên MỘT dòng, không xuống dòng giữa chừng. Chữ "(AI)" là nhãn để giáo viên duyệt lại: giữ nguyên.\n'+
+'- Điền từ: Vị trí là câu chứa đáp án trong bài.\n';
+var IELTS_RULES=
+'TÁCH ĐỀ IELTS READING\n'+
+'Giáo viên dán kèm đề IELTS Reading (ở mục CAU_HOI_IELTS_READING hoặc DE_GOC). Hãy chuyển ĐÚNG đề đó sang định dạng task bên dưới để giáo viên chép vào công cụ. KHÔNG tự soạn câu hỏi mới.\n'+
+'- Giữ nguyên văn câu hỏi, dòng hướng dẫn, các lựa chọn và số thứ tự câu của đề (không sửa, không dịch, không rút gọn).\n'+
+'- Mỗi nhóm bắt đầu bằng dòng “Questions a-b”, rồi dòng hướng dẫn gốc.\n'+
+'- Trắc nghiệm: các lựa chọn xuống dòng "A. …", đáp án ghi dòng “Answer: B”. True/False/Not Given hoặc Yes/No/Not Given: đáp án ghi [ĐA: TRUE] (hoặc FALSE, NOT GIVEN, YES, NO). Nối heading hoặc nối thông tin: danh sách "i. …" hoặc "A. …" đặt ngay dưới dòng hướng dẫn, TRƯỚC câu đầu tiên; mỗi câu là một dòng, đáp án là nhãn trong danh sách. Điền từ, hoàn thành câu, bảng, sơ đồ: mỗi chỗ trống thành một câu có ______, nhiều đáp án chấp nhận được thì ngăn bằng /.\n'+
+'- Phần nào của đề là hình hoặc sơ đồ không chuyển được sang chữ thì chuyển phần đọc được thành câu có chỗ trống, và nói rõ điều đó trong dòng "Giải thích (AI)" của câu đầu nhóm.\n'+
+'- Với MỖI câu, tự đọc BÀI ĐỌC để TÌM ĐÁP ÁN ĐÚNG, không đoán và không dựa vào trí nhớ về đề. Ghi đáp án theo đúng điều bài đọc cho thấy. Nếu giáo viên có điền DAP_AN_THAM_KHAO mà khác đáp án bạn tìm được, vẫn ghi đáp án theo bài đọc và thêm vào cuối lời giải thích: "(Lưu ý: đáp án tham khảo ghi X.)".\n'+
+'- Sau đó viết "Giải thích (AI)" và "Vị trí" cho từng câu theo quy tắc ở mục GIẢI THÍCH VÀ VỊ TRÍ ĐÁP ÁN.\n\n';
 var TASK_RULES=
 'TASK ĐỌC HIỂU (chỉ soạn khi LOAI_BAI là CONTENT)\n'+
 'Soạn bộ task kiểm tra đọc hiểu cho học viên làm ngay trong lúc đọc, theo phong cách IELTS Reading nhưng dựa HOÀN TOÀN vào nội dung bài. Câu hỏi và hướng dẫn viết bằng tiếng Anh. BẮT BUỘC có đủ ba nhóm, theo đúng thứ tự, đánh số câu liên tục từ 1:\n\n'+
@@ -5312,48 +5416,57 @@ var TASK_RULES=
 'C. Lựa chọn ba\n'+
 'D. Lựa chọn bốn\n'+
 'Answer: B\n'+
+'Giải thích (AI): Đáp án B vì … (đoạn A nói rằng …). A sai vì …; C sai vì …; D sai vì ….\n'+
+'Vị trí: "Câu chép nguyên văn trong bài làm căn cứ."\n'+
 '2. Câu hỏi tiếp theo?\n'+
 'A. …\n'+
 '(lặp lại tương tự; mỗi câu một dòng “Answer: X” ngay sau lựa chọn D)\n\n'+
 'Questions 5-10\n'+
 'Do the following statements agree with the information given in the text? Write TRUE, FALSE or NOT GIVEN.\n'+
 '5. Nội dung nhận định. [ĐA: TRUE]\n'+
-'6. Nội dung nhận định. [ĐA: NOT GIVEN]\n\n'+
+'Giải thích (AI): Bài nói đúng như nhận định: ….\n'+
+'Vị trí: "Câu chép nguyên văn trong bài."\n'+
+'6. Nội dung nhận định. [ĐA: NOT GIVEN]\n'+
+'Giải thích (AI): Bài không đề cập đến …; chỉ nói về ….\n'+
+'Vị trí: "Câu gần nhất bàn về chủ đề này."\n\n'+
 'Questions 11-15 (Matching Headings)\n'+
 'The text has paragraphs A-F. Choose the correct heading for each paragraph from the list of headings below.\n'+
 'i. Heading một\n'+
 'ii. Heading hai\n'+
 'iii. Heading ba\n'+
 '11. Paragraph B [ĐA: iii]\n'+
+'Giải thích (AI): Đoạn B nói về … nên khớp heading iii.\n'+
+'Vị trí: "Câu chủ đề của đoạn B."\n'+
 '12. Paragraph C [ĐA: i]\n\n'+
 '(Hoặc, nếu chọn Matching Information)\n'+
 'Questions 11-15\n'+
 'Which paragraph contains the following information? Write the correct letter, A-F.\n'+
 '11. a description of how the system works [ĐA: C]\n'+
 '12. an example of a negative effect [ĐA: E]\n\n'+
-'QUY TẮC ĐỊNH DẠNG TASK: mỗi nhóm bắt đầu bằng dòng “Questions a-b”, rồi dòng hướng dẫn. Số câu liên tục qua cả ba nhóm. Mỗi câu có đáp án: trắc nghiệm ghi “Answer: B” dưới các lựa chọn; True/False/Not Given và Matching ghi [ĐA: …] cuối dòng. Không thêm lời giải thích, không thêm nhóm nào khác.\n';
+'QUY TẮC ĐỊNH DẠNG TASK: mỗi nhóm bắt đầu bằng dòng “Questions a-b”, rồi dòng hướng dẫn. Số câu liên tục qua cả ba nhóm. Mỗi câu có đáp án: trắc nghiệm ghi “Answer: B” dưới các lựa chọn; True/False/Not Given và Matching ghi [ĐA: …] cuối dòng. Mỗi câu có thêm dòng "Giải thích (AI): …" và "Vị trí: …" theo mục GIẢI THÍCH VÀ VỊ TRÍ ĐÁP ÁN. Không thêm lời dẫn hay nhóm nào khác.\n\n'+TASK_EXPL;
 var TASK_INPUT=
 '=== DỮ LIỆU ĐẦU VÀO ===\n'+
 'LOAI_BAI: <ghi CONTENT nếu đây là bài đọc lấy nội dung, kiến thức; ghi IELTS nếu là bài IELTS có sẵn đề>\n'+
 'SO_CAU_ELICIT: <điền tổng số câu, hoặc để trống để AI tự tính 4-5 câu mỗi đoạn>\n'+
-'CAU_HOI_IELTS_READING: <dán câu hỏi IELTS Reading nếu có>\n'+
+'CAU_HOI_IELTS_READING: <dán đề IELTS Reading (câu hỏi, hướng dẫn, lựa chọn) nếu có>\n'+
+'DAP_AN_THAM_KHAO: <dán đáp án chính thức của đề nếu có>\n'+
 'CAU_HOI_Y_DO_TAC_GIA: <dán dạng Multiple Choice về ý đồ/hàm ý tác giả nếu có>\n'+
 'BAI_DOC:\n<dán bài đọc vào đây>\n\n'+
-'Quy ước: mục LOAI_BAI ghi rõ CONTENT nghĩa là bài đọc này dùng để lấy nội dung, KHÔNG phải đề thi: bạn BẮT BUỘC soạn thêm TASK ĐỌC HIỂU (khối ```task) theo phần quy tắc ở trên. Nếu LOAI_BAI còn nguyên dấu < > hoặc ghi IELTS thì KHÔNG soạn task. Với các mục khác: mục nào còn nguyên dấu < > nghĩa là giáo viên không cung cấp; khi đó SO_CAU_ELICIT mặc định theo mật độ 4 đến 5 câu mỗi đoạn, bỏ qua nhóm "Thông tin sẽ cần" và "Ý đồ tác giả", vẫn tạo các nhóm "Dòng lập luận", "Coherence", "Từ trong ngữ cảnh", "Kiến thức".';
+'Quy ước: mục LOAI_BAI ghi rõ CONTENT nghĩa là bài đọc này dùng để lấy nội dung, KHÔNG phải đề thi: bạn BẮT BUỘC soạn thêm TASK ĐỌC HIỂU (khối ```task) theo phần quy tắc ở trên. Nếu LOAI_BAI ghi IELTS và CAU_HOI_IELTS_READING có đề: KHÔNG soạn câu mới; hãy TÁCH đề đó thành khối ```task theo mục TÁCH ĐỀ IELTS (kèm đáp án tìm từ bài đọc, giải thích và vị trí). Nếu LOAI_BAI còn nguyên dấu < > hoặc ghi IELTS mà không có đề thì KHÔNG soạn task. Với các mục khác: mục nào còn nguyên dấu < > nghĩa là giáo viên không cung cấp; khi đó SO_CAU_ELICIT mặc định theo mật độ 4 đến 5 câu mỗi đoạn, bỏ qua nhóm "Thông tin sẽ cần" và "Ý đồ tác giả", vẫn tạo các nhóm "Dòng lập luận", "Coherence", "Từ trong ngữ cảnh", "Kiến thức".';
 function aiTaskPrompt(){
   return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh.\n\nBài đọc ở cuối là bài đọc LẤY NỘI DUNG (content), không phải đề thi. NHIỆM VỤ: soạn bộ task đọc hiểu cho bài này theo quy tắc dưới đây. Công cụ của giáo viên đọc kết quả của bạn bằng chương trình nên phải đúng định dạng.\n\n'+TASK_RULES+'\n'+
   'ĐỊNH DẠNG TRẢ LỜI: chỉ MỘT khối code ```task … ``` chứa bộ task. Không thêm lời dẫn, giải thích hay chú thích; không chép lại bài đọc.\n\nBÀI ĐỌC (đánh nhãn đoạn A, B, C… theo thứ tự các đoạn thân bài):\n<dán bài đọc vào đây>';
 }
 function aiAllPrompt(){
-  return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh.\n\nNHIỆM VỤ: với bài đọc ở cuối, hãy (1) phân tích bài, (2) tô màu bài bằng thẻ, (3) soạn câu hỏi elicit dạng JSON, (4) NẾU LOAI_BAI là CONTENT thì soạn thêm task đọc hiểu. Công cụ của giáo viên đọc kết quả của bạn bằng chương trình nên phải đúng định dạng. Bước phân tích làm âm thầm, không cần viết ra. Đọc mục LOAI_BAI trong DỮ LIỆU ĐẦU VÀO trước để biết có phải soạn task hay không.\n\n'+
+  return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh.\n\nNHIỆM VỤ: với bài đọc ở cuối, hãy (1) phân tích bài, (2) tô màu bài bằng thẻ, (3) soạn câu hỏi elicit dạng JSON, (4) NẾU LOAI_BAI là CONTENT thì soạn thêm task đọc hiểu; NẾU LOAI_BAI là IELTS và giáo viên dán đề thì TÁCH đề thành task (kèm đáp án, giải thích, vị trí). Công cụ của giáo viên đọc kết quả của bạn bằng chương trình nên phải đúng định dạng. Bước phân tích làm âm thầm, không cần viết ra. Đọc mục LOAI_BAI trong DỮ LIỆU ĐẦU VÀO trước để biết có phải soạn task hay không.\n\n'+
   '########## PHẦN 1: TÔ MÀU ##########\n'+promptColor()+'\n'+
   '########## PHẦN 2: CÂU HỎI ELICIT ##########\n'+EL_WHY+EL_CRITERIA+'\n'+EL_CHECK+'\n'+
-  '########## PHẦN 3: TASK ĐỌC HIỂU ##########\n'+TASK_RULES+'\n'+
+  '########## PHẦN 3: TASK ĐỌC HIỂU ##########\n'+IELTS_RULES+TASK_RULES+'\n'+
   '########## ĐỊNH DẠNG TRẢ LỜI ##########\n'+
   'Trả lời đúng các khối code sau, theo thứ tự, không có lời dẫn, lời kết hay chú thích nào ngoài các khối:\n'+
   '1) Khối ```text chứa bài đọc đã tô màu (Phần 1).\n'+
   '2) Khối ```json chứa JSON elicit (Phần 2). "evidence" chép từ bài GỐC, không kèm thẻ màu.\n'+
-  '3) Khối ```task chứa task đọc hiểu (Phần 3). CHỈ có khối này khi LOAI_BAI là CONTENT; nếu không thì chỉ trả hai khối trên.\n\n'+TASK_INPUT;
+  '3) Khối ```task chứa task đọc hiểu (Phần 3). CHỈ có khối này khi LOAI_BAI là CONTENT (task tự soạn) hoặc LOAI_BAI là IELTS có đề dán kèm (task tách từ đề); nếu không thì chỉ trả hai khối trên.\n\n'+TASK_INPUT;
 }
 function elLevel(t){ var s=String(t||'').toLowerCase(); if(/infer|ngầm|ngam|suy/.test(s)) return 'inferential'; if(/liter|chi\s*tiết|chi\s*tiet|direct/.test(s)) return 'literal'; return ''; }
 function elType(t){ var s=String(t||'').toLowerCase(); if(/research|tra\s*c|\*/.test(s)) return 'research'; if(/^(yn|y\/n|yes|no|tf)|yes\s*\/?\s*no|có\s*\/?\s*không/.test(s)) return 'yn'; return 'wh'; }
@@ -5554,7 +5667,7 @@ function impTaskStatus(){
   if(!raw){ s.textContent=''; s.className='imp-json-s'; return; }
   var x=RD.parseExam(raw); if(!x){ s.textContent='Chưa đọc được task. Mỗi nhóm cần bắt đầu bằng dòng “Questions 1-4”.'; s.className='imp-json-s bad'; return; }
   var T={tfng:'True/False/Not Given',ynng:'Yes/No/Not Given',mc:'Multiple Choice',match:'Matching',fill:'Điền từ'};
-  s.textContent='Sẵn sàng thêm '+x.count+' câu task ('+x.groups.map(function(g){ return T[g.type]; }).join(', ')+'), '+x.keyed+'/'+x.count+' câu có đáp án'+(function(){ var m=[]; x.groups.forEach(function(g){ g.items.forEach(function(i){ if(!i.ans) m.push(i.n); }); }); return m.length?'. Thiếu đáp án ở câu '+m.join(', '):'.'; })(); s.className='imp-json-s '+(x.keyed===x.count?'ok':'bad');
+  s.textContent='Sẵn sàng thêm '+x.count+' câu task ('+x.groups.map(function(g){ return T[g.type]; }).join(', ')+'), '+x.keyed+'/'+x.count+' câu có đáp án, '+x.expl+' câu có giải thích'+(function(){ var m=[]; x.groups.forEach(function(g){ g.items.forEach(function(i){ if(!i.ans) m.push(i.n); }); }); return m.length?'. Thiếu đáp án ở câu '+m.join(', '):'.'; })(); s.className='imp-json-s '+(x.keyed===x.count?'ok':'bad');
 }
 $('#imp-task').addEventListener('input',function(){ impTaskStatus(); });
 function impTaskApply(starting){
@@ -5884,12 +5997,109 @@ function renderExamPane(){
 function examSummary(){
   var ex=L.examOn?RD.parseExam(L.examText):null, s=$('#ex-sum'), c=$('#ex-cnt');
   c.textContent=ex?ex.count:0;
-  if(!L.examOn){ s.innerHTML=''; return; }
-  if(!(L.examText||'').trim()){ s.innerHTML='Chưa có đề. Dán đề vào ô trên, hoặc bấm “Chèn đề mẫu”.'; return; }
-  if(!ex){ s.innerHTML='<span class="warn">Chưa nhận ra câu hỏi nào. Mỗi câu cần bắt đầu bằng số, ví dụ “1. …”.</span>'; return; }
+  if(!L.examOn){ s.innerHTML=''; rvRender(null); return; }
+  if(!(L.examText||'').trim()){ rvRender(null); s.innerHTML='Chưa có đề. Dán đề vào ô trên, hoặc bấm “Chèn đề mẫu”.'; return; }
+  if(!ex){ rvRender(null); s.innerHTML='<span class="warn">Chưa nhận ra câu hỏi nào. Mỗi câu cần bắt đầu bằng số, ví dụ “1. …”.</span>'; return; }
   var T={tfng:'True/False/Not Given',ynng:'Yes/No/Not Given',mc:'Trắc nghiệm',match:'Nối',fill:'Điền từ'};
-  s.innerHTML='<b>'+ex.groups.length+' nhóm · '+ex.count+' câu</b> · '+ex.keyed+' câu có đáp án'+(ex.keyed<ex.count?' <span class="warn">(thiếu '+(ex.count-ex.keyed)+')</span>':'')+'<br>'+ex.groups.map(function(g){ return esc(g.title||'Nhóm')+': '+T[g.type]; }).join(' · ');
+  rvRender(ex);
+  s.innerHTML='<b>'+ex.groups.length+' nhóm · '+ex.count+' câu</b> · '+ex.keyed+' câu có đáp án'+(ex.keyed<ex.count?' <span class="warn">(thiếu '+(ex.count-ex.keyed)+')</span>':'')+' · '+ex.expl+' câu có giải thích<br>'+ex.groups.map(function(g){ return esc(g.title||'Nhóm')+': '+T[g.type]; }).join(' · ');
 }
+/* ----- Duyệt đáp án + giải thích (AI) ----- */
+var RV_Q=/^\s*(\d+)\s*[.)]\s+/, RV_H=/^\s*(?:questions?|câu(?:\s*hỏi)?)\s*\d/i, RV_ANS=/^\s*(?:answer|ans|đáp án|đa)\s*[:：]\s*(.+)$/i;
+var RV_EXP=/^\s*(?:giải\s*thích|giai\s*thich|explanation|explain)\s*(\(\s*ai\s*\))?\s*[:：]\s*(.*)$/i, RV_LOC=/^\s*(?:vị\s*trí|vi\s*tri|location|căn\s*cứ|can\s*cu)\s*[:：]\s*(.+)$/i;
+var RV_INL=/\s*[\[\(](?:ĐA|DA|ĐÁP ÁN|ans|answer)\s*[:：]\s*[^\]\)]+[\]\)]\s*$/i;
+function rvUnq(x){ return String(x).trim().replace(/^["“”„'‘’]+|["“”„'‘’]+$/g,'').trim(); }
+function rvPatch(n,pt){
+  var lines=String(L.examText||'').replace(/\r/g,'').split('\n'), s=-1, e=lines.length, i;
+  for(i=0;i<lines.length;i++){ var m0=RV_Q.exec(lines[i]); if(m0&&+m0[1]===n&&!RV_H.test(lines[i])){ s=i; break; } }
+  if(s<0) return false;
+  for(i=s+1;i<lines.length;i++){ if(RV_Q.test(lines[i])||RV_H.test(lines[i])){ e=i; break; } }
+  var blk=lines.slice(s,e), tail=[]; while(blk.length>1&&!blk[blk.length-1].trim()) tail.unshift(blk.pop());
+  var keep=[], cur='', exp=null, ai=false, loc=[];
+  blk.forEach(function(ln,k){
+    if(k===0){ keep.push(ln); return; }
+    var m;
+    if(!ln.trim()){ if(cur!=='exp') keep.push(ln); return; }
+    if((m=RV_EXP.exec(ln))){ exp=m[2].trim(); ai=!!m[1]; cur='exp'; return; }
+    if((m=RV_LOC.exec(ln))){ loc.push(rvUnq(m[1])); cur=''; return; }
+    if(RV_ANS.test(ln)){ cur=''; keep.push(ln); return; }
+    if(cur==='exp'){ exp+=' '+ln.trim(); return; }
+    keep.push(ln);
+  });
+  if(pt.ans!==undefined){
+    var a=String(pt.ans).trim(), done=false;
+    for(i=0;i<keep.length&&!done;i++){ if(RV_INL.test(keep[i])){ keep[i]=keep[i].replace(RV_INL,'').replace(/\s+$/,'')+(a?' [ĐA: '+a+']':''); done=true; } }
+    for(i=0;i<keep.length&&!done;i++){ if(RV_ANS.test(keep[i])){ if(a) keep[i]='Answer: '+a; else { keep.splice(i,1); } done=true; } }
+    if(!done&&a) keep.push('Answer: '+a);
+  }
+  if(pt.exp!==undefined){ exp=pt.exp; ai=!!pt.expAi; }
+  else if(pt.expAi!==undefined){ ai=!!pt.expAi; }
+  if(pt.loc!==undefined) loc=pt.loc.slice();
+  var out=keep.slice();
+  if(exp!==null&&String(exp).trim()) out.push((ai?'Giải thích (AI): ':'Giải thích: ')+String(exp).trim().replace(/\s*\n\s*/g,' '));
+  loc.forEach(function(q){ q=rvUnq(q); if(q) out.push('Vị trí: "'+q.replace(/\s*\n\s*/g,' ')+'"'); });
+  L.examText=lines.slice(0,s).concat(out,tail,lines.slice(e)).join('\n');
+  return true;
+}
+var rvOpen=null, rvFocus=null;
+function rvCommit(msg){ var t=$('#ex-text'); t.value=L.examText; examSummary(); autoTa(t); saveDraft(); if(msg) toast(msg); }
+function rvRender(ex){
+  var box=$('#ex-rv'); if(!box) return;
+  if(!ex||!L.examOn){ box.innerHTML=''; return; }
+  var items=[]; ex.groups.forEach(function(G){ G.items.forEach(function(I){ items.push({G:G,I:I}); }); });
+  var pend=items.filter(function(x){ return x.I.exp&&x.I.expAi; }).length, nExp=items.filter(function(x){ return x.I.exp; }).length;
+  var H=null; try{ H=elHay(); }catch(e){ H=null; }
+  var open=(rvOpen==null)?(pend>0):rvOpen;
+  var rows=items.map(function(x){
+    var I=x.I, st, cl;
+    if(I.exp&&I.expAi){ st='AI · chờ duyệt'; cl='ai'; } else if(I.exp){ st='Đã duyệt'; cl='ok'; } else if(!I.ans){ st='Thiếu đáp án'; cl='no'; } else { st='Chưa có giải thích'; cl='gr'; }
+    var locs=(I.loc||[]).map(function(q,k){
+      var found=H?!!elFind(H,q):true;
+      return '<div class="rv-lc '+(found?'ok':'bad')+'"><span title="'+esc(q)+'">“'+esc(q.length>110?q.slice(0,108)+'…':q)+'”</span>'+(found?'':'<em>không thấy trong bài</em>')+'<button type="button" class="rv-x" data-rv="locdel" data-k="'+k+'" aria-label="Bỏ đoạn này">✕</button></div>';
+    }).join('');
+    return '<div class="rv-q" data-n="'+I.n+'"><div class="rv-h"><span class="rv-n">'+I.n+'</span><span class="rv-t">'+esc(I.q.length>96?I.q.slice(0,94)+'…':I.q)+'</span><span class="rv-st '+cl+'">'+st+'</span></div>'+
+      '<div class="rv-r"><label>Đáp án <input class="rv-a" data-rv-f="ans" value="'+esc(I.ans||'')+'" autocomplete="off" spellcheck="false"></label>'+
+      (I.exp&&I.expAi?'<button type="button" class="btn sm rv-yes" data-rv="yes">✓ AI đúng</button><button type="button" class="btn sm ghost rv-no" data-rv="no">✗ AI sai</button>':'')+'</div>'+
+      '<label class="rv-l">Giải thích cho học viên<textarea class="rv-e" data-rv-f="exp" rows="2" spellcheck="false" placeholder="'+(I.ans?'Viết lời giải thích…':'Nhập đáp án đúng trước, rồi viết giải thích…')+'">'+esc(I.exp||'')+'</textarea></label>'+
+      '<div class="rv-loc">'+locs+'<button type="button" class="btn sm ghost rv-add" data-rv="locadd">+ Gắn đoạn đang bôi đen trong bài</button></div></div>';
+  }).join('');
+  box.innerHTML='<details class="rv"'+(open?' open':'')+'><summary>Duyệt đáp án và giải thích <span class="rv-cnt">'+nExp+'/'+items.length+' câu có giải thích'+(pend?' · '+pend+' chờ duyệt':'')+'</span></summary>'+
+    '<p class="rv-note">Giải thích do AI soạn có nhãn “AI · chờ duyệt”. Nếu đáp án của AI sai, bấm “AI sai” (hoặc sửa ô Đáp án): giải thích và đoạn trích của AI sẽ bị xoá để bạn nhập lại. Học viên chỉ thấy nút Giải thích khi câu đó có giải thích hoặc đoạn trích.</p>'+
+    (pend?'<div class="rv-bulk"><button type="button" class="btn sm" data-rv="yesall">✓ Duyệt hết '+pend+' câu còn lại</button></div>':'')+rows+'</details>';
+  if(rvFocus){ var f=box.querySelector('.rv-q[data-n="'+rvFocus.n+'"] [data-rv-f="'+rvFocus.f+'"]'); rvFocus=null; if(f){ f.focus(); try{ f.scrollIntoView({block:'nearest'}); }catch(e){} } }
+}
+function rvItem(n){ var ex=RD.parseExam(L.examText), r=null; if(ex) ex.groups.forEach(function(G){ G.items.forEach(function(I){ if(I.n===n) r={G:G,I:I}; }); }); return r; }
+(function(){
+  var box=$('#ex-rv'); if(!box) return;
+  box.addEventListener('toggle',function(e){ if(e.target.classList&&e.target.classList.contains('rv')) rvOpen=e.target.open; },true);
+  box.addEventListener('mousedown',function(e){ if(e.target.closest&&e.target.closest('[data-rv="locadd"]')) e.preventDefault(); });
+  box.addEventListener('click',function(e){
+    var b=e.target.closest('[data-rv]'); if(!b) return; var q=b.closest('.rv-q'), n=q?+q.getAttribute('data-n'):0, act=b.getAttribute('data-rv'), it=n?rvItem(n):null;
+    if(act==='yes'){ rvPatch(n,{expAi:false}); rvCommit('Đã duyệt câu '+n); }
+    else if(act==='yesall'){ var ex=RD.parseExam(L.examText), c=0; if(ex) ex.groups.forEach(function(G){ G.items.forEach(function(I){ if(I.exp&&I.expAi){ rvPatch(I.n,{expAi:false}); c++; } }); }); rvCommit('Đã duyệt '+c+' câu'); }
+    else if(act==='no'){ rvPatch(n,{ans:'',exp:null,loc:[]}); rvFocus={n:n,f:'ans'}; rvCommit('Đã xoá đáp án và giải thích của AI ở câu '+n+'. Nhập đáp án đúng và giải thích mới.'); }
+    else if(act==='locdel'){ if(!it) return; var k=+b.getAttribute('data-k'), l=(it.I.loc||[]).slice(); l.splice(k,1); rvPatch(n,{loc:l}); rvCommit(); }
+    else if(act==='locadd'){
+      if(!it) return; var sel=window.getSelection(), txt=sel&&sel.rangeCount?sel.toString().replace(/\s+/g,' ').trim():'';
+      var inEd=sel&&sel.anchorNode&&ed.contains(sel.anchorNode);
+      if(!txt||!inEd){ toast('Bôi đen đoạn văn chứa đáp án trong bài trước, rồi bấm nút này',true); return; }
+      var l2=(it.I.loc||[]).slice(); l2.push(txt); rvPatch(n,{loc:l2}); rvCommit('Đã gắn đoạn trích cho câu '+n);
+    }
+  });
+  box.addEventListener('change',function(e){
+    var f=e.target.getAttribute&&e.target.getAttribute('data-rv-f'); if(!f) return; var q=e.target.closest('.rv-q'), n=+q.getAttribute('data-n'), it=rvItem(n); if(!it) return;
+    if(f==='ans'){
+      var nv=e.target.value.trim(), same=RD.examNorm(nv,it.G.type)===RD.examNorm(it.I.ans,it.G.type);
+      if(same) return;
+      if(it.I.exp&&it.I.expAi){ rvPatch(n,{ans:nv,exp:null,loc:[]}); rvFocus={n:n,f:'exp'}; rvCommit('Đáp án khác với AI nên đã xoá giải thích của AI. Hãy nhập giải thích mới cho câu '+n+'.'); }
+      else { rvPatch(n,{ans:nv}); rvCommit(); }
+    } else if(f==='exp'){
+      var v=e.target.value.trim(); if(v===(it.I.exp||'')) return;
+      rvPatch(n,{exp:v,expAi:false}); rvCommit(v?'Đã lưu giải thích câu '+n:'');
+    }
+  });
+})();
+
 $('#ex-on').addEventListener('change',function(e){ L.examOn=e.target.checked; L.examTouched=true; renderExamPane(); saveDraft(); if(L.examOn) showTab('ex',true); });
 $('#ex-open').addEventListener('change',function(e){ L.examOpen=e.target.checked; saveDraft(); });
 $('#ex-check').addEventListener('change',function(e){ L.examCheck=e.target.checked; saveDraft(); });
