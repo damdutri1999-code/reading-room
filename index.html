@@ -6732,7 +6732,7 @@ function dvAll(){
       vl.filter(function(x){ return String(x.title||'').toLowerCase().indexOf(q)>=0||String(x.topic||'').toLowerCase().indexOf(q)>=0; }).forEach(function(x){ out.push(li(x)); });
     } else if(DV.sec==='my'){
       vf.filter(function(f){ return (f.parent||'')===DV.cur; }).forEach(function(f){ out.push(fi(f)); });
-      vl.filter(function(x){ return DV.cur===''?true:hasF(x,DV.cur); }).forEach(function(x){ out.push(li(x)); });
+      vl.filter(function(x){ return DV.cur===''?dvLoose(x):(hasF(x,DV.cur)&&!fl(x).some(function(f){ return f!==DV.cur&&LIB.folders[f]&&isUnder(f,DV.cur); })); }).forEach(function(x){ out.push(li(x)); });
     } else if(DV.sec==='loose'){
       vl.filter(dvLoose).forEach(function(x){ out.push(li(x)); });
     } else if(DV.sec==='recent'){
@@ -6844,7 +6844,7 @@ function dvArea(){
         (it.k==='f'?'<span class="dv-fline">'+dvIc('folder')+dvNameHtml(it)+(it.o.system?'<i class="dv-b b2">Mặc định</i>':'')+(it.o.starred?dvIc('star','st'):'')+'</span>':
         '<span class="dv-prev">'+dvThumb(it)+'</span><span class="dv-cap">'+dvNameHtml(it)+(it.o.starred?dvIc('star','st'):'')+'</span><span class="dv-bd">'+dvBadges(it)+'</span>')+'</div>'; }
     if(fo.length) h+='<div class="dv-gh">Thư mục</div><div class="dv-grid fo" role="listbox" aria-multiselectable="true">'+fo.map(card).join('')+'</div>';
-    if(fl.length) h+='<div class="dv-gh">'+(DV.sec==='my'&&!DV.cur&&!DV.q?'Tất cả bài đọc ('+fl.length+')':'Bài đọc')+'</div><div class="dv-grid fl" role="listbox" aria-multiselectable="true">'+fl.map(card).join('')+'</div>';
+    if(fl.length) h+='<div class="dv-gh">'+(DV.sec==='my'&&!DV.cur&&!DV.q?'Bài chưa vào thư mục ('+fl.length+')':'Bài đọc')+'</div><div class="dv-grid fl" role="listbox" aria-multiselectable="true">'+fl.map(card).join('')+'</div>';
   }
   el.innerHTML=h; dvSelUI();
   if(DV.ren){ var ri=el.querySelector('[data-dvren]'); if(ri){ ri.focus(); var dot=ri.value.length; ri.setSelectionRange(0,dot); } }
