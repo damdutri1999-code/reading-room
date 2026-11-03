@@ -1617,6 +1617,11 @@ html.rr-fs-on{overflow:hidden}
   html.rd-ex-open .rr-read.rr-fs::before,html.rd-ex-open .rr-read.rr-fs .rd-progress{right:410px}
 }
 
+.rr-card .ls{display:flex;flex-wrap:wrap;gap:3px 12px;margin-top:2px;font:500 12px/1.35 var(--rr-ui);opacity:.82;text-align:left}
+.rr-card .ls:empty{display:none}
+.rr-card .ls b{font-weight:700}
+.rr-card .ls .ls0{opacity:.75}
+.rr-lib.list .rr-card .ls{flex:0 0 auto;margin-top:0}
 .rr-fw{position:relative;min-width:0}
 .rr-fw .rr-fo{width:100%;box-sizing:border-box;padding-right:52px}
 .rr-fsh{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:var(--rr-muted);cursor:pointer;transition:background .15s,color .15s}
@@ -4387,14 +4392,25 @@ RR.init=function(opts){
   function rowHtml(list){
     return list.map(function(L,i){
       var I=RR.info(L), s=opts.status?opts.status(L):{st:'new',p:0}, k=hashN(L.id||L.title), rot=((k%5)-2)*0.5;
-      return '<button type="button" class="rr-card" data-open="'+esc(L.id)+'" style="--d:'+(i*50)+'ms;--rot:'+rot+'deg;--nc:'+NOTE[k%4]+'">'+RR.thumb(L,'',s.st)+'<span class="body"><span class="ti">'+esc(I.title)+'</span><span class="mt">'+(I.catName?'<span class="lv cat">'+esc(I.catName)+'</span>':'')+(I.exam?'<span class="lv exq">Có đề · '+I.exam+' câu</span>':'')+(I.topic?'<span class="lv tp">'+esc(I.topic)+'</span>':'')+(I.level?'<span class="lv lo">'+esc(I.level)+'</span>':'')+'<span>'+I.minutes+' phút · '+I.questions+' câu hỏi</span><span class="st lo st-'+s.st+'">'+ST[s.st]+'</span></span>'+(s.p>0&&s.p<100?'<span class="rr-prog" style="--p:'+s.p+'%"><i></i></span>':'')+'</span></button>';
+      return '<button type="button" class="rr-card" data-open="'+esc(L.id)+'" style="--d:'+(i*50)+'ms;--rot:'+rot+'deg;--nc:'+NOTE[k%4]+'">'+RR.thumb(L,'',s.st)+'<span class="body"><span class="ti">'+esc(I.title)+'</span><span class="mt">'+(I.catName?'<span class="lv cat">'+esc(I.catName)+'</span>':'')+(I.exam?'<span class="lv exq">Có đề · '+I.exam+' câu</span>':'')+(I.topic?'<span class="lv tp">'+esc(I.topic)+'</span>':'')+(I.level?'<span class="lv lo">'+esc(I.level)+'</span>':'')+'<span>'+I.minutes+' phút · '+I.questions+' câu hỏi</span><span class="st lo st-'+s.st+'">'+ST[s.st]+'</span></span><span class="ls" data-ls="'+esc(L.id)+'">'+lsInner(L.id)+'</span>'+(s.p>0&&s.p<100?'<span class="rr-prog" style="--p:'+s.p+'%"><i></i></span>':'')+'</span></button>';
     }).join('');
   }
   var FOLD='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
   var SHI='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>';
   function shBtn(fid,tile){ if(!opts.shareFolder||!opts.shareFolder(fid)) return ''; return '<button type="button" class="'+(tile?'rr-fsh':'rr-share rr-fsc')+'" data-share data-fshare="'+esc(fid)+'" aria-haspopup="menu" aria-expanded="false" aria-label="Chia sẻ thư mục" title="Chia sẻ thư mục">'+SHI+(tile?'':'<span>Chia sẻ thư mục</span>')+'</button>'; }
+  var lsMap=null, lsBusy=false;
+  function fmtN(n){ return String(Math.round(n||0)).replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+  function lsInner(id){
+    if(!lsMap) return ''; var v=lsMap[id]||{o:0,s:0};
+    if(!v.o&&!v.s) return '<span class="ls0">Chưa có lượt đọc</span>';
+    return '<span title="Số lượt mở bài"><b>'+fmtN(v.o)+'</b> lượt đọc</span><span title="Thời lượng đọc trung bình mỗi lượt">TB <b>'+fmtDur(v.o?v.s/v.o:0)+'</b>/lượt</span><span title="Tổng thời lượng đọc của mọi học viên">Tổng <b>'+fmtDur(v.s)+'</b></span>';
+  }
+  function lsPaint(){ main.querySelectorAll('[data-ls]').forEach(function(el){ el.innerHTML=lsInner(el.getAttribute('data-ls')); }); }
+  function lsLoad(){ if(lsMap||lsBusy||!opts.lstats) return; lsBusy=true;
+    var p; try{ p=opts.lstats(); }catch(e){ lsBusy=false; return; }
+    Promise.resolve(p).then(function(a){ lsBusy=false; if(Array.isArray(a)){ lsMap={}; a.forEach(function(r){ lsMap[r.id]={o:+r.opens||0,s:+r.secs||0}; }); lsPaint(); } },function(){ lsBusy=false; }); }
   function renderLib(){
-    var box=main.querySelector('[data-lib]'); if(!box) return;
+    var box=main.querySelector('[data-lib]'); if(!box) return; lsLoad();
     var fw=main.querySelector('[data-fo-wrap]'); if(fw) fw.innerHTML='';
     var q=libQ.trim().toLowerCase(), all=lessons(), fm=FM(), hasFo=Object.keys(fm).length>0;
     if(libF===null||(hasFo&&libF!==FR()&&!fm[libF])) libF=FR();
@@ -6181,7 +6197,7 @@ function showHome(v){
   if(!$('#studio').hidden||!$('#preview').hidden){ if(!$('#preview').hidden) setMode('edit'); changed(true); }
   document.body.classList.add('rr-on');
   if(!rrCtl) rrCtl=RR.init({root:rrRoot, mode:'studio', studentHref:function(){ return khoLink('chung'); }, shareFolder:function(f){ var u=khoLink('chung'); if(!u||!f||!underChung(f)) return ''; return f===CH?u+'#/lib':u+'#/lib/'+encodeURIComponent(f); }, app:function(){ return LIB.app; }, lessons:libLessons, folders:function(){ return foMap(); }, foRoot:'',
-    status:function(){ return {st:'new',p:0}; }, teacher:renderTeacherHub, usage:function(){ var c=cl(); if(!(c&&clUrl(c.url)&&c.key)) return Promise.resolve(null); return clCall('get_usage',{}); }, stats:function(){ var c=cl(); if(!(c&&clUrl(c.url)&&c.key)) return Promise.resolve(null); return clCall('get_stats',{}); }, gate:{ok:authOk,name:authName,role:function(){ return isOwnerRole()?'Owner':''; },login:authLogin,register:authRegister,logout:authLogout}, onEdit:function(){ leaveHome(); }, onBack:function(){ document.body.classList.add('rr-on'); if($('#preview')&&!$('#preview').hidden) setMode('edit'); },
+    status:function(){ return {st:'new',p:0}; }, teacher:renderTeacherHub, lstats:function(){ var c=cl(); if(!(c&&clUrl(c.url)&&c.key)) return Promise.resolve(null); return clCall('get_lesson_stats',{}); }, usage:function(){ var c=cl(); if(!(c&&clUrl(c.url)&&c.key)) return Promise.resolve(null); return clCall('get_usage',{}); }, stats:function(){ var c=cl(); if(!(c&&clUrl(c.url)&&c.key)) return Promise.resolve(null); return clCall('get_stats',{}); }, gate:{ok:authOk,name:authName,role:function(){ return isOwnerRole()?'Owner':''; },login:authLogin,register:authRegister,logout:authLogout}, onEdit:function(){ leaveHome(); }, onBack:function(){ document.body.classList.add('rr-on'); if($('#preview')&&!$('#preview').hidden) setMode('edit'); },
     openLesson:function(x,host){ return RD.mount(host,x,{},{persist:false}); }});
   rrCtl.show(v||'home');
 }
@@ -6646,7 +6662,7 @@ function studentDoc(data){
    'var ctl=RR.init({root:document.getElementById("rr-root"),mode:"student",noHome:!!D.start,logoHome:D.start?location.href.split(/[?#]/)[0]:"",share:D.cloud?function(L){return location.href.split(/[?#]/)[0]+"?kho="+D.cloud.id+"#/read/"+encodeURIComponent(L.id);}:null,shareFolder:D.cloud?function(f){var b=location.href.split(/[?#]/)[0]+"?kho="+D.cloud.id;return (!f||f==="chung")?b+"#/lib":b+"#/lib/"+encodeURIComponent(f);}:null,app:function(){return D.app;},lessons:function(){return D.lessons;},folders:function(){return D.folders||{};},foRoot:(D.cloud&&D.cloud.id==="chung")?"chung":"",'+
    'status:function(L){var w=work(L);if(!w)return{st:"new",p:0};var I=RR.info(L),tot=I.questions+I.notes,done=0;Object.keys(w.answers||{}).forEach(function(k){if(String(w.answers[k]).trim())done++;});Object.keys(w.notes||{}).forEach(function(k){if(String(w.notes[k]).trim())done++;});'+
    'var p=tot?Math.min(100,Math.round(done/tot*100)):((w.comments||[]).length?50:0);return{st:w.submitted?"done":((done||(w.comments||[]).length)?"doing":"new"),p:w.submitted?100:p};},'+
-   'teacher:null,loading:function(){return D.loading;},stats:function(){if(!D.cloud)return Promise.resolve(null);var C=D.cloud,ac=new AbortController();setTimeout(function(){ac.abort();},8000);return fetch(C.url+"/rest/v1/rpc/get_stats",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.ok?r.json():null;});},track:D.cloud?{send:function(fn,body){try{fetch(D.cloud.url+"/rest/v1/rpc/"+fn,{method:"POST",keepalive:true,headers:{"apikey":D.cloud.key,"Authorization":"Bearer "+D.cloud.key,"Content-Type":"application/json"},body:JSON.stringify(body||{})}).catch(function(){});}catch(e){}}}:null,usage:function(){if(!D.cloud)return Promise.resolve(null);var C=D.cloud,ac=new AbortController();setTimeout(function(){ac.abort();},8000);return fetch(C.url+"/rest/v1/rpc/get_usage",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.ok?r.json():null;});},openLesson:function(L,host){return RD.mount(host,L,{},{persist:true});}});'+
+   'teacher:null,loading:function(){return D.loading;},lstats:function(){if(!D.cloud)return Promise.resolve(null);var C=D.cloud,ac=new AbortController();setTimeout(function(){ac.abort();},8000);return fetch(C.url+"/rest/v1/rpc/get_lesson_stats",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.ok?r.json():null;});},stats:function(){if(!D.cloud)return Promise.resolve(null);var C=D.cloud,ac=new AbortController();setTimeout(function(){ac.abort();},8000);return fetch(C.url+"/rest/v1/rpc/get_stats",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.ok?r.json():null;});},track:D.cloud?{send:function(fn,body){try{fetch(D.cloud.url+"/rest/v1/rpc/"+fn,{method:"POST",keepalive:true,headers:{"apikey":D.cloud.key,"Authorization":"Bearer "+D.cloud.key,"Content-Type":"application/json"},body:JSON.stringify(body||{})}).catch(function(){});}catch(e){}}}:null,usage:function(){if(!D.cloud)return Promise.resolve(null);var C=D.cloud,ac=new AbortController();setTimeout(function(){ac.abort();},8000);return fetch(C.url+"/rest/v1/rpc/get_usage",{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.ok?r.json():null;});},openLesson:function(L,host){return RD.mount(host,L,{},{persist:true});}});'+
    'if(D.start==="lib"&&ctl.view()==="home"&&!/#\\/read\\//.test(H0))ctl.go("lib");'+
    'if(D.cloud){var C=D.cloud,SH=C.id==="chung",KC="rr:kho:"+C.id,ac=new AbortController(),tm=setTimeout(function(){ac.abort();},15000);var pr=window.__kq||fetch(C.url+"/rest/v1/rpc/"+(SH?"get_shared":"get_lib"),{method:"POST",signal:ac.signal,headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json"},body:JSON.stringify(SH?{}:{p_id:C.id})}).then(function(r){return r.ok?r.json():null;});pr.then(function(j){clearTimeout(tm);var d=SH?(j&&{lessons:j.lessons,folders:j.folders}):(j&&j.data);var had=D.loading;D.loading=false;if(!d||!d.lessons){if(had)ctl.refresh();return;}try{localStorage.setItem(KC,JSON.stringify({app:d.app||null,lessons:d.lessons,folders:d.folders||{}}));}catch(e){}var cur=JSON.stringify([D.lessons,D.folders||{}]),nxt=JSON.stringify([d.lessons,d.folders||{}]);if(cur===nxt&&(!d.app||JSON.stringify(D.app)===JSON.stringify(d.app))){if(had)ctl.refresh();return;}D.lessons=d.lessons;D.folders=d.folders||{};if(d.app)D.app=d.app;var mm=/#\\/read\\/(.+)$/.exec(H0);if(mm&&ctl.view()!=="read"){try{ctl.open(decodeURIComponent(mm[1]));}catch(e){}if(ctl.view()==="read")return;}if(ctl.view()!=="read"){ctl.refresh();if(!had)ctl.toast("Đã cập nhật bài mới");}else{ctl.toast("Có bài mới. Quay lại kho bài để xem.");}}).catch(function(){D.loading=false;if(ctl.view()!=="read")ctl.refresh();});}'+
    '})();<\/script></body></html>';
@@ -6862,6 +6878,17 @@ function dvSelUI(){
   }
   dvInfo();
 }
+var LSM=null, LSM_AT=0, LSM_BUSY=false, LSM_FAIL=false;
+function lsRows(id){
+  if(!x0cloud()||LSM_FAIL) return '';
+  if(!LSM){ lsFetchT(); return '<dt>Lượt đọc</dt><dd class="dv-muted">Đang tải…</dd>'; }
+  var v=LSM[id]||{o:0,s:0}; if(Date.now()-LSM_AT>60000) lsFetchT();
+  if(!v.o&&!v.s) return '<dt>Lượt đọc</dt><dd>Chưa có lượt đọc</dd>';
+  return '<dt>Lượt đọc</dt><dd><b>'+v.o+'</b> lượt</dd><dt>Đọc trung bình</dt><dd>'+fmtDur(v.o?v.s/v.o:0)+' mỗi lượt</dd><dt>Tổng thời lượng</dt><dd>'+fmtDur(v.s)+'</dd>';
+}
+function x0cloud(){ var c=cl(); return !!(c&&clUrl(c.url)&&c.key); }
+function lsFetchT(){ if(LSM_BUSY||!x0cloud()) return; LSM_BUSY=true;
+  clCall('get_lesson_stats',{}).then(function(j){ LSM_BUSY=false; if(Array.isArray(j)){ LSM={}; j.forEach(function(r){ LSM[r.id]={o:+r.opens||0,s:+r.secs||0}; }); LSM_AT=Date.now(); if(hubTab==='drive'&&DV.info) dvInfo(); } },function(){ LSM_BUSY=false; LSM_FAIL=true; }); }
 function dvInfo(){
   var el=rrRoot.querySelector('[data-dv-info]'); if(!el) return; el.hidden=!DV.info; if(!DV.info) return;
   var s=dvSelItems(), h='';
@@ -6869,7 +6896,7 @@ function dvInfo(){
     if(it.k==='f'){ var kids=Object.keys(LIB.folders).filter(function(i){ return LIB.folders[i].parent===it.id; }).length, ls=LIB.order.filter(function(i){ return LIB.lessons[i]&&LIB.lessons[i].folder===it.id; }).length;
       h='<div class="dv-ip"><span class="dv-fold big">'+dvIc('folder')+'</span></div><h4>'+esc(it.name)+'</h4><dl><dt>Loại</dt><dd>Thư mục</dd><dt>Vị trí</dt><dd>'+esc(dvLoc(it))+'</dd><dt>Nội dung</dt><dd>'+ls+' bài · '+kids+' thư mục con</dd><dt>Chủ sở hữu</dt><dd>'+esc(ownerName())+' · Owner</dd><dt>Tạo lúc</dt><dd>'+fmtDate(it.o.created)+'</dd></dl>'; }
     else { var x=it.o, I=RR.info(cleanLessonOf(x));
-      h='<div class="dv-ip"><span class="dv-th big">'+RR.thumb(x,'width:100%;height:100%')+'</span></div><h4>'+esc(it.name)+'</h4><dl><dt>Loại</dt><dd>Bài đọc'+(x.cat?' · '+esc(RR.CATS[x.cat]):'')+(x.level?' · '+esc(x.level):'')+'</dd><dt>Trạng thái</dt><dd>'+(x.done?'Đã hoàn tất':'Bản nháp')+'</dd><dt>Chủ đề</dt><dd>'+(x.topic?esc(x.topic):'–')+' <button type="button" class="tw-btn" style="height:24px;padding:0 8px;font-size:12px;margin-left:6px" data-dva="topic">'+(x.topic?'Sửa':'Thêm')+'</button></dd><dt>Nội dung</dt><dd>'+I.minutes+' phút · '+I.questions+' câu hỏi · '+I.notes+' ô ghi chú</dd><dt>Nằm trong</dt><dd>'+esc(dvLoc(it))+'</dd><dt>Chủ sở hữu</dt><dd>'+esc(ownerName())+' · Owner</dd><dt>Sửa đổi</dt><dd>'+(x.updated?fmtDate(x.updated):'–')+'</dd></dl>'+
+      h='<div class="dv-ip"><span class="dv-th big">'+RR.thumb(x,'width:100%;height:100%')+'</span></div><h4>'+esc(it.name)+'</h4><dl><dt>Loại</dt><dd>Bài đọc'+(x.cat?' · '+esc(RR.CATS[x.cat]):'')+(x.level?' · '+esc(x.level):'')+'</dd><dt>Trạng thái</dt><dd>'+(x.done?'Đã hoàn tất':'Bản nháp')+'</dd><dt>Chủ đề</dt><dd>'+(x.topic?esc(x.topic):'–')+' <button type="button" class="tw-btn" style="height:24px;padding:0 8px;font-size:12px;margin-left:6px" data-dva="topic">'+(x.topic?'Sửa':'Thêm')+'</button></dd><dt>Nội dung</dt><dd>'+I.minutes+' phút · '+I.questions+' câu hỏi · '+I.notes+' ô ghi chú</dd><dt>Nằm trong</dt><dd>'+esc(dvLoc(it))+'</dd><dt>Chủ sở hữu</dt><dd>'+esc(ownerName())+' · Owner</dd><dt>Sửa đổi</dt><dd>'+(x.updated?fmtDate(x.updated):'–')+'</dd>'+lsRows(x.id)+'</dl>'+
         (x.done&&DV.sec!=='trash'?'<div class="dv-sws"><span class="dv-muted">Kho</span>'+khoBtn(x)+'</div>':'');
     }
   } else if(s.length>1){ h='<h4>'+s.length+' mục đã chọn</h4><p class="dv-muted">Chọn một mục để xem chi tiết.</p>'; }
