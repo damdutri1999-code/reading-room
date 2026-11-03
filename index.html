@@ -698,7 +698,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .eli-mode{display:flex;flex-direction:column;gap:6px;font:13px var(--ui)}
 .eli-mode label{display:flex;gap:8px;align-items:center;cursor:pointer}
 .el-chip{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font:600 10.5px/1.4 var(--ui);background:rgba(127,127,127,.15);color:inherit;vertical-align:middle}
-.el-chip.t-yn{background:#dbeafe;color:#1d4ed8}.el-chip.t-wh{background:#fde68a;color:#7a4a00}.el-chip.t-research{background:#ede9fe;color:#5b34d6}
+.el-chip.t-yn{background:#dbeafe;color:#1d4ed8}.el-chip.t-wh{background:#fde68a;color:#7a4a00}.el-chip.t-research{background:#ede9fe;color:#5b34d6}.el-chip.lv-literal{background:#dcfce7;color:#166534}.el-chip.lv-inferential{background:#ffe4e6;color:#9f1239}
 
 .imp-json{display:flex;flex-direction:column;gap:6px;font:500 13px var(--ui)}
 .imp-json em{font-style:normal;opacity:.65;font-weight:400}
@@ -1122,7 +1122,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 
 .rd-chips{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0 0}
 .rd-chip{font:600 10.5px/1 var(--rd-ui);padding:4px 8px;border-radius:999px;background:color-mix(in srgb,var(--rd-ink,#222) 9%,transparent);color:var(--rd-ink,inherit)}
-.rd-chip.t-yn{background:#dbeafe;color:#1d4ed8}.rd-chip.t-wh{background:#fde68a;color:#7a4a00}.rd-chip.t-research{background:#ede9fe;color:#5b34d6}
+.rd-chip.t-yn{background:#dbeafe;color:#1d4ed8}.rd-chip.t-wh{background:#fde68a;color:#7a4a00}.rd-chip.t-research{background:#ede9fe;color:#5b34d6}.rd-chip.lv-literal{background:#dcfce7;color:#166534}.rd-chip.lv-inferential{background:#ffe4e6;color:#9f1239}
 .rd-terms{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 2px;font:12px var(--rd-ui)}
 .rd-terms span{opacity:.7}
 .rd-terms a{padding:3px 9px;border-radius:999px;border:1px solid var(--rd-line);color:var(--rd-accent);text-decoration:none}
@@ -2191,7 +2191,8 @@ RD.mount = function(root, lesson, init, opts){
     var blk = anchors[0].closest('.rd-blk'); if(!blk) return;
     var c = h('div','rd-card rd-qc'); c.setAttribute('data-el',id);
     var TL={yn:'Yes/No',wh:'WH',research:'Tra cứu'};
-    var chips=(def.type&&TL[def.type]?'<span class="rd-chip t-'+def.type+'">'+TL[def.type]+'</span>':'')+(def.group?'<span class="rd-chip">'+esc(def.group)+'</span>':'');
+    var LV={literal:'Tìm chi tiết',inferential:'Hiểu ý ngầm'};
+    var chips=(def.type&&TL[def.type]?'<span class="rd-chip t-'+def.type+'">'+TL[def.type]+'</span>':'')+(def.level&&LV[def.level]?'<span class="rd-chip lv-'+def.level+'">'+LV[def.level]+'</span>':'')+(def.group?'<span class="rd-chip">'+esc(def.group)+'</span>':'');
     var terms=(def.terms&&def.terms.length)?'<div class="rd-terms"><span>Tra cứu:</span>'+def.terms.map(function(t){ return '<a href="https://www.google.com/search?q='+encodeURIComponent(t)+'" target="_blank" rel="noopener noreferrer">'+esc(t)+'</a>'; }).join('')+'</div>':'';
     c.innerHTML = '<div class="rd-box"><button type="button" class="rd-cl" aria-expanded="false" aria-label="Câu hỏi Q'+n+'"><span class="n">Q'+n+'</span><span class="t">'+esc(def.q||'')+'</span></button>'+
       '<div class="rd-more">'+(chips?'<div class="rd-chips">'+chips+'</div>':'')+terms+
@@ -4764,7 +4765,7 @@ $('#tc-custom').addEventListener('change',function(e){ restoreSel(); setTc(e.tar
 
 /* ---------- Elicit questions ---------- */
 var elMode=null;
-function elDef(d){ d=d||{}; var o={q:d.q||'',hint:d.hint||''}; if(d.type) o.type=d.type; if(d.group) o.group=d.group; if(d.terms&&d.terms.length) o.terms=d.terms.slice(0,6); return o; }
+function elDef(d){ d=d||{}; var o={q:d.q||'',hint:d.hint||''}; if(d.type) o.type=d.type; if(d.level) o.level=d.level; if(d.group) o.group=d.group; if(d.terms&&d.terms.length) o.terms=d.terms.slice(0,6); return o; }
 function anchorsOf(id){ return $$('.el[data-el="'+id+'"]',ed); }
 function anchorText(id){ return anchorsOf(id).map(function(a){ return a.textContent; }).join(' ').replace(/\s+/g,' ').trim(); }
 function short(s,n){ s=s.replace(/\s+/g,' ').trim(); return s.length>n?s.slice(0,n)+'…':s; }
@@ -5213,7 +5214,7 @@ function promptColor(){
   '- Tiêu đề và heading đặt đầu dòng: "# Tiêu đề bài", "> Phụ đề" (nếu bài có), "## Heading 1", "### Heading 2". Có thể dùng **đậm**, *nghiêng* nếu bài gốc có.\n\n'+
   'BẢN DỊCH TIẾNG VIỆT (bắt buộc)\n'+
   '- Với MỖI đoạn văn thường của bài (không phải tiêu đề, phụ đề, heading), thêm MỘT dòng riêng ngay bên dưới đoạn đó, KHÔNG có dòng trống ở giữa, theo đúng dạng:  [vi: bản dịch tiếng Việt của đoạn ngay phía trên]\n'+
-  '- Dịch tự nhiên, đúng nghĩa, đủ ý, văn phong rõ ràng cho học viên; giữ nguyên tên riêng, số liệu và thuật ngữ cần giữ. Dịch cả đoạn thành một dòng liền, không xuống dòng.\n'+
+  '- DỊCH THEO Ý, KHÔNG DỊCH TỪNG CHỮ: đọc hiểu cả câu rồi diễn đạt lại bằng tiếng Việt tự nhiên như người Việt viết; được đổi trật tự từ, tách hoặc gộp câu khi cần cho mượt, nhưng không thêm, không bớt ý, không đổi sắc thái. Tránh lối dịch word-for-word, cấu trúc câu Việt hoá gượng; văn phong rõ ràng cho học viên; giữ nguyên tên riêng, số liệu và thuật ngữ cần giữ. Dịch cả đoạn thành một dòng liền, không xuống dòng.\n'+
   '- Bản dịch KHÔNG chứa thẻ màu và không chứa dấu ngoặc vuông [ ] ở bên trong.\n'+
   '- Mỗi đoạn dịch tương ứng đúng một đoạn gốc; không gộp, không tách, không bỏ sót đoạn nào.\n\n'+
   'VÍ DỤ ĐOẠN ĐÃ TÔ KÈM BẢN DỊCH:\n'+
@@ -5229,50 +5230,59 @@ function aiPrompt(){
 
 /* ---------- Elicit từ AI (JSON) ---------- */
 var EL_TYPES={yn:'Yes/No',wh:'WH',research:'Tra cứu'};
-function elChips(d){ d=d||{}; return (d.type&&EL_TYPES[d.type]?'<span class="el-chip t-'+d.type+'">'+EL_TYPES[d.type]+'</span>':'')+(d.group?'<span class="el-chip">'+esc(d.group)+'</span>':''); }
+var EL_LV={literal:'Tìm chi tiết',inferential:'Hiểu ý ngầm'};
+function elChips(d){ d=d||{}; return (d.type&&EL_TYPES[d.type]?'<span class="el-chip t-'+d.type+'">'+EL_TYPES[d.type]+'</span>':'')+(d.level&&EL_LV[d.level]?'<span class="el-chip lv-'+d.level+'">'+EL_LV[d.level]+'</span>':'')+(d.group?'<span class="el-chip">'+esc(d.group)+'</span>':''); }
 var EL_CRITERIA=
 'MỤC TIÊU CỦA BỘ CÂU HỎI ELICIT\n'+
-'Tạo bộ câu hỏi gợi mở bằng tiếng Việt, bám sát chính xác nội dung bài đọc. Câu hỏi giúp học viên hiểu chủ đề, theo dõi lập luận và nhận ra cách các ý trong bài liên kết với nhau. Hãy tạo đủ nhiều câu hỏi hữu ích để giáo viên xem lại và xoá bớt. Số lượng cụ thể nằm ở mục SO_CAU_ELICIT trong phần DỮ LIỆU ĐẦU VÀO; nếu chưa có thì tạo khoảng 15 đến 20 câu.\n\n'+
-'QUY TẮC CHUNG\n'+
-'1. Mỗi câu hỏi phải dựa trên một câu, cụm từ hoặc chi tiết thực sự có trong bài đọc.\n'+
-'2. Với mỗi câu hỏi, trích nguyên văn phần làm căn cứ vào trường "evidence". Không tự sửa câu trích dẫn.\n'+
-'3. Câu hỏi phải giúp học viên hiểu bài hoặc thực hiện một thao tác đọc rõ ràng. Tránh câu hỏi chung chung, không gắn với văn bản.\n'+
-'4. Viết câu hỏi bằng tiếng Việt.\n'+
-'5. Phối trộn hai dạng câu hỏi:\n   - "yn": câu hỏi Có/Không.\n   - "wh": câu hỏi bắt đầu bằng Ai, Cái gì, Ở đâu, Khi nào, Tại sao, Như thế nào, v.v.\n'+
-'6. Mục tiêu tỷ lệ trên tổng số câu hỏi là 60% "yn" và 40% "wh". Nếu không thể đạt tỷ lệ chính xác, hãy làm tròn hợp lý.\n'+
-'7. Câu hỏi Có/Không không nên chỉ kiểm tra khả năng nhớ. Khi phù hợp, yêu cầu học viên giải thích hoặc tìm bằng chứng.\n'+
-'8. Mỗi câu phải có câu trả lời gợi ý ngắn trong trường "answer".\n'+
-'9. Không bịa trích dẫn, không suy diễn quá điều bài đọc nói và không trình bày kiến thức ngoài bài như thể đó là nội dung của bài.\n'+
-'10. Tạo nhiều câu hỏi phù hợp để giáo viên lựa chọn; không tự giới hạn ở một vài câu.\n'+
-'11. Câu hỏi mở rộng kiến thức phải được đặt ngay sau câu hỏi về chi tiết trong bài mà câu hỏi đó mở rộng.\n\n'+
+'Bộ câu hỏi dành cho học viên TỰ ĐỌC Ở NHÀ trước buổi học; giáo viên sẽ hỏi thêm trên lớp. Vì không có giáo viên bên cạnh, mỗi câu phải tự đủ nghĩa, rõ ràng, và dẫn học viên quay lại đúng chỗ trong bài. Câu hỏi bằng tiếng Việt, bám sát chính xác nội dung bài đọc, giúp học viên hiểu chủ đề, theo dõi lập luận và nhận ra cách các ý liên kết với nhau.\n\n'+
+'TIÊU CHÍ MỘT CÂU HỎI TỐT\n'+
+'1. Mỗi câu chỉ hỏi MỘT ý, ngắn gọn (tối đa khoảng 25 từ), dùng ngôn ngữ đơn giản; từ hoặc cụm tiếng Anh trong bài đặt trong ngoặc kép.\n'+
+'2. Không chứa sẵn đáp án, không chép nguyên một câu trong bài rồi chỉ đổi thành dấu hỏi, không dẫn dắt để học viên đoán được đáp án mà không cần đọc.\n'+
+'3. Trả lời được CHỈ bằng cách đọc kỹ bài. Không hỏi điều bài không nói; không bịa trích dẫn; không suy diễn quá điều bài đọc cho phép; không trình bày kiến thức ngoài bài như thể đó là nội dung của bài.\n'+
+'4. Mỗi câu thuộc một trong hai mức tư duy, ghi ở trường "level":\n'+
+'   - "literal" (Tìm chi tiết): thông tin được nêu trực tiếp trong bài (ai, cái gì, ở đâu, khi nào, bao nhiêu, nguyên nhân hay kết quả được nói thẳng).\n'+
+'   - "inferential" (Hiểu ý ngầm): phải suy ra từ chi tiết trong bài: lý do không nói thẳng, hàm ý, quan hệ giữa các ý, ý nghĩa của câu khó. Câu loại này phải yêu cầu học viên chỉ ra manh mối trong bài làm căn cứ.\n'+
+'   Mỗi đoạn có chi tiết phù hợp thì nên có cả hai mức. Câu type "research" không cần "level".\n'+
+'5. Phối trộn hình thức: "yn" (Có/Không) và "wh" (Ai, Cái gì, Ở đâu, Khi nào, Tại sao, Như thế nào…), tỷ lệ xấp xỉ 60% "yn" và 40% "wh".\n'+
+'6. Câu "yn" không được chỉ kiểm tra trí nhớ: luôn kèm yêu cầu giải thích hoặc chỉ ra bằng chứng, ví dụ "…? Vì sao em nghĩ vậy / Dấu hiệu nào trong bài cho thấy điều đó?".\n'+
+'7. Trường "answer": đáp án gợi ý ngắn gọn (1 đến 2 câu), viết như lời hướng dẫn để học viên tự đối chiếu sau khi trả lời, không lặp nguyên văn câu trong bài.\n\n'+
+'QUY TẮC PHỦ BÀI (bắt buộc)\n'+
+'1. Xét lần lượt TỪNG ĐOẠN. Trong mỗi đoạn, MỌI chi tiết khớp với tiêu chí của một nhóm câu hỏi dưới đây đều phải được hỏi; không bỏ sót.\n'+
+'2. Mật độ trung bình 4 đến 5 câu cho mỗi đoạn, tuỳ độ dài và độ dày thông tin: đoạn nhiều chi tiết hoặc nhiều chỗ khó có thể hơn, đoạn ngắn có thể ít hơn. Không để đoạn nào có 0 câu, trừ khi đoạn đó thật sự không có chi tiết nào khớp tiêu chí (ví dụ tiêu đề hay câu chuyển ý rất ngắn).\n'+
+'3. Ưu tiên những chỗ học viên dễ vướng: câu có cấu trúc phức tạp, đại từ hoặc từ thay thế dễ nhầm, từ vựng khó, chỗ lập luận đổi hướng.\n'+
+'4. Sắp xếp câu hỏi theo thứ tự xuất hiện của căn cứ trong bài. Nếu giáo viên điền SO_CAU_ELICIT thì tuân theo số đó nhưng vẫn phân bổ đều các đoạn; nếu không điền thì dùng mật độ ở mục 2.\n'+
+'5. Câu hỏi mở rộng kiến thức phải được đặt ngay sau câu hỏi về chi tiết trong bài mà nó mở rộng.\n\n'+
 'CÁC NHÓM CÂU HỎI\n'+
 'A. "Thông tin sẽ cần": chỉ tạo nhóm này nếu giáo viên cung cấp câu hỏi IELTS Reading có sẵn. Dùng hình ảnh hoặc gợi ý trước khi đọc để học viên dự đoán từ khoá có thể xuất hiện trong bài. Không giả định có hình ảnh nếu giáo viên chưa cung cấp. Nếu không có câu hỏi IELTS Reading thì bỏ qua nhóm này. Evidence của nhóm này là đoạn trong bài chứa từ khoá hoặc thông tin tương ứng.\n'+
-'B. "Dòng lập luận": luôn tạo. Tập trung vào các chi tiết liên quan đến chủ đề và giúp học viên hiểu bài hơn: cách một ý được giải thích, lý do hỗ trợ kết luận, mối quan hệ giữa các chi tiết, ý nghĩa của câu/đoạn khó. Giúp học viên lần theo mạch suy nghĩ và tìm manh mối trong văn bản.\n'+
-'C. "Coherence": luôn tạo. Khai thác liên từ và linking devices; referencing (từ hoặc cụm từ tham chiếu đến thông tin khác trong bài); substitution (từ hoặc cụm từ thay thế cho thông tin đã nêu); cách các ý kết nối kể cả khi không có từ nối rõ ràng; quan hệ tiếp nối, đối lập, nguyên nhân-kết quả, ví dụ và trình tự khi có trong bài. Khi phù hợp, trích đúng từ, cụm từ hoặc câu làm căn cứ rồi hỏi từ đó tham chiếu/thay thế cho điều gì, hoặc hai ý liên kết với nhau như thế nào.\n'+
-'D. "Kiến thức": luôn tạo. Câu hỏi phải bắt đầu từ kiến thức theo chủ đề được nêu cụ thể trong bài. Có thể tạo câu hỏi mở rộng để học viên tìm hiểu thêm ngoài bài. Mỗi câu mở rộng phải: (1) bắt đầu bằng dấu sao "*" trong nội dung trường "q"; (2) dùng type "research"; (3) có trường "terms" gồm các từ khoá tiếng Anh gợi ý để tra cứu; (4) được đặt ngay sau câu hỏi về chi tiết trong bài có liên quan. Không yêu cầu tìm hiểu chủ đề ngoài bài nếu không chỉ rõ mối liên hệ với chi tiết trong bài.\n'+
-'E. "Ý đồ tác giả": chỉ tạo khi giáo viên cung cấp dạng câu hỏi IELTS Reading Multiple Choice hỏi về ý đồ hoặc hàm ý của tác giả (dấu hiệu như "Implications", "What points does the author mean" hoặc cách hỏi tương đương). Nếu không có thì bỏ qua nhóm này. Khi được kích hoạt, tạo câu hỏi giúp học viên suy luận ý tác giả muốn truyền đạt, hàm ý, thái độ hoặc mục đích từ một chi tiết cụ thể trong bài; yêu cầu giải thích suy luận và chỉ ra bằng chứng trong bài.\n\n'+
+'B. "Dòng lập luận": luôn tạo. Tập trung vào các chi tiết liên quan đến chủ đề và giúp học viên hiểu bài hơn: cách một ý được giải thích, lý do hỗ trợ kết luận, mối quan hệ giữa các chi tiết, ý nghĩa của câu hoặc đoạn khó. Giúp học viên lần theo mạch suy nghĩ và tìm manh mối trong văn bản. Đây là nhóm có cả "literal" và "inferential".\n'+
+'C. "Coherence": luôn tạo. Khai thác liên từ và linking devices; referencing (từ hoặc cụm từ tham chiếu đến thông tin khác trong bài); substitution (từ hoặc cụm từ thay thế cho thông tin đã nêu); cách các ý kết nối kể cả khi không có từ nối rõ ràng; quan hệ tiếp nối, đối lập, nguyên nhân-kết quả, ví dụ và trình tự khi có trong bài. Trích đúng từ, cụm từ hoặc câu làm căn cứ rồi hỏi từ đó tham chiếu hoặc thay thế cho điều gì, hay hai ý liên kết với nhau như thế nào. Với referencing và substitution, ghi cả chỗ đại từ lẫn chỗ nó chỉ tới vào "evidence" (hai mục).\n'+
+'D. "Từ trong ngữ cảnh": luôn tạo khi bài có từ hoặc cụm từ khó mà học viên có thể đoán nghĩa nhờ câu xung quanh. Evidence là câu chứa từ đó. Không hỏi thẳng "X nghĩa là gì"; thay vào đó hỏi về manh mối, ví dụ "Dựa vào vế sau, em đoán \'X\' gần nghĩa với điều gì?" hoặc "Từ nào gần đó cho thấy \'X\' mang nghĩa tích cực hay tiêu cực?". Không nêu nghĩa của từ trong câu hỏi. Phần "answer" ghi nghĩa trong ngữ cảnh và manh mối để đoán. Bỏ qua từ mà ngữ cảnh không đủ để đoán. Thường là "inferential".\n'+
+'E. "Kiến thức": luôn tạo. Câu hỏi phải bắt đầu từ kiến thức theo chủ đề được nêu cụ thể trong bài. Có thể tạo câu hỏi mở rộng để học viên tìm hiểu thêm ngoài bài. Mỗi câu mở rộng phải: (1) bắt đầu bằng dấu sao "*" trong nội dung trường "q"; (2) dùng type "research"; (3) có trường "terms" gồm các từ khoá tiếng Anh gợi ý để tra cứu; (4) được đặt ngay sau câu hỏi về chi tiết trong bài có liên quan. Không yêu cầu tìm hiểu chủ đề ngoài bài nếu không chỉ rõ mối liên hệ với chi tiết trong bài.\n'+
+'F. "Ý đồ tác giả": chỉ tạo khi giáo viên cung cấp dạng câu hỏi IELTS Reading Multiple Choice hỏi về ý đồ hoặc hàm ý của tác giả (dấu hiệu như "Implications", "What points does the author mean" hoặc cách hỏi tương đương). Nếu không có thì bỏ qua nhóm này. Khi được kích hoạt, tạo câu hỏi giúp học viên suy luận ý tác giả muốn truyền đạt, hàm ý, thái độ hoặc mục đích từ một chi tiết cụ thể trong bài; yêu cầu giải thích suy luận và chỉ ra bằng chứng trong bài. Luôn là "inferential".\n\n'+
 'CẤU TRÚC JSON\n'+
 '{"elicits":[\n'+
-'  {"n":1,"group":"Dòng lập luận","type":"yn","q":"Câu hỏi bằng tiếng Việt?","evidence":["Trích nguyên văn từ bài đọc."],"answer":"Câu trả lời gợi ý."},\n'+
-'  {"n":2,"group":"Kiến thức","type":"research","q":"* Câu hỏi mở rộng bằng tiếng Việt?","evidence":["Chi tiết nguyên văn trong bài có liên quan."],"terms":["English key term 1","English key term 2"],"answer":"Gợi ý cách tra cứu hoặc thảo luận."}\n'+
+'  {"n":1,"group":"Dòng lập luận","type":"wh","level":"literal","q":"Câu hỏi bằng tiếng Việt?","evidence":["Trích nguyên văn từ bài đọc."],"answer":"Câu trả lời gợi ý."},\n'+
+'  {"n":2,"group":"Dòng lập luận","type":"yn","level":"inferential","q":"Câu hỏi Có/Không kèm yêu cầu giải thích?","evidence":["Trích nguyên văn từ bài đọc."],"answer":"Câu trả lời gợi ý."},\n'+
+'  {"n":3,"group":"Kiến thức","type":"research","q":"* Câu hỏi mở rộng bằng tiếng Việt?","evidence":["Chi tiết nguyên văn trong bài có liên quan."],"terms":["English key term 1","English key term 2"],"answer":"Gợi ý cách tra cứu hoặc thảo luận."}\n'+
 ']}\n\n'+
 'QUY TẮC JSON\n'+
-'- Tên trường được phép: "n", "group", "type", "q", "evidence", "terms", "answer". Chỉ research mới có "terms".\n'+
-'- Đánh số "n" liên tục theo thứ tự xuất hiện. Dùng đúng tên nhóm: "Thông tin sẽ cần", "Dòng lập luận", "Coherence", "Kiến thức", "Ý đồ tác giả".\n'+
-'- type chỉ là "yn", "wh" hoặc "research".\n'+
+'- Tên trường được phép: "n", "group", "type", "level", "q", "evidence", "terms", "answer". Chỉ research mới có "terms" (và không có "level").\n'+
+'- Đánh số "n" liên tục theo thứ tự xuất hiện. Dùng đúng tên nhóm: "Thông tin sẽ cần", "Dòng lập luận", "Coherence", "Từ trong ngữ cảnh", "Kiến thức", "Ý đồ tác giả".\n'+
+'- type chỉ là "yn", "wh" hoặc "research". level chỉ là "literal" hoặc "inferential".\n'+
 '- "evidence" là MẢNG các đoạn chữ chép NGUYÊN VĂN từ bài (đúng từng chữ, chữ hoa/thường, dấu câu), mỗi đoạn tối đa một câu, KHÔNG dùng dấu “…”, không dịch, không viết lại. Căn cứ nằm ở hai chỗ thì ghi thành hai mục. Nhiều câu hỏi được dùng chung một đoạn evidence.\n'+
 '- Đảm bảo JSON hợp lệ: dấu ngoặc kép và dấu phẩy đúng chuẩn, không có dấu phẩy thừa cuối danh sách.\n';
 var EL_INPUT=
 '=== DỮ LIỆU ĐẦU VÀO ===\n'+
-'SO_CAU_ELICIT: <điền số câu>\n'+
+'SO_CAU_ELICIT: <điền tổng số câu, hoặc để trống để AI tự tính 4-5 câu mỗi đoạn>\n'+
 'CAU_HOI_IELTS_READING: <dán câu hỏi IELTS Reading nếu có>\n'+
 'CAU_HOI_Y_DO_TAC_GIA: <dán dạng Multiple Choice về ý đồ/hàm ý tác giả nếu có>\n'+
 'BAI_DOC:\n<dán bài đọc vào đây>\n\n'+
-'Quy ước: mục nào còn nguyên dấu < > nghĩa là giáo viên không cung cấp. Khi đó: SO_CAU_ELICIT mặc định 15 đến 20 câu; bỏ qua hoàn toàn nhóm "Thông tin sẽ cần" và nhóm "Ý đồ tác giả"; vẫn tạo các nhóm "Dòng lập luận", "Coherence", "Kiến thức".';
+'Quy ước: mục nào còn nguyên dấu < > nghĩa là giáo viên không cung cấp. Khi đó: SO_CAU_ELICIT mặc định theo mật độ 4 đến 5 câu mỗi đoạn; bỏ qua hoàn toàn nhóm "Thông tin sẽ cần" và nhóm "Ý đồ tác giả"; vẫn tạo các nhóm "Dòng lập luận", "Coherence", "Từ trong ngữ cảnh", "Kiến thức".';
 var EL_CHECK='TỰ KIỂM TRA TRƯỚC KHI TRẢ LỜI\n'+
 '1. Mọi chuỗi trong "evidence" đều xuất hiện NGUYÊN VĂN, đúng từng chữ và dấu câu, trong bài đọc gốc (không kèm thẻ màu).\n'+
 '2. JSON hợp lệ (ngoặc, dấu phẩy, dấu nháy kép); không có trường ngoài danh sách cho phép; "terms" chỉ có ở type "research".\n'+
-'3. Số câu đúng SO_CAU_ELICIT (nếu có); tỷ lệ "yn"/"wh" xấp xỉ 60/40; câu research đứng ngay sau câu về chi tiết liên quan.\n'+
+'3. Mọi đoạn đều được phủ: mọi chi tiết khớp tiêu chí đều có câu hỏi, trung bình 4 đến 5 câu mỗi đoạn; số câu đúng SO_CAU_ELICIT (nếu có); tỷ lệ "yn"/"wh" xấp xỉ 60/40; câu research đứng ngay sau câu về chi tiết liên quan.\n'+
+'3b. Mỗi câu (trừ research) có "level" là "literal" hoặc "inferential"; câu "inferential" yêu cầu chỉ ra manh mối; câu "yn" có kèm yêu cầu giải thích; mỗi câu chỉ hỏi một ý, không chứa sẵn đáp án.\n'+
 '4. Nhóm "Thông tin sẽ cần" và "Ý đồ tác giả" chỉ xuất hiện khi giáo viên đã cung cấp dữ liệu tương ứng.\n';
 var EL_WHY='Công cụ của giáo viên xử lý kết quả của bạn như sau: nó tìm từng chuỗi trong "evidence" trong bài đọc rồi gắn câu hỏi vào đúng chỗ đó; học viên đọc bài và thấy câu hỏi hiện bên cạnh đoạn văn. Vì vậy "evidence" phải khớp chữ trong bài tuyệt đối; nếu không khớp, câu hỏi sẽ bị mất.\n\n';
 function aiElicitPrompt(){
@@ -5325,11 +5335,11 @@ var TASK_RULES=
 var TASK_INPUT=
 '=== DỮ LIỆU ĐẦU VÀO ===\n'+
 'LOAI_BAI: <ghi CONTENT nếu đây là bài đọc lấy nội dung, kiến thức; ghi IELTS nếu là bài IELTS có sẵn đề>\n'+
-'SO_CAU_ELICIT: <điền số câu>\n'+
+'SO_CAU_ELICIT: <điền tổng số câu, hoặc để trống để AI tự tính 4-5 câu mỗi đoạn>\n'+
 'CAU_HOI_IELTS_READING: <dán câu hỏi IELTS Reading nếu có>\n'+
 'CAU_HOI_Y_DO_TAC_GIA: <dán dạng Multiple Choice về ý đồ/hàm ý tác giả nếu có>\n'+
 'BAI_DOC:\n<dán bài đọc vào đây>\n\n'+
-'Quy ước: mục LOAI_BAI ghi rõ CONTENT nghĩa là bài đọc này dùng để lấy nội dung, KHÔNG phải đề thi: bạn BẮT BUỘC soạn thêm TASK ĐỌC HIỂU (khối ```task) theo phần quy tắc ở trên. Nếu LOAI_BAI còn nguyên dấu < > hoặc ghi IELTS thì KHÔNG soạn task. Với các mục khác: mục nào còn nguyên dấu < > nghĩa là giáo viên không cung cấp; khi đó SO_CAU_ELICIT mặc định 15 đến 20 câu, bỏ qua nhóm "Thông tin sẽ cần" và "Ý đồ tác giả", vẫn tạo các nhóm "Dòng lập luận", "Coherence", "Kiến thức".';
+'Quy ước: mục LOAI_BAI ghi rõ CONTENT nghĩa là bài đọc này dùng để lấy nội dung, KHÔNG phải đề thi: bạn BẮT BUỘC soạn thêm TASK ĐỌC HIỂU (khối ```task) theo phần quy tắc ở trên. Nếu LOAI_BAI còn nguyên dấu < > hoặc ghi IELTS thì KHÔNG soạn task. Với các mục khác: mục nào còn nguyên dấu < > nghĩa là giáo viên không cung cấp; khi đó SO_CAU_ELICIT mặc định theo mật độ 4 đến 5 câu mỗi đoạn, bỏ qua nhóm "Thông tin sẽ cần" và "Ý đồ tác giả", vẫn tạo các nhóm "Dòng lập luận", "Coherence", "Từ trong ngữ cảnh", "Kiến thức".';
 function aiTaskPrompt(){
   return 'Bạn là trợ lý soạn bài Reading comprehension cho giáo viên tiếng Anh.\n\nBài đọc ở cuối là bài đọc LẤY NỘI DUNG (content), không phải đề thi. NHIỆM VỤ: soạn bộ task đọc hiểu cho bài này theo quy tắc dưới đây. Công cụ của giáo viên đọc kết quả của bạn bằng chương trình nên phải đúng định dạng.\n\n'+TASK_RULES+'\n'+
   'ĐỊNH DẠNG TRẢ LỜI: chỉ MỘT khối code ```task … ``` chứa bộ task. Không thêm lời dẫn, giải thích hay chú thích; không chép lại bài đọc.\n\nBÀI ĐỌC (đánh nhãn đoạn A, B, C… theo thứ tự các đoạn thân bài):\n<dán bài đọc vào đây>';
@@ -5345,6 +5355,7 @@ function aiAllPrompt(){
   '2) Khối ```json chứa JSON elicit (Phần 2). "evidence" chép từ bài GỐC, không kèm thẻ màu.\n'+
   '3) Khối ```task chứa task đọc hiểu (Phần 3). CHỈ có khối này khi LOAI_BAI là CONTENT; nếu không thì chỉ trả hai khối trên.\n\n'+TASK_INPUT;
 }
+function elLevel(t){ var s=String(t||'').toLowerCase(); if(/infer|ngầm|ngam|suy/.test(s)) return 'inferential'; if(/liter|chi\s*tiết|chi\s*tiet|direct/.test(s)) return 'literal'; return ''; }
 function elType(t){ var s=String(t||'').toLowerCase(); if(/research|tra\s*c|\*/.test(s)) return 'research'; if(/^(yn|y\/n|yes|no|tf)|yes\s*\/?\s*no|có\s*\/?\s*không/.test(s)) return 'yn'; return 'wh'; }
 function elParse(raw){
   var s=String(raw||'').trim(); if(!s) return {err:'Hãy dán khối JSON mà AI trả về.'};
@@ -5361,7 +5372,7 @@ function elParse(raw){
     var ev=x.evidence||x.evidences||x.can_cu||x['căn cứ']||[]; if(typeof ev==='string') ev=[ev]; if(!Array.isArray(ev)) ev=[];
     ev=ev.map(function(t){ return String(t==null?'':t); }).filter(function(t){ return t.trim(); });
     var tm=x.terms||x.keywords||[]; if(typeof tm==='string') tm=tm.split(/[,;]/); if(!Array.isArray(tm)) tm=[];
-    items.push({n:x.n!=null?x.n:k+1,q:q,type:elType(x.type),group:String(x.group||x.nhom||'').trim(),evidence:ev,hint:String(x.answer||x.hint||x.goiy||'').trim(),terms:tm.map(function(t){ return String(t).trim(); }).filter(Boolean)});
+    items.push({n:x.n!=null?x.n:k+1,q:q,type:elType(x.type),level:elLevel(x.level||x.muc||x['mức']),group:String(x.group||x.nhom||'').trim(),evidence:ev,hint:String(x.answer||x.hint||x.goiy||'').trim(),terms:tm.map(function(t){ return String(t).trim(); }).filter(Boolean)});
   });
   if(!items.length) return {err:'Mọi câu hỏi đều thiếu trường "q" (nội dung câu hỏi).'};
   return {items:items,skip:skip};
@@ -5417,7 +5428,7 @@ function elApply(items,mode){
       splitNodes(r).forEach(function(t){ var s=document.createElement('span'); s.className='el'; s.setAttribute('data-el',id); wrap(t,s); n++; });
     });
     if(!n) return;
-    var d={q:it.q,hint:it.hint}; if(it.type) d.type=it.type; if(it.group) d.group=it.group; if(it.terms.length) d.terms=it.terms;
+    var d={q:it.q,hint:it.hint}; if(it.type) d.type=it.type; if(it.level&&it.type!=='research') d.level=it.level; if(it.group) d.group=it.group; if(it.terms.length) d.terms=it.terms;
     L.elicits[id]=d; added++;
   });
   lastElSig=null; changed(true); showTab('el',true);
