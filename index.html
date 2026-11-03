@@ -1209,6 +1209,40 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 [data-th="constellation"] .rd-vi-btn{background:#ffd6e0;color:#4a1426}[data-th="constellation"] .rd-vi-btn[aria-expanded=true]{background:#ffb8cb;color:#4a1426}
 [data-th="constellation"] .rd-vi-t{background:#ffd6e0;color:#4a1426}[data-th="constellation"] .rd-vi-t::before{background:rgba(255,226,235,.9)}
 .rd-vi-all[aria-pressed=true]{background:var(--rd-accent);border-color:var(--rd-accent);color:var(--rd-paper,#fff)}
+
+/* ---- Tra từ: thẻ từ điển nảy ra từ chính từ được bấm (stage = tối xanh, notebook = giấy trắng mực xanh, constellation = xanh đêm vàng) ---- */
+:root{--lk-bg:#1f2547;--lk-ink:#e9ecfb;--lk-mut:#a9b2d6;--lk-acc:#8fa2ff;--lk-line:rgba(255,255,255,.14);--lk-soft:rgba(143,162,255,.16);--lk-sh:0 22px 44px -18px rgba(0,0,0,.65);--lk-head:var(--rd-ui,'Be Vietnam Pro',system-ui,sans-serif);--lk-r:14px;--lk-hl:rgba(143,162,255,.32)}
+[data-th="notebook"]{--lk-bg:#fffef9;--lk-ink:#2a2620;--lk-mut:#6b6254;--lk-acc:#1f3a8a;--lk-line:rgba(31,58,138,.22);--lk-soft:#fff3a8;--lk-sh:0 16px 30px -16px rgba(0,0,0,.45);--lk-head:'Patrick Hand','Be Vietnam Pro',system-ui,sans-serif;--lk-r:4px;--lk-hl:#fff3a8}
+[data-th="constellation"]{--lk-bg:#141a3d;--lk-ink:#eef1fb;--lk-mut:#b6bedf;--lk-acc:#ffe9a8;--lk-line:rgba(255,233,168,.22);--lk-soft:rgba(255,233,168,.14);--lk-sh:0 22px 44px -18px rgba(8,10,40,.8);--lk-head:'Patrick Hand','Be Vietnam Pro',system-ui,sans-serif;--lk-hl:rgba(255,233,168,.45)}
+::highlight(rd-look){background-color:var(--lk-hl);color:inherit}
+.rd-lk{position:fixed;z-index:1200;width:min(350px,calc(100vw - 16px));background:var(--lk-bg);color:var(--lk-ink);border:1px solid var(--lk-line);border-radius:var(--lk-r);box-shadow:var(--lk-sh);font-family:var(--rd-ui,'Be Vietnam Pro',system-ui,sans-serif);animation:lkPop .3s cubic-bezier(.2,1.35,.4,1) both}
+.rd-lk-in{max-height:min(72vh,560px);overflow:auto;padding:14px 16px 12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain;border-radius:inherit}
+.rd-lk::before{content:"";position:absolute;left:var(--ax,28px);top:-6px;width:11px;height:11px;background:var(--lk-bg);border-left:1px solid var(--lk-line);border-top:1px solid var(--lk-line);transform:rotate(45deg)}
+.rd-lk.flip::before{top:auto;bottom:-6px;transform:rotate(225deg)}
+@keyframes lkPop{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}
+.rd-lk-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.rd-lk-fill{flex:1}
+.rd-lk-hw{font:700 22px/1.15 var(--lk-head);letter-spacing:.005em;overflow-wrap:anywhere}
+[data-th="notebook"] .rd-lk-hw,[data-th="constellation"] .rd-lk-hw{font-weight:400;font-size:27px}
+.rd-lk-pos{font:600 10.5px/1 var(--rd-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--lk-acc);border:1px solid color-mix(in srgb,var(--lk-acc) 55%,transparent);padding:3px 6px;border-radius:5px}
+.rd-lk-ib{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1px solid var(--lk-line);background:transparent;color:var(--lk-ink);cursor:pointer;padding:0;flex:none}
+.rd-lk-ib:hover{background:var(--lk-soft)}.rd-lk-ib[data-lk=x]{border:0}
+.rd-lk-ib svg,.rd-lk-sp svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rd-lk-ib.heart[aria-pressed=true]{color:#ff6b81;border-color:#ff6b81}.rd-lk-ib.heart[aria-pressed=true] svg{fill:#ff6b81}
+.rd-lk-sp{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--lk-line);background:transparent;color:var(--lk-ink);border-radius:99px;padding:6px 11px 6px 9px;font:600 11.5px/1 var(--rd-ui);cursor:pointer}
+.rd-lk-sp svg{stroke:var(--lk-acc);width:14px;height:14px}.rd-lk-sp:hover{background:var(--lk-soft)}
+.rd-lk-ipa{font:500 12.5px/1.2 var(--rd-ui);color:var(--lk-mut)}
+.rd-lk button:focus-visible{outline:2px solid var(--lk-acc);outline-offset:2px}
+.rd-lk-vn{font:600 15px/1.45 var(--rd-ui);color:var(--lk-ink)}.rd-lk-vn small{display:block;font:400 12.5px/1.5 var(--rd-ui);color:var(--lk-mut);margin-top:2px}
+.rd-lk-en{font:400 13px/1.6 var(--rd-ui);color:var(--lk-mut);margin:0}
+.rd-lk-ex{font:italic 400 13px/1.6 var(--rd-ui);color:var(--lk-ink);border-left:2px solid color-mix(in srgb,var(--lk-acc) 60%,transparent);padding-left:10px;margin:6px 0 0}
+.rd-lk-m{display:flex;flex-direction:column;gap:4px}
+.rd-lk-lab{font:700 10px/1 var(--rd-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--lk-mut)}
+.rd-lk-chips{display:flex;flex-wrap:wrap;gap:6px}.rd-lk-chip{font:500 12px/1 var(--rd-ui);padding:6px 10px;border-radius:99px;background:var(--lk-soft);color:var(--lk-ink)}
+.rd-lk-src{font:500 10.5px/1.4 var(--rd-ui);color:var(--lk-mut);opacity:.9}.rd-lk-src b{font-weight:700}
+.rd-lk-load{display:flex;align-items:center;gap:5px;margin:0;font:500 12.5px var(--rd-ui);color:var(--lk-mut)}
+.rd-lk-load i{width:6px;height:6px;border-radius:50%;background:var(--lk-acc);animation:lkDot 1s infinite ease-in-out both}.rd-lk-load i:nth-child(2){animation-delay:.15s}.rd-lk-load i:nth-child(3){animation-delay:.3s;margin-right:4px}
+@keyframes lkDot{0%,80%,100%{opacity:.25;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.rd-lk{animation:none}.rd-lk-load i{animation:none;opacity:.7}}
 </style>
 <style id="rr-css">
 /* Reading Room shell: home, library, teacher hub and themed reading. Everything is scoped under .rr and uses --rr-* tokens so it never touches the Studio editor */
@@ -2034,7 +2068,7 @@ RD.mount = function(root, lesson, init, opts){
     '<div class="rd-bar"><div class="rd-legend" role="group" aria-label="Mã màu">'+chips+'</div>'+
     '<div class="rd-tools"><span class="rd-zoom" role="group" aria-label="Cỡ chữ"><span class="rd-zwrap"><button type="button" class="rd-btn rd-zv" aria-haspopup="listbox" aria-expanded="false" title="Chọn mức phóng to"><span class="rd-zt">100%</span><svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="rd-zmenu" role="listbox" aria-label="Mức phóng to" hidden></div></span></span><button type="button" class="rd-btn rd-focus-btn" aria-pressed="false">Tập trung</button><button type="button" class="rd-btn rd-nohl-btn" aria-pressed="false" title="Xem bài đọc thuần, không có highlight nào">Không highlight</button><button type="button" class="rd-btn rd-vi-all" aria-pressed="false" title="Hiện hoặc ẩn bản dịch tiếng Việt của mọi đoạn" hidden>Bản dịch</button><button type="button" class="rd-btn rd-tts-btn" aria-pressed="false" title="Nghe bài đọc (giọng đọc của thiết bị)" hidden>Nghe</button>'+
     ''+(lesson.exam&&lesson.exam.groups&&lesson.exam.groups.length?'<span class="rd-mode" role="group" aria-label="Chế độ học"><button type="button" class="rd-btn rd-mode-read" aria-pressed="true">Đọc kỹ</button><button type="button" class="rd-btn rd-exam-btn" aria-pressed="false">Task đọc hiểu <span class="rd-count rd-ex-n">'+lesson.exam.count+'</span></button></span>':'')+'<button type="button" class="rd-btn rd-work-btn">Bài làm <span class="rd-count">0</span></button></div></div>'+
-    '<p class="rd-tip">'+(window.matchMedia&&matchMedia('(hover:none)').matches?'Chạm giữ một từ rồi kéo để chọn cụm từ cần ghi chú. Chạm vào ô màu để ẩn hoặc hiện từng loại.':'Bôi đen một cụm từ để ghi chú lên bài. Bấm vào ô màu để ẩn hoặc hiện từng loại.')+'</p></header>'+
+    '<p class="rd-tip">'+(window.matchMedia&&matchMedia('(hover:none)').matches?'Chạm vào một từ để tra nghĩa. Chạm giữ rồi kéo để chọn cụm từ cần ghi chú. Chạm vào ô màu để ẩn hoặc hiện từng loại.':'Bấm vào một từ để tra nghĩa. Bôi đen một cụm từ để ghi chú lên bài. Bấm vào ô màu để ẩn hoặc hiện từng loại.')+'</p></header>'+
     '<article class="rd-text"></article></div>'+
     '<aside class="rd-drawer" aria-label="Bài làm của tôi"><div class="rd-dr-head"><h2>Bài làm của tôi</h2><button type="button" class="rd-btn rd-x">Đóng</button></div>'+
     '<div class="rd-dr-body"><label class="rd-lbl" for="'+uidp+'-name">Tên học viên</label><input class="rd-input rd-name" id="'+uidp+'-name" autocomplete="name" placeholder="Nhập tên của em"><div class="rd-dr-list"></div></div>'+
@@ -2400,6 +2434,140 @@ RD.mount = function(root, lesson, init, opts){
     on(all,'click',function(){ var o=all.getAttribute('aria-pressed')!=='true'; vws.forEach(function(w){ setV(w,o); }); sync(); try{ localStorage.setItem('rd:viall',o?'1':'0'); }catch(_){} toast(o?'Đã hiện bản dịch của mọi đoạn':'Đã ẩn bản dịch'); });
     try{ if(localStorage.getItem('rd:viall')==='1'){ vws.forEach(function(w){ setV(w,true); }); sync(); } }catch(_){}
   })();
+  /* ---------- Tra từ khi bấm vào một từ: từ điển mở + dịch miễn phí, không dùng AI ---------- */
+  (function(){
+    var DK='rd:dict:v2', FK='rd:fav:v1', mem={}, fav={}, pop=null, cur=null, rafL=0, seq=0;
+    try{ mem=JSON.parse(localStorage.getItem(DK))||{}; }catch(_){ mem={}; }
+    try{ fav=JSON.parse(localStorage.getItem(FK))||{}; }catch(_){ fav={}; }
+    function saveMem(){ try{ var ks=Object.keys(mem); if(ks.length>300) ks.slice(0,ks.length-300).forEach(function(k){ delete mem[k]; }); localStorage.setItem(DK,JSON.stringify(mem)); }catch(_){} }
+    function saveFav(){ try{ localStorage.setItem(FK,JSON.stringify(fav)); }catch(_){} }
+    function wordAt(e){
+      var x=e.clientX, y=e.clientY, r=null;
+      try{
+        if(document.caretPositionFromPoint){ var cp=document.caretPositionFromPoint(x,y); if(cp&&cp.offsetNode){ r=document.createRange(); r.setStart(cp.offsetNode,cp.offset); r.collapse(true); } }
+        else if(document.caretRangeFromPoint) r=document.caretRangeFromPoint(x,y);
+      }catch(_){ r=null; }
+      if(!r||r.startContainer.nodeType!==3||!art.contains(r.startContainer)) return null;
+      var n=r.startContainer, t=n.nodeValue, i=r.startOffset, a=i, b=i, L=/[A-Za-z'’\-]/;
+      while(a>0&&L.test(t.charAt(a-1))) a--; while(b<t.length&&L.test(t.charAt(b))) b++;
+      while(a<b&&/['’\-]/.test(t.charAt(a))) a++; while(b>a&&/['’\-]/.test(t.charAt(b-1))) b--;
+      var raw=t.slice(a,b); if(raw.length<2||!/^[A-Za-z]/.test(raw)) return null;
+      var rr=document.createRange(); rr.setStart(n,a); rr.setEnd(n,b);
+      var rs=rr.getClientRects(), hit=false; for(var k=0;k<rs.length;k++){ var q=rs[k]; if(x>=q.left-2&&x<=q.right+2&&y>=q.top-3&&y<=q.bottom+3) hit=true; }
+      if(!hit) return null;
+      return {raw:raw, key:raw.toLowerCase().replace(/['’]s$/,''), range:rr};
+    }
+    function cands(w){
+      var c=[w]; function add(s){ if(s&&s.length>=2&&c.indexOf(s)<0) c.push(s); }
+      if(/ies$/.test(w)&&w.length>4) add(w.slice(0,-3)+'y');
+      if(/(ches|shes|sses|xes|zes)$/.test(w)) add(w.slice(0,-2));
+      if(/s$/.test(w)&&!/ss$/.test(w)) add(w.slice(0,-1));
+      if(/ied$/.test(w)) add(w.slice(0,-3)+'y');
+      if(/ed$/.test(w)){ add(w.slice(0,-2)); add(w.slice(0,-1)); if(/(.)\1ed$/.test(w)) add(w.slice(0,-3)); }
+      if(/ing$/.test(w)){ add(w.slice(0,-3)); add(w.slice(0,-3)+'e'); if(/(.)\1ing$/.test(w)) add(w.slice(0,-4)); }
+      if(/ily$/.test(w)) add(w.slice(0,-3)+'y'); if(/ly$/.test(w)) add(w.slice(0,-2));
+      if(/er$/.test(w)) add(w.slice(0,-2)); if(/est$/.test(w)) add(w.slice(0,-3));
+      return c.slice(0,6);
+    }
+    function getJ(url,ms){ var ac=window.AbortController?new AbortController():null, t=setTimeout(function(){ if(ac) ac.abort(); },ms||8000); return fetch(url,ac?{signal:ac.signal}:{}).then(function(r){ clearTimeout(t); if(!r.ok){ var er=new Error('http'); er.status=r.status; throw er; } return r.json(); }); }
+    function parseDict(j){
+      var e=j&&j[0]; if(!e) return null; var ph={}, aud={};
+      (e.phonetics||[]).forEach(function(p){ var a=p.audio||'', tx=p.text||'', k=/-us\./.test(a)?'us':/-uk\./.test(a)?'uk':'any'; if(tx&&!ph[k]) ph[k]=tx; if(a&&!aud[k]) aud[k]=a; });
+      if(e.phonetic&&!ph.any&&!ph.us&&!ph.uk) ph.any=e.phonetic;
+      var ipa=[]; if(ph.us||aud.us) ipa.push({k:'US',t:ph.us||ph.any||'',a:aud.us||''}); if(ph.uk||aud.uk) ipa.push({k:'UK',t:ph.uk||ph.any||'',a:aud.uk||''});
+      if(!ipa.length&&(ph.any||aud.any)) ipa.push({k:'IPA',t:ph.any||'',a:aud.any||''});
+      var means=[], syn=[]; (j||[]).forEach(function(en){ (en.meanings||[]).forEach(function(m){
+        if(means.length<3&&!means.some(function(x){ return x.pos===m.partOfSpeech; })){ var d=(m.definitions||[])[0]||{}, ex=''; (m.definitions||[]).forEach(function(x){ if(!ex&&x.example) ex=x.example; }); means.push({pos:m.partOfSpeech,def:d.definition||'',ex:ex}); }
+        (m.synonyms||[]).concat(((m.definitions||[])[0]||{}).synonyms||[]).forEach(function(s){ if(syn.length<6&&syn.indexOf(s)<0) syn.push(s); }); }); });
+      return {head:e.word,ipa:ipa,means:means,syn:syn};
+    }
+    function fetchDict(list,i){ i=i||0; if(i>=list.length) return Promise.resolve(null); return getJ('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(list[i])).then(parseDict,function(e){ if(e&&e.status===404) return null; throw e; }).then(function(r){ return r||fetchDict(list,i+1); }); }
+    function fetchVn(w){ return getJ('https://api.mymemory.translated.net/get?langpair=en%7Cvi&q='+encodeURIComponent(w)).then(function(j){
+      if(!j||+j.responseStatus!==200) return []; var out=[], seen={}; function put(s){ s=String(s||'').trim(); var l=s.toLowerCase(); if(!s||l===w||/MYMEMORY|\bhttp/i.test(s)||seen[l]||out.length>=3) return; seen[l]=1; out.push(s); }
+      var ms=(j.matches||[]).filter(function(m){ return String(m.segment||'').toLowerCase()===w; }).sort(function(a,b){ return (+b.match||0)-(+a.match||0); }); ms.forEach(function(m){ put(m.translation); });
+      if(!out.length&&j.responseData) put(j.responseData.translatedText); return out; }); }
+    function lookup(key){
+      if(mem[key]&&mem[key].ok) return Promise.resolve(mem[key]);
+      var d=fetchDict(cands(key)).catch(function(){ return undefined; }), v=fetchVn(key).catch(function(){ return undefined; });
+      return Promise.all([d,v]).then(function(a){ var dd=a[0], vv=a[1];
+        if(dd===undefined&&vv===undefined) throw new Error('net');
+        var res={ok:1,key:key,head:(dd&&dd.head)||key,ipa:(dd&&dd.ipa)||[],means:(dd&&dd.means)||[],syn:(dd&&dd.syn)||[],vn:vv||[]};
+        if(dd||(vv&&vv.length)){ mem[key]=res; saveMem(); } return res; });
+    }
+    /* phát âm: giọng đọc của thiết bị trước, file âm thanh của từ điển nếu không có */
+    function pickVoice(lang){ var SSx=window.speechSynthesis; if(!SSx||!SSx.getVoices) return null; var vs=(SSx.getVoices()||[]).filter(function(v){ return String(v.lang||'').replace('_','-').toLowerCase()===lang.toLowerCase(); });
+      function sc(v){ var n=v.name||'',s=0; if(/natural|neural|online/i.test(n)) s+=100; if(/premium|enhanced|siri/i.test(n)) s+=90; if(/\bAva\b/i.test(n)) s+=60; if(/google/i.test(n)) s+=30; return s; }
+      vs.sort(function(a,b){ return sc(b)-sc(a); }); return vs[0]||null; }
+    function speak(word,lang,audio){
+      var SSx=window.speechSynthesis;
+      try{ if(SSx&&window.SpeechSynthesisUtterance){ SSx.cancel(); var u=new SpeechSynthesisUtterance(word), vo=pickVoice(lang); u.lang=lang; if(vo) u.voice=vo; u.rate=.9; SSx.speak(u); return; } }catch(_){}
+      if(audio){ try{ new Audio(audio).play().catch(function(){}); }catch(_){} }
+    }
+    function chips(a){ return a.map(function(s){ return '<span class="rd-lk-chip">'+esc(s)+'</span>'; }).join(''); }
+    function body(c,st){
+      var spk='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+      var heart='<button type="button" class="rd-lk-ib heart" data-lk="fav" aria-pressed="'+(!!fav[c.key])+'" aria-label="Lưu từ này"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.2-9A5.3 5.3 0 0 1 12 6.6 5.3 5.3 0 0 1 21.2 12c-2.2 4.4-9.2 9-9.2 9z"/></svg></button>';
+      var x='<button type="button" class="rd-lk-ib" data-lk="x" aria-label="Đóng"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>';
+      var h='<div class="rd-lk-row"><span class="rd-lk-hw">'+esc(cur.raw)+'</span>'+(st.data&&st.data.means.slice(0,2).map(function(m){ return '<span class="rd-lk-pos">'+esc(m.pos)+'</span>'; }).join(''))+'<span class="rd-lk-fill"></span>'+(st.data?heart:'')+x+'</div>';
+      if(st.loading) return h+'<p class="rd-lk-load"><i></i><i></i><i></i> Đang tra từ…</p>';
+      if(st.err) return h+'<p class="rd-lk-en">Chưa tra được từ này. Kiểm tra mạng rồi thử lại.</p><div class="rd-lk-row"><button type="button" class="rd-lk-sp" data-lk="say" data-lang="en-US">'+spk+'Nghe từ</button><button type="button" class="rd-lk-sp" data-lk="retry">Thử lại</button></div>';
+      var d=st.data, o=h;
+      if(d.head.toLowerCase()!==cur.key) o+='<div class="rd-lk-src">từ gốc: <b>'+esc(d.head)+'</b></div>';
+      var ip=d.ipa.length?d.ipa:[{k:'US',t:'',a:''},{k:'UK',t:'',a:''}];
+      o+='<div class="rd-lk-row">'+ip.map(function(p){ return '<button type="button" class="rd-lk-sp" data-lk="say" data-lang="'+(p.k==='UK'?'en-GB':'en-US')+'" data-audio="'+esc(p.a)+'" aria-label="Nghe giọng '+(p.k==='UK'?'Anh':'Mỹ')+'">'+spk+p.k+(p.t?' <span class="rd-lk-ipa">'+esc(p.t)+'</span>':'')+'</button>'; }).join('')+'</div>';
+      if(d.vn.length) o+='<div class="rd-lk-vn">'+esc(d.vn[0])+(d.vn.length>1?'<small>'+esc(d.vn.slice(1).join(' · '))+'</small>':'')+'</div>';
+      d.means.slice(0,2).forEach(function(m){ o+='<div class="rd-lk-m"><span class="rd-lk-lab">'+esc(m.pos)+'</span><div class="rd-lk-en">'+esc(m.def)+'</div>'+(m.ex?'<p class="rd-lk-ex">'+esc(m.ex)+'</p>':'')+'</div>'; });
+      if(!d.means.length&&!d.vn.length) o+='<p class="rd-lk-en">Từ điển chưa có từ này.</p>';
+      if(d.syn.length) o+='<div class="rd-lk-m"><span class="rd-lk-lab">Đồng nghĩa</span><div class="rd-lk-chips">'+chips(d.syn)+'</div></div>';
+      o+='<span class="rd-lk-src">Từ điển mở. Nghĩa Việt là bản dịch tự động, có thể chưa sát nghĩa trong bài.</span>';
+      return o;
+    }
+    function place(){
+      if(!pop||!cur) return; var rs=cur.range.getClientRects(), rr=rs[0]||cur.range.getBoundingClientRect();
+      if(rr.bottom<0||rr.top>innerHeight){ close(); return; }
+      var w=pop.offsetWidth, h=pop.offsetHeight, vw=document.documentElement.clientWidth, vh=innerHeight;
+      var left=Math.max(8,Math.min(rr.left-24,vw-w-8)), flip=false, top=rr.bottom+12;
+      if(top+h>vh-8&&rr.top-h-12>8){ top=rr.top-h-12; flip=true; }
+      top=Math.max(8,Math.min(top,vh-h-8));
+      var ax=Math.max(16,Math.min(w-30,rr.left+rr.width/2-left-6));
+      pop.style.left=left+'px'; pop.style.top=top+'px'; pop.style.setProperty('--ax',ax+'px'); pop.style.transformOrigin=(ax+6)+'px '+(flip?'100%':'0');
+      pop.classList.toggle('flip',flip);
+    }
+    function mark(on){ try{ if(window.CSS&&CSS.highlights&&window.Highlight){ if(on&&cur) CSS.highlights.set('rd-look',new Highlight(cur.range)); else CSS.highlights.delete('rd-look'); } }catch(_){} }
+    function close(){ if(pop){ pop.remove(); pop=null; } cur=null; mark(false); seq++; }
+    function draw(st,anim){
+      if(!pop){ pop=document.createElement('div'); pop.className='rd-lk'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Tra từ'); document.body.appendChild(pop); if(anim===false) pop.style.animation='none'; }
+      pop._st=st; pop.innerHTML='<div class="rd-lk-in">'+body(st.data||{key:cur.key,means:[],ipa:[],syn:[],vn:[],head:cur.key},st)+'</div>'; place();
+    }
+    function open(wd){
+      var same=cur&&cur.key===wd.key&&pop; cur=wd; mark(true); var my=++seq;
+      if(pop){ pop.remove(); pop=null; }
+      var st={loading:true}; draw(st);
+      lookup(wd.key).then(function(d){ if(my!==seq||!pop) return; draw({data:d}); },function(){ if(my!==seq||!pop) return; draw({err:1}); });
+      void same;
+    }
+    on(art,'click',function(e){
+      var t=e.target; if(!t||!t.closest) return;
+      var sel=getSelection(); if(sel&&!sel.isCollapsed) return;
+      if(t.closest('a,button,textarea,input,select,.el,.rd-card,.rd-nb,.rd-vi,.nb')){ return; }
+      var wd=wordAt(e); if(!wd){ close(); return; }
+      e._rdLook=true;
+      if(cur&&pop&&cur.key===wd.key&&cur.range.startContainer===wd.range.startContainer&&cur.range.startOffset===wd.range.startOffset){ close(); return; }
+      open(wd);
+    });
+    on(document,'click',function(e){ if(!pop) return; if(pop.contains(e.target)||(art.contains(e.target))) return; close(); });
+    on(document,'keydown',function(e){ if(e.key==='Escape'&&pop){ close(); } });
+    on(window,'scroll',function(){ if(pop&&!rafL) rafL=requestAnimationFrame(function(){ rafL=0; place(); }); },{passive:true});
+    on(window,'resize',function(){ place(); });
+    on(document,'click',function(e){
+      var b=e.target.closest&&e.target.closest('.rd-lk [data-lk]'); if(!b||!pop) return; var a=b.getAttribute('data-lk');
+      if(a==='x'){ close(); }
+      else if(a==='say'){ speak(cur.raw.replace(/['’]s$/,''),b.getAttribute('data-lang')||'en-US',b.getAttribute('data-audio')||''); }
+      else if(a==='fav'){ var d=pop._st&&pop._st.data; if(!d) return; if(fav[d.key]){ delete fav[d.key]; toast('Đã bỏ lưu “'+cur.raw+'”'); } else { fav[d.key]={w:d.head,vn:(d.vn||[])[0]||'',t:Date.now()}; toast('Đã lưu từ “'+cur.raw+'”'); } saveFav(); b.setAttribute('aria-pressed',String(!!fav[d.key])); }
+      else if(a==='retry'){ var wd=cur; close(); open(wd); }
+    });
+    cleanup.push(function(){ close(); });
+  })();
   var hbtn=$('.rd-nohl-btn');
   function setNoHl(o,say){ R.classList.toggle('nohl',o); if(hbtn) hbtn.setAttribute('aria-pressed',String(o)); try{ localStorage.setItem('rd:nohl',o?'1':'0'); }catch(_){} if(say) toast(o?'Đã tắt mọi màu color-code: chỉ còn chữ thuần':'Đã bật lại highlight'); }
   on(hbtn,'click',function(){ setNoHl(!R.classList.contains('nohl'),true); });
@@ -2466,7 +2634,7 @@ RD.mount = function(root, lesson, init, opts){
       if(a==='play'){ if(tt.play) tStop(); else tSay(); } else if(a==='prev'){ tGo(tt.idx-(tt.si>0?0:1)); } else if(a==='next'){ tGo(tt.idx+1); } else if(a==='close'){ tOpen(false); } });
     on(rateS,'change',function(){ tt.rate=parseFloat(rateS.value)||1; try{ localStorage.setItem('rd:tts:rate',String(tt.rate)); }catch(_){} if(tt.play){ tCut(); tSay(); } });
     on(voiceS,'change',function(){ tt.voice=voiceS.value; ttsHint(); try{ localStorage.setItem('rd:tts:voice',tt.voice); }catch(_){} if(tt.play){ tCut(); tSay(); } });
-    on(art,'click',function(e){ if(!tt.open) return; var sel=getSelection(); if(sel&&!sel.isCollapsed) return; if(e.target.closest('a,button,textarea,input,.el,.rd-card,.rd-nb')) return; var b=e.target.closest('.rd-blk'); if(!b) return; var i=tt.units.indexOf(b); if(i<0) return; tt.idx=i; tt.si=0; tt.sents=[]; tSay(); });
+    on(art,'click',function(e){ if(!tt.open||e._rdLook) return; var sel=getSelection(); if(sel&&!sel.isCollapsed) return; if(e.target.closest('a,button,textarea,input,.el,.rd-card,.rd-nb')) return; var b=e.target.closest('.rd-blk'); if(!b) return; var i=tt.units.indexOf(b); if(i<0) return; tt.idx=i; tt.si=0; tt.sents=[]; tSay(); });
     on(window,'pagehide',function(){ try{ SS.cancel(); }catch(_){} });
     cleanup.push(function(){ try{ SS.cancel(); }catch(_){} });
   }
