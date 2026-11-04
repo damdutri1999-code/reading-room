@@ -1620,7 +1620,7 @@ html.rr-fs-on{overflow:hidden}
   html.rd-ex-open .rr-read.rr-fs::before,html.rd-ex-open .rr-read.rr-fs .rd-progress{right:410px}
 }
 
-.rr-card .ls{display:grid;grid-template-columns:repeat(2,1fr);margin:2px -14px -14px;border-top:1px solid var(--rr-line);background:rgba(127,127,127,.07);text-align:center}
+.rr-card .ls{display:grid;grid-template-columns:repeat(2,1fr);margin:auto -14px -14px;border-top:1px solid var(--rr-line);background:rgba(127,127,127,.07);text-align:center}
 .rr-card .ls:empty{display:none}
 .rr-card .ls .lsc{padding:8px 6px 7px;min-width:0}
 .rr-card .ls .lsc+.lsc{border-left:1px solid var(--rr-line)}
@@ -4424,11 +4424,14 @@ RR.init=function(opts){
   }
   function lsBadge(id){ if(!lsMap) return ''; var v=lsMap[id]; return (v&&v.o)?EYE+'<span>'+fmtN(v.o)+'</span>':''; }
   function lsPaint(){ main.querySelectorAll('[data-ls]').forEach(function(el){ el.innerHTML=lsInner(el.getAttribute('data-ls')); }); main.querySelectorAll('[data-lsb]').forEach(function(el){ var h=lsBadge(el.getAttribute('data-lsb')); el.innerHTML=h; el.hidden=!h; }); }
-  function lsLoad(){ if(lsMap||lsBusy||!opts.lstats) return; lsBusy=true;
+  var lsAt=0, lsTm=0;
+  function lsLoad(force){ if(lsBusy||!opts.lstats) return; if(!force&&lsMap&&Date.now()-lsAt<6000) return; lsBusy=true;
     var p; try{ p=opts.lstats(); }catch(e){ lsBusy=false; return; }
-    Promise.resolve(p).then(function(a){ lsBusy=false; if(Array.isArray(a)){ lsMap={}; a.forEach(function(r){ lsMap[r.id]={o:+r.opens||0,s:+r.secs||0}; }); lsPaint(); } },function(){ lsBusy=false; }); }
+    Promise.resolve(p).then(function(a){ lsBusy=false; if(Array.isArray(a)){ var m={}; a.forEach(function(r){ m[r.id]={o:+r.opens||0,s:+r.secs||0}; }); lsMap=m; lsAt=Date.now(); lsPaint(); } else lsLater(3500); },function(){ lsBusy=false; lsLater(3500); }); }
+  function lsLater(ms){ if(lsTm) return; lsTm=setTimeout(function(){ lsTm=0; if(main&&main.querySelector('[data-ls]')) lsLoad(true); },ms); }
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden&&main&&main.querySelector('[data-ls]')) lsLoad(); });
   function renderLib(){
-    var box=main.querySelector('[data-lib]'); if(!box) return; lsLoad();
+    var box=main.querySelector('[data-lib]'); if(!box) return; lsLoad(); lsLater(5000);
     var fw=main.querySelector('[data-fo-wrap]'); if(fw) fw.innerHTML='';
     var q=libQ.trim().toLowerCase(), all=lessons(), fm=FM(), hasFo=Object.keys(fm).length>0;
     if(libF===null||(hasFo&&libF!==FR()&&!fm[libF])) libF=FR();
