@@ -909,7 +909,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .rd .hl{color:inherit;background-color:transparent;background-image:linear-gradient(var(--hl),var(--hl));background-repeat:no-repeat;background-size:0% 100%;padding:.04em .12em;margin:0 -.04em;border-radius:.25em;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-size .8s cubic-bezier(.65,.05,.25,1) var(--d,0ms)}
 .rd .in .hl,.rd:not(.anim) .hl{background-size:100% 100%}
 .rd .el{cursor:pointer;background-image:linear-gradient(var(--rd-accent),var(--rd-accent));background-repeat:no-repeat;background-position:0 100%;background-size:0% 2px;transition:background-size .6s ease 1s,background-color .2s;border-radius:2px}
-.rd .in .el,.rd:not(.anim) .el{background-size:100% 2px}
+.rd .in .el.qon,.rd:not(.anim) .el.qon{background-size:100% 2px}
 .rd .el.hot{background-color:var(--rd-accent-soft)}
 .rd .el[data-n]::after{content:attr(data-n);font:600 10px/1 var(--rd-ui);color:var(--rd-paper);background:var(--rd-accent);border-radius:999px;padding:2px 5px;margin-left:3px;vertical-align:super}
 
@@ -1222,7 +1222,7 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 /* ---- Bản dịch tiếng Việt: stage = bong bóng tối (F), notebook = giấy ghi chú vàng (B), constellation = giấy ghi chú hồng (B) ---- */
 .rd-vi{grid-column:1;min-width:0;padding:2px 0 6px}
 @media (min-width:1080px){.rd-row > .rd-vi{grid-column:2;grid-row:calc(var(--n,1) + 1)}}
-.rd-vi-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid color-mix(in srgb,var(--rd-accent) 50%,transparent);background:transparent;color:var(--rd-accent);border-radius:999px;padding:6px 12px;font:600 12px/1 var(--rd-ui);cursor:pointer;margin:2px 0 0}
+.rd-vi-btn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid color-mix(in srgb,var(--rd-accent) 60%,var(--rd-ink,#1b2030));background:color-mix(in srgb,var(--rd-accent) 12%,transparent);color:color-mix(in srgb,var(--rd-accent) 55%,var(--rd-ink,#1b2030));border-radius:999px;padding:7px 14px;font:600 13px/1 var(--rd-ui);cursor:pointer;margin:2px 0 0}
 .rd-vi-btn svg{stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
 .rd-vi-btn[aria-expanded=true]{background:var(--rd-accent);color:var(--rd-paper,#fff)}.rd-vi-btn[aria-expanded=true] svg{transform:rotate(180deg)}
 .rd-vi-btn:focus-visible{outline:2px solid var(--rd-accent);outline-offset:3px}
@@ -2274,7 +2274,7 @@ RD.mount = function(root, lesson, init, opts){
     var ta = c.querySelector('textarea'); ta.value = st.answers[id]||''; tas.push(ta);
     function mark(){ c.classList.toggle('done',!!(ta.value||'').trim()); } mark();
     var clb=c.querySelector('.rd-cl');
-    function setOpen(o){ if(o&&c.classList.contains('locked')) return; if(o){ order.forEach(function(k2){ var o2=cards[k2]; if(o2&&o2.el!==c&&o2.el.classList.contains('open')) o2.el.classList.remove('open'); var b2=o2&&o2.el.querySelector('.rd-cl'); if(b2&&o2.el!==c) b2.setAttribute('aria-expanded','false'); }); } c.classList.toggle('open',!!o); clb.setAttribute('aria-expanded',String(!!o)); if(o){ grow(ta); } }
+    function setOpen(o){ if(o&&c.classList.contains('locked')) return; if(o){ order.forEach(function(k2){ var o2=cards[k2]; if(o2&&o2.el!==c&&o2.el.classList.contains('open')) o2.el.classList.remove('open'); var b2=o2&&o2.el.querySelector('.rd-cl'); if(b2&&o2.el!==c) b2.setAttribute('aria-expanded','false'); }); } c.classList.toggle('open',!!o); clb.setAttribute('aria-expanded',String(!!o)); order.forEach(function(k3){ var o3=cards[k3]; if(o3) o3.anchors.forEach(function(a3){ a3.classList.toggle('qon',o3.el.classList.contains('open')); }); }); if(o){ grow(ta); } }
     c._open=setOpen;
     on(ta,'input',function(){ st.answers[id]=ta.value; grow(ta); mark(); save(c); });
     var hb = c.querySelector('.rd-hint-btn');
@@ -2667,9 +2667,10 @@ RD.mount = function(root, lesson, init, opts){
     cleanup.push(function(){ close(); });
   })();
   var hbtn=$('.rd-nohl-btn');
-  function setNoHl(o,say){ R.classList.toggle('nohl',o); if(hbtn) hbtn.setAttribute('aria-pressed',String(o)); try{ localStorage.setItem('rd:nohl',o?'1':'0'); }catch(_){} if(say) toast(o?'Đã tắt mọi màu color-code: chỉ còn chữ thuần':'Đã bật lại highlight'); }
+  function setNoHl(o,say){ R.classList.toggle('nohl',o); if(hbtn){ hbtn.setAttribute('aria-pressed',String(!o)); hbtn.textContent='Highlight & color code'; hbtn.title=o?'Đang xem bài đọc thuần. Bấm để bật highlight và color code':'Đang bật highlight và color code. Bấm để xem bài đọc thuần'; } try{ localStorage.setItem('rd:hl',o?'0':'1'); }catch(_){} if(say) toast(o?'Đã tắt highlight và color code: chỉ còn chữ thuần':'Đã bật highlight và color code'); }
   on(hbtn,'click',function(){ setNoHl(!R.classList.contains('nohl'),true); });
-  try{ if(localStorage.getItem('rd:nohl')==='1') setNoHl(true,false); }catch(_){}
+  var hlOn=false; try{ hlOn=localStorage.getItem('rd:hl')==='1'; }catch(_){}
+  setNoHl(!hlOn,false);
   /* ---------- Nghe bài đọc (text-to-speech của trình duyệt, không cần AI) ---------- */
   var SS=window.speechSynthesis, TTS_OK=!!(SS&&window.SpeechSynthesisUtterance), tbtn=$('.rd-tts-btn');
   if(TTS_OK&&tbtn){ tbtn.hidden=!!R.closest('.rr-read');
