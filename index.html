@@ -482,6 +482,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .ex-help p{margin:8px 0 0}
 .imp-cat{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:12px;border:1.5px solid color-mix(in srgb,#6d4aff 40%,var(--line));background:color-mix(in srgb,#6d4aff 7%,var(--surface))}
 .modal:not(.as-start) .imp-cat{display:none}
+.modal.as-upd .mode{display:none!important}
 .imp-cat-l{font:600 13px/1 var(--ui)}.imp-cat-l em{font-style:normal;font-weight:400;color:var(--muted);font-size:12px}
 .cat-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .cat-pick button{display:flex;flex-direction:column;gap:3px;text-align:left;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:inherit}
@@ -1748,6 +1749,7 @@ html.rr-fs-on{overflow:hidden}
       <button type="button" class="ib" data-act="clear" data-tip="Xoá định dạng · Alt+0" aria-label="Xoá định dạng"><i data-i="eraser"></i></button>
       <span class="sep"></span>
       <button type="button" class="pill accent" data-act="el" data-tip="Gắn câu hỏi vào chữ đang chọn · Alt+Q"><i data-i="question"></i>Câu hỏi</button>
+      <button type="button" class="pill" data-act="upd" data-tip="Mở khung nạp bài, chỉ cập nhật phần bạn dán (chữ, elicit hoặc task)"><i data-i="upload"></i>Cập nhật từ AI</button>
       <button type="button" class="pill" data-act="nb" data-tip="Chèn ô ghi chú sau đoạn đang đứng"><i data-i="note"></i>Ghi chú</button>
     </div>
 
@@ -4872,6 +4874,7 @@ function act(a,btn){
     case 'undo': case 'redo': ed.focus(); document.execCommand(a); changed(); break;
     case 'style': openStyleMenu(btn); break;
     case 'import': openImport(); break;
+    case 'upd': openUpd(); break;
     case 'ul': restoreSel(); document.execCommand('insertUnorderedList'); changed(true); break;
     case 'bold': case 'italic': case 'underline': restoreSel(); document.execCommand(a); changed(true); updStates(); break;
     case 'code': codeAction(btn.getAttribute('data-c')); break;
@@ -5679,8 +5682,18 @@ $('#eli-go').addEventListener('click',function(){
 /* ---------- Import raw text ---------- */
 var impBlocks=[], impFromDocx=false;
 var CYCLE=['normal','title','subtitle','h1','h2','h3'];
-function openImport(){ closePops(); $('#import').hidden=false; setTimeout(function(){ $('#imp-text').focus(); },50); renderImp(); }
-function closeImport(){ if($('#import').classList.contains('as-start')) return; $('#import').hidden=true; }
+function openImport(){ closePops(); updOff(); $('#import').hidden=false; setTimeout(function(){ $('#imp-text').focus(); },50); renderImp(); }
+function closeImport(){ if($('#import').classList.contains('as-start')) return; $('#import').hidden=true; updOff(); }
+function updOff(){ var m=$('#import'); if(!m.classList.contains('as-upd')) return; m.classList.remove('as-upd'); $('#imp-h').textContent='Nạp văn bản thô'; $('#imp-lede').textContent='Dán bài đọc hoặc chọn tệp .txt, .md, .docx. Studio tách đoạn và đoán kiểu Tiêu đề, Heading. Bấm vào nhãn ở cột xem trước để đổi kiểu.'; $('#imp-ok').innerHTML=svg('check')+'Đưa vào bài'; $('#imp-note').textContent='Thay toàn bộ bài sẽ xoá câu hỏi và ô ghi chú hiện có. Dòng Tiêu đề đầu tiên sẽ thành tên bài, dòng Phụ đề ngay sau nó thành hướng dẫn.'; }
+function openUpd(){
+  closePops(); var m=$('#import'); m.classList.add('as-upd'); m.hidden=false;
+  $('#imp-h').textContent='Cập nhật bài từ AI';
+  $('#imp-lede').textContent='Chỉ dán phần cần sửa: bài đã tô màu, JSON elicit hoặc task. Ô nào để trống thì phần đó của bài giữ nguyên.';
+  $('#imp-ok').innerHTML=svg('check')+'Cập nhật phần đã dán';
+  $('#imp-note').textContent='Bài tô màu mới sẽ thay toàn bộ nội dung bài. JSON elicit mới thay toàn bộ câu elicit cũ. Task mới thay toàn bộ task cũ. Loại bài, dạng đề và các phần không dán giữ nguyên.';
+  $('#imp-text').value=''; $('#imp-json').value=''; $('#imp-task').value=''; impBlocks=[]; impEls={}; impMap={}; impCount={}; impLesson=null; impJsonStatus(); impTaskStatus(); renderImp();
+  setTimeout(function(){ $('#imp-text').focus(); },50);
+}
 $('#imp-cancel').addEventListener('click',closeImport);
 $('#import').addEventListener('click',function(e){ if(e.target===$('#import')) closeImport(); });
 function looksWrapped(t){
@@ -5865,6 +5878,25 @@ var impCat='';
 function setImpCat(c){ impCat=c; $$('.cat-pick button').forEach(function(b){ b.setAttribute('aria-checked',String(b.getAttribute('data-cat')===c)); }); if(c){ $('#imp-exam').checked=(c==='ielts'); $('#imp-exam-s').textContent=c==='ielts'?'IELTS Cam mặc định có đề bài. Bỏ chọn nếu bài này chỉ để đọc.':(c==='content'?'Kiến thức mặc định không có đề bài. Chọn nếu bài này có câu hỏi.':'Bài mẫu viết mặc định không có đề bài. Chọn nếu bài này có câu hỏi để học viên làm.'); } }
 $$('.cat-pick button').forEach(function(b){ b.addEventListener('click',function(){ setImpCat(b.getAttribute('data-cat')); }); });
 $('#imp-ok').addEventListener('click',function(){
+  if($('#import').classList.contains('as-upd')){
+    var raw1=$('#imp-json').value.trim(), raw2=$('#imp-task').value.trim(), hasT=impBlocks.length>0;
+    if(!hasT&&!raw1&&!raw2){ toast('Chưa dán gì để cập nhật',true); return; }
+    var parts=[], jp=null;
+    if(raw1){ jp=elParse(raw1); if(jp.err){ toast('Không đọc được JSON elicit: '+jp.err,true); return; } }
+    if(raw2&&!RD.parseExam(raw2)){ toast('Chưa đọc được task. Mỗi nhóm cần bắt đầu bằng dòng “Questions 1-4”.',true); return; }
+    if(hasT){
+      var bl2=impBlocks.slice();
+      if(bl2[0]&&bl2[0].style==='title'){ L.title=bl2[0].text; bl2.shift(); if(bl2[0]&&bl2[0].style==='subtitle'){ L.subtitle=bl2[0].text; bl2.shift(); } }
+      L.elicits={}; L.notes={};
+      Object.keys(impEls).forEach(function(k){ L.elicits[k]=impEls[k]; });
+      L.html=blocksHtml(bl2)+'<p><br></p>'; loadUI(); parts.push('bài đọc ('+bl2.length+' đoạn)');
+    }
+    if(jp){ var n2=elApply(jp.items,hasT?'add':'replace'); parts.push('elicit ('+n2+'/'+jp.items.length+' câu)'); }
+    if(raw2){ var tn2=impTaskApply(true); parts.push('task ('+tn2+' câu)'); }
+    changed(true); saveDraft(); closeImport();
+    impBlocks=[]; impEls={}; impMap={}; impCount={}; $('#imp-text').value=''; $('#imp-json').value=''; $('#imp-task').value=''; impJsonStatus(); impTaskStatus(); renderImp();
+    toast('Đã cập nhật: '+parts.join(', ')+(hasT&&!jp?'. Bài đổi nên câu elicit cũ đã bị xoá, hãy dán JSON elicit mới.':'')); return;
+  }
   if(!impBlocks.length){ toast('Chưa có văn bản để đưa vào',true); $('#imp-text').focus(); return; }
   var starting=$('#import').classList.contains('as-start');
   if(starting&&!impCat&&!(impLesson&&impLesson.cat)){ var ic=$('.imp-cat'); ic.classList.remove('need'); void ic.offsetWidth; ic.classList.add('need'); ic.scrollIntoView({block:'center',behavior:'smooth'}); toast('Hãy chọn loại bài: IELTS Cam, Kiến thức, Mẫu Task 1 hoặc Mẫu Task 2',true); return; }
