@@ -482,7 +482,8 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .ex-help p{margin:8px 0 0}
 .imp-cat{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:12px;border:1.5px solid color-mix(in srgb,#6d4aff 40%,var(--line));background:color-mix(in srgb,#6d4aff 7%,var(--surface))}
 .modal:not(.as-start) .imp-cat{display:none}
-.modal.as-upd .mode{display:none!important}
+.modal.as-upd .mode:not(.upd-mode){display:none!important}
+.modal:not(.as-upd) .upd-mode{display:none!important}
 .imp-cat-l{font:600 13px/1 var(--ui)}.imp-cat-l em{font-style:normal;font-weight:400;color:var(--muted);font-size:12px}
 .cat-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .cat-pick button{display:flex;flex-direction:column;gap:3px;text-align:left;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:inherit}
@@ -1945,6 +1946,7 @@ html.rr-fs-on{overflow:hidden}
       </div>
     </div>
     <div class="mrow">
+      <div class="mode upd-mode" role="radiogroup" aria-label="Cách cập nhật"><label><input type="radio" name="upd-mode" value="replace" checked>Ghi đè phần đã dán</label><label><input type="radio" name="upd-mode" value="append">Bổ sung thêm vào</label></div>
       <div class="mode" data-modal role="radiogroup" aria-label="Cách đưa vào bài"><label><input type="radio" name="imp-mode" value="replace" checked>Thay toàn bộ bài</label><label><input type="radio" name="imp-mode" value="append">Thêm vào cuối bài</label></div>
       <span class="sp"></span>
       <button type="button" class="btn ghost" data-prompt-all><i data-i="sparkle"></i>Câu lệnh cho AI</button>
@@ -5688,9 +5690,9 @@ function updOff(){ var m=$('#import'); if(!m.classList.contains('as-upd')) retur
 function openUpd(){
   closePops(); var m=$('#import'); m.classList.add('as-upd'); m.hidden=false;
   $('#imp-h').textContent='Cập nhật bài từ AI';
-  $('#imp-lede').textContent='Chỉ dán phần cần sửa: bài đã tô màu, JSON elicit hoặc task. Ô nào để trống thì phần đó của bài giữ nguyên.';
+  $('#imp-lede').textContent='Chỉ dán phần cần sửa: bài đã tô màu, JSON elicit hoặc task. Ô nào để trống thì phần đó của bài giữ nguyên. Chọn Ghi đè hoặc Bổ sung ở hàng dưới.';
   $('#imp-ok').innerHTML=svg('check')+'Cập nhật phần đã dán';
-  $('#imp-note').textContent='Bài tô màu mới sẽ thay toàn bộ nội dung bài. JSON elicit mới thay toàn bộ câu elicit cũ. Task mới thay toàn bộ task cũ. Loại bài, dạng đề và các phần không dán giữ nguyên.';
+  $('#imp-note').textContent='Ghi đè: bài, câu elicit hoặc task mới thay hẳn phần cũ. Bổ sung: phần mới được thêm vào sau phần cũ (bài thêm vào cuối, câu elicit và task thêm tiếp). Loại bài, dạng đề và các phần không dán luôn giữ nguyên.'; var ur=document.querySelector('input[name="upd-mode"][value="replace"]'); if(ur) ur.checked=true;
   $('#imp-text').value=''; $('#imp-json').value=''; $('#imp-task').value=''; impBlocks=[]; impEls={}; impMap={}; impCount={}; impLesson=null; impJsonStatus(); impTaskStatus(); renderImp();
   setTimeout(function(){ $('#imp-text').focus(); },50);
 }
@@ -5884,18 +5886,26 @@ $('#imp-ok').addEventListener('click',function(){
     var parts=[], jp=null;
     if(raw1){ jp=elParse(raw1); if(jp.err){ toast('Không đọc được JSON elicit: '+jp.err,true); return; } }
     if(raw2&&!RD.parseExam(raw2)){ toast('Chưa đọc được task. Mỗi nhóm cần bắt đầu bằng dòng “Questions 1-4”.',true); return; }
+    var um=document.querySelector('input[name="upd-mode"]:checked').value, ow=um==='replace';
     if(hasT){
       var bl2=impBlocks.slice();
-      if(bl2[0]&&bl2[0].style==='title'){ L.title=bl2[0].text; bl2.shift(); if(bl2[0]&&bl2[0].style==='subtitle'){ L.subtitle=bl2[0].text; bl2.shift(); } }
-      L.elicits={}; L.notes={};
-      Object.keys(impEls).forEach(function(k){ L.elicits[k]=impEls[k]; });
-      L.html=blocksHtml(bl2)+'<p><br></p>'; loadUI(); parts.push('bài đọc ('+bl2.length+' đoạn)');
+      if(ow){
+        if(bl2[0]&&bl2[0].style==='title'){ L.title=bl2[0].text; bl2.shift(); if(bl2[0]&&bl2[0].style==='subtitle'){ L.subtitle=bl2[0].text; bl2.shift(); } }
+        L.elicits={}; L.notes={};
+        Object.keys(impEls).forEach(function(k){ L.elicits[k]=impEls[k]; });
+        L.html=blocksHtml(bl2)+'<p><br></p>'; loadUI();
+      } else {
+        Object.keys(impEls).forEach(function(k){ L.elicits[k]=impEls[k]; });
+        var last2=ed.lastElementChild; while(last2&&last2.tagName==='P'&&!last2.textContent.trim()){ var pv3=last2.previousElementSibling; last2.remove(); last2=pv3; }
+        ed.insertAdjacentHTML('beforeend',blocksHtml(bl2)+'<p><br></p>'); $$('.nb',ed).forEach(decorateNb);
+      }
+      parts.push((ow?'bài đọc (ghi đè, ':'bài đọc (thêm vào cuối, ')+bl2.length+' đoạn)');
     }
-    if(jp){ var n2=elApply(jp.items,hasT?'add':'replace'); parts.push('elicit ('+n2+'/'+jp.items.length+' câu)'); }
-    if(raw2){ var tn2=impTaskApply(true); parts.push('task ('+tn2+' câu)'); }
+    if(jp){ var n2=elApply(jp.items,(hasT&&ow)||!ow?'add':'replace'); parts.push('elicit ('+(ow?'ghi đè, ':'bổ sung, ')+n2+'/'+jp.items.length+' câu)'); }
+    if(raw2){ var tn2=impTaskApply(ow); parts.push('task ('+(ow?'ghi đè, ':'bổ sung, ')+tn2+' câu)'); }
     changed(true); saveDraft(); closeImport();
     impBlocks=[]; impEls={}; impMap={}; impCount={}; $('#imp-text').value=''; $('#imp-json').value=''; $('#imp-task').value=''; impJsonStatus(); impTaskStatus(); renderImp();
-    toast('Đã cập nhật: '+parts.join(', ')+(hasT&&!jp?'. Bài đổi nên câu elicit cũ đã bị xoá, hãy dán JSON elicit mới.':'')); return;
+    toast('Đã cập nhật: '+parts.join(', ')+(hasT&&ow&&!jp?'. Bài đổi nên câu elicit cũ đã bị xoá, hãy dán JSON elicit mới.':'')); return;
   }
   if(!impBlocks.length){ toast('Chưa có văn bản để đưa vào',true); $('#imp-text').focus(); return; }
   var starting=$('#import').classList.contains('as-start');
