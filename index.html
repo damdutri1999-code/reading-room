@@ -1000,7 +1000,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .rd.can-lead .rd-row > .rd-blk:not(.rd-nb){cursor:pointer;border-radius:8px;transition:background-color .2s}
 .rd.can-lead .rd-row > .rd-blk:not(.rd-nb):hover{background:color-mix(in srgb,var(--rd-accent-soft) 60%,transparent)}
 .rd-card.locked .rd-card-q{filter:blur(5px);-webkit-user-select:none;user-select:none}
-.rd-card.locked textarea,.rd-card.locked .rd-hint-btn,.rd-card.locked .rd-hint,.rd-card.locked .rd-saved{display:none}
+.rd-card.locked .rd-mc,.rd-card.locked .rd-mc-fb,.rd-card.locked textarea,.rd-card.locked .rd-hint-btn,.rd-card.locked .rd-hint,.rd-card.locked .rd-saved{display:none}
 .rd-card.locked::after{content:"Chờ giáo viên mở câu hỏi";display:block;font-size:12.5px;color:var(--rd-muted);margin-top:4px}
 .rd-card.unlock{animation:rdUnlock .7s ease}
 @keyframes rdUnlock{30%{box-shadow:0 0 0 6px color-mix(in srgb,var(--rd-accent) 25%,transparent)}}
@@ -1285,6 +1285,17 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-lk-load i{width:6px;height:6px;border-radius:50%;background:var(--lk-acc);animation:lkDot 1s infinite ease-in-out both}.rd-lk-load i:nth-child(2){animation-delay:.15s}.rd-lk-load i:nth-child(3){animation-delay:.3s;margin-right:4px}
 @keyframes lkDot{0%,80%,100%{opacity:.25;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.rd-lk{animation:none}.rd-lk-load i{animation:none;opacity:.7}}
+.rd-mc{display:grid;gap:6px;margin-top:8px}
+.rd-mc-o{display:flex;gap:9px;align-items:flex-start;text-align:left;width:100%;font:14px/1.45 var(--rd-ui);color:var(--rd-ink);background:var(--rd-bg);border:1.5px solid var(--rd-line);border-radius:10px;padding:8px 10px;cursor:pointer}
+.rd-mc-o b{flex:none;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font:700 12px var(--rd-ui);background:var(--rd-paper);border:1px solid var(--rd-line)}
+.rd-mc-o:hover{border-color:var(--rd-accent)}
+.rd-mc-o:focus-visible{outline:2px solid var(--rd-accent);outline-offset:2px}
+.rd-mc-o.on{border-color:var(--rd-accent);background:var(--rd-accent-soft)}
+.rd-mc-o.ok{border-color:var(--rd-student);background:var(--rd-student-soft);color:var(--rd-ink)}
+.rd-mc-o.bad{border-color:#d9534f;background:color-mix(in srgb,#d9534f 14%,transparent)}
+.rd-mc-fb{margin-top:8px;font-size:13px;line-height:1.5;color:var(--rd-muted);background:var(--rd-bg);border-radius:8px;padding:8px 10px}
+.rd-mc-fb p{margin:0 0 4px}.rd-mc-fb .v{font-weight:700;color:var(--rd-ink)}
+.rd-mc-fb.good .v{color:var(--rd-student)}.rd-mc-fb.wrong .v{color:#c0392b}
 </style>
 <style id="rr-css">
 /* Reading Room shell: home, library, teacher hub and themed reading. Everything is scoped under .rr and uses --rr-* tokens so it never touches the Studio editor */
@@ -2261,14 +2272,16 @@ RD.mount = function(root, lesson, init, opts){
     anchors[anchors.length-1].setAttribute('data-n','Q'+n);
     var blk = anchors[0].closest('.rd-blk'); if(!blk) return;
     var c = h('div','rd-card rd-qc'); c.setAttribute('data-el',id);
-    var TL={yn:'Yes/No',wh:'WH',research:'Tra cứu'};
+    var isMc=def.type==='mc'&&Array.isArray(def.opts)&&def.opts.length>=2;
+    var TL={yn:'Yes/No',wh:'WH',research:'Tra cứu',mc:'Trắc nghiệm'};
     var LV={literal:'Tìm chi tiết',inferential:'Hiểu ý ngầm'};
     var chips=(def.type&&TL[def.type]?'<span class="rd-chip t-'+def.type+'">'+TL[def.type]+'</span>':'')+(def.level&&LV[def.level]?'<span class="rd-chip lv-'+def.level+'">'+LV[def.level]+'</span>':'')+(def.group?'<span class="rd-chip">'+esc(def.group)+'</span>':'');
     var terms=(def.terms&&def.terms.length)?'<div class="rd-terms"><span>Tra cứu:</span>'+def.terms.map(function(t){ return '<a href="https://www.google.com/search?q='+encodeURIComponent(t)+'" target="_blank" rel="noopener noreferrer">'+esc(t)+'</a>'; }).join('')+'</div>':'';
     c.innerHTML = '<div class="rd-box"><button type="button" class="rd-cl" aria-expanded="false" aria-label="Câu hỏi Q'+n+'"><span class="n">Q'+n+'</span><span class="t">'+esc(def.q||'')+'</span></button>'+
       '<div class="rd-more">'+(chips?'<div class="rd-chips">'+chips+'</div>':'')+terms+
-      (def.hint?'<button type="button" class="rd-link rd-hint-btn" aria-expanded="false">Xem gợi ý</button><div class="rd-hint"><div><p>'+esc(def.hint)+'</p></div></div>':'')+
-      '<textarea class="rd-ta" rows="2" placeholder="Câu trả lời của em…" aria-label="Trả lời Q'+n+'"></textarea><span class="rd-saved">Đã lưu</span></div></div>';
+      (isMc?'<div class="rd-mc" role="radiogroup" aria-label="Các lựa chọn Q'+n+'">'+def.opts.map(function(t,i){ return '<button type="button" class="rd-mc-o" role="radio" aria-checked="false" data-i="'+i+'"><b>'+'ABCDEF'.charAt(i)+'</b><span>'+esc(t)+'</span></button>'; }).join('')+'</div><div class="rd-mc-fb" aria-live="polite" hidden></div>':
+      (def.hint?'<button type="button" class="rd-link rd-hint-btn" aria-expanded="false">Xem gợi ý</button><div class="rd-hint"><div><p>'+esc(def.hint)+'</p></div></div>':''))+
+      '<textarea class="rd-ta"'+(isMc?' hidden':'')+' rows="2" placeholder="Câu trả lời của em…" aria-label="Trả lời Q'+n+'"></textarea><span class="rd-saved">Đã lưu</span></div></div>';
     blk.parentNode.insertBefore(c, blk); rowSpan(blk.parentNode);
     cards[id] = {el:c, n:n, q:def.q||'', anchors:anchors};
     var ta = c.querySelector('textarea'); ta.value = st.answers[id]||''; tas.push(ta);
@@ -2277,6 +2290,18 @@ RD.mount = function(root, lesson, init, opts){
     function setOpen(o){ if(o&&c.classList.contains('locked')) return; if(o){ order.forEach(function(k2){ var o2=cards[k2]; if(o2&&o2.el!==c&&o2.el.classList.contains('open')) o2.el.classList.remove('open'); var b2=o2&&o2.el.querySelector('.rd-cl'); if(b2&&o2.el!==c) b2.setAttribute('aria-expanded','false'); }); } c.classList.toggle('open',!!o); clb.setAttribute('aria-expanded',String(!!o)); order.forEach(function(k3){ var o3=cards[k3]; if(o3) o3.anchors.forEach(function(a3){ a3.classList.toggle('qon',o3.el.classList.contains('open')); }); }); if(o){ grow(ta); } }
     c._open=setOpen;
     on(ta,'input',function(){ st.answers[id]=ta.value; grow(ta); mark(); save(c); });
+    if(isMc){ (function(){
+      var ob=[].slice.call(c.querySelectorAll('.rd-mc-o')), fb=c.querySelector('.rd-mc-fb'), ans=+def.ans;
+      function cur(){ var v=(ta.value||'').trim(); var i='ABCDEF'.indexOf(v.charAt(0)); return (i>=0&&i<def.opts.length&&v.charAt(1)==='.')?i:-1; }
+      function paint(){ var k=cur(); ob.forEach(function(b,i){ b.classList.toggle('on',i===k); b.classList.toggle('ok',k>=0&&i===k&&i===ans); b.classList.toggle('bad',k>=0&&i===k&&i!==ans); b.setAttribute('aria-checked',String(i===k)); });
+        if(k<0){ fb.hidden=true; fb.innerHTML=''; return; }
+        var good=(k===ans), has=(ans>=0&&ans<def.opts.length);
+        fb.hidden=false; fb.className='rd-mc-fb '+(!has?'':(good?'good':'wrong'));
+        fb.innerHTML=(has?'<p class="v">'+(good?'Đúng rồi.':'Chưa đúng. Đáp án là '+'ABCDEF'.charAt(ans)+'.')+'</p>':'')+(def.hint?'<p>'+esc(def.hint)+'</p>':'')+'<button type="button" class="rd-link rd-mc-loc">Xem vị trí trong bài</button>'; }
+      ob.forEach(function(b){ on(b,'click',function(){ var i=+b.getAttribute('data-i'); ta.value='ABCDEF'.charAt(i)+'. '+def.opts[i]; st.answers[id]=ta.value; mark(); save(c); paint(); }); });
+      on(fb,'click',function(e){ if(e.target.closest('.rd-mc-loc')) flash(anchors); });
+      paint();
+    })(); }
     var hb = c.querySelector('.rd-hint-btn');
     if(hb) on(hb,'click',function(){ var hint=c.querySelector('.rd-hint'); var o=!hint.classList.contains('open'); hint.classList.toggle('open',o); hb.setAttribute('aria-expanded',String(o)); hb.textContent=o?'Ẩn gợi ý':'Xem gợi ý'; });
     on(c,'mouseenter',function(){ anchors.forEach(function(a){ a.classList.add('hot'); }); linkShow('el:'+id,anchors,c,'var(--rd-accent)'); });
@@ -2288,7 +2313,7 @@ RD.mount = function(root, lesson, init, opts){
       a.setAttribute('tabindex','0'); a.setAttribute('role','button'); a.setAttribute('aria-label','Mở câu hỏi Q'+n);
       on(a,'mouseenter',function(){ c.classList.add('hot'); anchors.forEach(function(x){ x.classList.add('hot'); }); linkShow('el:'+id,anchors,c,'var(--rd-accent)'); });
       on(a,'mouseleave',function(){ c.classList.remove('hot'); anchors.forEach(function(x){ x.classList.remove('hot'); }); linkHide(); });
-      function go(){ setOpen(true); flash([c]); if(innerWidth<1080) c.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); ta.focus({preventScroll:true}); }
+      function go(){ setOpen(true); flash([c]); if(innerWidth<1080) c.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); (isMc?c.querySelector('.rd-mc-o'):ta).focus({preventScroll:true}); }
       on(a,'click',function(e){ if(e._rdLook) return; var s=getSelection(); if(s && !s.isCollapsed) return; if(e&&e.target&&e.target.closest&&e.target.closest('.el')!==a) return; go(); });
       on(a,'keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
     });
@@ -2960,7 +2985,7 @@ RD.mount = function(root, lesson, init, opts){
     setCanLead:function(on){ R.classList.toggle('can-lead',!!on); },
     setLocked:function(open){
       order.forEach(function(id){ var c=cards[id]; if(!c) return; var was=c.el.classList.contains('locked'), lk=!!(open&&open.indexOf(id)<0);
-        c.el.classList.toggle('locked',lk); c.el.querySelector('textarea').disabled=lk;
+        c.el.classList.toggle('locked',lk); c.el.querySelector('textarea').disabled=lk; [].forEach.call(c.el.querySelectorAll('.rd-mc-o'),function(b){ b.disabled=lk; });
         if(was&&!lk){ c.el.classList.remove('unlock'); void c.el.offsetWidth; c.el.classList.add('unlock'); } });
     },
     setSpot:function(map){
@@ -4907,7 +4932,7 @@ $('#tc-custom').addEventListener('change',function(e){ restoreSel(); setTc(e.tar
 
 /* ---------- Elicit questions ---------- */
 var elMode=null;
-function elDef(d){ d=d||{}; var o={q:d.q||'',hint:d.hint||''}; if(d.type) o.type=d.type; if(d.level) o.level=d.level; if(d.group) o.group=d.group; if(d.terms&&d.terms.length) o.terms=d.terms.slice(0,6); return o; }
+function elDef(d){ d=d||{}; var o={q:d.q||'',hint:d.hint||''}; if(d.type) o.type=d.type; if(d.level) o.level=d.level; if(d.group) o.group=d.group; if(d.terms&&d.terms.length) o.terms=d.terms.slice(0,6); if(d.type==='mc'&&Array.isArray(d.opts)){ o.opts=d.opts.slice(0,6); if(d.ans!=null) o.ans=d.ans; } return o; }
 function anchorsOf(id){ return $$('.el[data-el="'+id+'"]',ed); }
 function anchorText(id){ return anchorsOf(id).map(function(a){ return a.textContent; }).join(' ').replace(/\s+/g,' ').trim(); }
 function short(s,n){ s=s.replace(/\s+/g,' ').trim(); return s.length>n?s.slice(0,n)+'…':s; }
@@ -5370,7 +5395,7 @@ function aiPrompt(){
 }
 
 /* ---------- Elicit từ AI (JSON) ---------- */
-var EL_TYPES={yn:'Yes/No',wh:'WH',research:'Tra cứu'};
+var EL_TYPES={yn:'Yes/No',wh:'WH',research:'Tra cứu',mc:'Trắc nghiệm'};
 var EL_LV={literal:'Tìm chi tiết',inferential:'Hiểu ý ngầm'};
 function elChips(d){ d=d||{}; return (d.type&&EL_TYPES[d.type]?'<span class="el-chip t-'+d.type+'">'+EL_TYPES[d.type]+'</span>':'')+(d.level&&EL_LV[d.level]?'<span class="el-chip lv-'+d.level+'">'+EL_LV[d.level]+'</span>':'')+(d.group?'<span class="el-chip">'+esc(d.group)+'</span>':''); }
 var EL_CRITERIA=
@@ -5524,7 +5549,7 @@ function aiAllPrompt(){
   '3) Khối ```task chứa task đọc hiểu (Phần 3). CHỈ có khối này khi LOAI_BAI là CONTENT (task tự soạn) hoặc LOAI_BAI là IELTS có đề dán kèm (task tách từ đề); nếu không thì chỉ trả hai khối trên.\n\n'+TASK_INPUT;
 }
 function elLevel(t){ var s=String(t||'').toLowerCase(); if(/infer|ngầm|ngam|suy/.test(s)) return 'inferential'; if(/liter|chi\s*tiết|chi\s*tiet|direct/.test(s)) return 'literal'; return ''; }
-function elType(t){ var s=String(t||'').toLowerCase(); if(/research|tra\s*c|\*/.test(s)) return 'research'; if(/^(yn|y\/n|yes|no|tf)|yes\s*\/?\s*no|có\s*\/?\s*không/.test(s)) return 'yn'; return 'wh'; }
+function elType(t){ var s=String(t||'').toLowerCase(); if(/^(mc|mcq)\b|trắc|trac\s*nghi|multiple|choice/.test(s)) return 'mc'; if(/research|tra\s*c|\*/.test(s)) return 'research'; if(/^(yn|y\/n|yes|no|tf)|yes\s*\/?\s*no|có\s*\/?\s*không/.test(s)) return 'yn'; return 'wh'; }
 function elParse(raw){
   var s=String(raw||'').trim(); if(!s) return {err:'Hãy dán khối JSON mà AI trả về.'};
   var i=s.search(/[\{\[]/); if(i<0) return {err:'Không thấy dữ liệu JSON. Khối AI trả về phải bắt đầu bằng { hoặc [.'};
@@ -5540,7 +5565,10 @@ function elParse(raw){
     var ev=x.evidence||x.evidences||x.can_cu||x['căn cứ']||[]; if(typeof ev==='string') ev=[ev]; if(!Array.isArray(ev)) ev=[];
     ev=ev.map(function(t){ return String(t==null?'':t); }).filter(function(t){ return t.trim(); });
     var tm=x.terms||x.keywords||[]; if(typeof tm==='string') tm=tm.split(/[,;]/); if(!Array.isArray(tm)) tm=[];
-    items.push({n:x.n!=null?x.n:k+1,q:q,type:elType(x.type),level:elLevel(x.level||x.muc||x['mức']),group:String(x.group||x.nhom||'').trim(),evidence:ev,hint:String(x.answer||x.hint||x.goiy||'').trim(),terms:tm.map(function(t){ return String(t).trim(); }).filter(Boolean)});
+    var ops=x.options||x.choices||x.opts||x.lua_chon||[]; if(!Array.isArray(ops)) ops=[]; ops=ops.map(function(t){ if(t&&typeof t==='object') t=t.text||t.t||t.label||''; return String(t==null?'':t).replace(/^\s*[A-Fa-f][\.\):]\s+/,'').trim(); }).filter(Boolean);
+    var ty=elType(x.type); if(ops.length>=2&&ty!=='research') ty='mc'; var ai=-1, cv=(x.correct!=null?x.correct:(x.correct_answer!=null?x.correct_answer:(x.answer_key!=null?x.answer_key:x.dap_an)));
+    if(ty==='mc'&&cv!=null){ if(typeof cv==='number') ai=cv>=0&&cv<ops.length?cv:(cv>=1&&cv<=ops.length?cv-1:-1); else { var cs=String(cv).trim(), li='ABCDEF'.indexOf(cs.charAt(0).toUpperCase()); if(cs.length<=2&&li>=0&&li<ops.length) ai=li; else { var nn=ops.map(function(o){ return o.toLowerCase(); }).indexOf(cs.toLowerCase()); if(nn>=0) ai=nn; } } }
+    items.push({opts:ty==='mc'?ops:[],ans:ai,n:x.n!=null?x.n:k+1,q:q,type:ty,level:elLevel(x.level||x.muc||x['mức']),group:String(x.group||x.nhom||'').trim(),evidence:ev,hint:String(x.answer||x.hint||x.goiy||'').trim(),terms:tm.map(function(t){ return String(t).trim(); }).filter(Boolean)});
   });
   if(!items.length) return {err:'Mọi câu hỏi đều thiếu trường "q" (nội dung câu hỏi).'};
   return {items:items,skip:skip};
@@ -5596,7 +5624,7 @@ function elApply(items,mode){
       splitNodes(r).forEach(function(t){ var s=document.createElement('span'); s.className='el'; s.setAttribute('data-el',id); wrap(t,s); n++; });
     });
     if(!n) return;
-    var d={q:it.q,hint:it.hint}; if(it.type) d.type=it.type; if(it.level&&it.type!=='research') d.level=it.level; if(it.group) d.group=it.group; if(it.terms.length) d.terms=it.terms;
+    var d={q:it.q,hint:it.hint}; if(it.type) d.type=it.type; if(it.level&&it.type!=='research') d.level=it.level; if(it.group) d.group=it.group; if(it.terms.length) d.terms=it.terms; if(it.type==='mc'&&it.opts&&it.opts.length>=2){ d.opts=it.opts; d.ans=it.ans; }
     L.elicits[id]=d; added++;
   });
   lastElSig=null; changed(true); showTab('el',true);
