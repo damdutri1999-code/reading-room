@@ -4310,7 +4310,7 @@ function hashN(s){ var h=0; s=String(s||''); for(var i=0;i<s.length;i++) h=(h*31
 function seed(str){ var h=2166136261; str=String(str||''); for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return function(){ h^=h<<13; h^=h>>>17; h^=h<<5; return ((h>>>0)%1000)/1000; }; }
 function plain(html){ var d=document.createElement('div'); d.innerHTML=html||''; return d.textContent||''; }
 RR.CATS={ielts:'IELTS Cam',content:'Kiến thức',task1:'Mẫu Task 1',task2:'Mẫu Task 2'};
-RR.DANG={task1:{line:'Biểu đồ đường',bar:'Biểu đồ cột',pie:'Biểu đồ tròn',table:'Bảng số liệu',mixed:'Biểu đồ kết hợp',map:'Bản đồ',process:'Quy trình'},task2:{opinion:'Opinion',discuss:'Thảo luận',advdis:'Ưu và nhược điểm',problem:'Vấn đề và giải pháp',twoq:'Hai câu hỏi'}};
+RR.DANG={task1:{line:'Biểu đồ đường',bar:'Biểu đồ cột',pie:'Biểu đồ tròn',table:'Bảng số liệu',mixed:'Biểu đồ kết hợp',map:'Bản đồ',process:'Quy trình'},task2:{agree:'Agree / Disagree',discuss:'Discuss both views and Opinion',advdis:'Advantage / Disadvantage',posneg:'Positive / Negative',problem:'Problem - Solution - Cause',twoq:'Double questions'}};
 RR.info=function(L){
   var words=plain(L.html).split(/\s+/).filter(Boolean).length;
   return {title:L.title||'Bài đọc', level:L.level||'', topic:L.topic||'', minutes:Math.max(2,Math.round(words/130)), questions:Object.keys(L.elicits||{}).length, notes:Object.keys(L.notes||{}).length, words:words, cat:L.cat||'', catName:(RR.CATS[L.cat]||'')+((RR.DANG[L.cat]&&RR.DANG[L.cat][L.dang])?' · '+RR.DANG[L.cat][L.dang]:''), exam:(L.exam&&L.exam.count)||0};
