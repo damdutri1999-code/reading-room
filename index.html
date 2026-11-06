@@ -1748,7 +1748,7 @@ html.rr-fs-on{overflow:hidden}
     </div>
 
     <article class="sheet">
-      <div class="eyebrow-row"><span class="eyebrow">Reading comprehension</span><label class="lvl"><span>Loại bài</span><select id="i-cat" aria-label="Loại bài"><option value="">Chọn loại bài</option><option value="ielts">IELTS Cam</option><option value="content">Kiến thức</option></select></label><label class="lvl"><span>Trình độ</span><select id="i-level" aria-label="Trình độ CEFR"><option value="">Chưa chọn</option><option>A1</option><option>A1-A2</option><option>A2</option><option>A2-B1</option><option>B1</option><option>B1-B2</option><option>B2</option><option>B2-C1</option><option>C1</option><option>C1-C2</option><option>C2</option><option>IELTS</option></select></label><label class="lvl lvl-topic"><span>Topic</span><input id="i-topic" list="topic-list" maxlength="40" placeholder="Chủ đề, vd: Family" autocomplete="off" aria-label="Topic (chủ đề)"><datalist id="topic-list"></datalist></label></div>
+      <div class="eyebrow-row"><span class="eyebrow">Reading comprehension</span><label class="lvl"><span>Loại bài</span><select id="i-cat" aria-label="Loại bài"><option value="">Chọn loại bài</option><option value="ielts">IELTS Cam</option><option value="content">Kiến thức</option><option value="task1">Mẫu Task 1</option><option value="task2">Mẫu Task 2</option></select></label><label class="lvl"><span>Trình độ</span><select id="i-level" aria-label="Trình độ CEFR"><option value="">Chưa chọn</option><option>A1</option><option>A1-A2</option><option>A2</option><option>A2-B1</option><option>B1</option><option>B1-B2</option><option>B2</option><option>B2-C1</option><option>C1</option><option>C1-C2</option><option>C2</option><option>IELTS</option></select></label><label class="lvl lvl-topic"><span>Topic</span><input id="i-topic" list="topic-list" maxlength="40" placeholder="Chủ đề, vd: Family" autocomplete="off" aria-label="Topic (chủ đề)"><datalist id="topic-list"></datalist></label></div>
       <textarea id="i-title" class="title-in" rows="1" placeholder="Tiêu đề bài đọc" aria-label="Tiêu đề bài đọc"></textarea>
       <textarea id="i-sub" class="sub-in" rows="1" placeholder="Hướng dẫn cho học viên (tuỳ chọn)" aria-label="Hướng dẫn cho học viên"></textarea>
       <div class="legend" id="legend"></div>
@@ -1929,7 +1929,7 @@ html.rr-fs-on{overflow:hidden}
         <label class="chk"><input type="checkbox" id="imp-detect" checked>Tự nhận diện Tiêu đề và Heading</label>
         <label class="chk"><input type="checkbox" id="imp-join">Nối các dòng bị ngắt giữa câu (văn bản copy từ PDF)</label>
         <div class="imp-cat" data-start-only><span class="imp-cat-l">Loại bài <em>(bắt buộc)</em></span>
-          <div class="cat-pick" role="radiogroup" aria-label="Loại bài"><button type="button" role="radio" aria-checked="false" data-cat="ielts"><b>IELTS Cam</b><small>Bài đọc Cambridge IELTS</small></button><button type="button" role="radio" aria-checked="false" data-cat="content"><b>Kiến thức</b><small>Bài đọc lấy nội dung, thông tin</small></button></div>
+          <div class="cat-pick" role="radiogroup" aria-label="Loại bài"><button type="button" role="radio" aria-checked="false" data-cat="ielts"><b>IELTS Cam</b><small>Bài đọc Cambridge IELTS</small></button><button type="button" role="radio" aria-checked="false" data-cat="content"><b>Kiến thức</b><small>Bài đọc lấy nội dung, thông tin</small></button><button type="button" role="radio" aria-checked="false" data-cat="task1"><b>Mẫu Task 1</b><small>Bài mẫu mô tả số liệu, báo cáo</small></button><button type="button" role="radio" aria-checked="false" data-cat="task2"><b>Mẫu Task 2</b><small>Bài mẫu lập luận, nêu quan điểm</small></button></div>
           <label class="chk"><input type="checkbox" id="imp-exam"><span>Bài này có đề bài (câu hỏi để học viên làm)<small id="imp-exam-s">IELTS Cam mặc định có đề bài.</small></span></label>
         </div>
       </div>
@@ -4294,7 +4294,7 @@ RR.esc=esc;
 function hashN(s){ var h=0; s=String(s||''); for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))|0; return Math.abs(h); }
 function seed(str){ var h=2166136261; str=String(str||''); for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return function(){ h^=h<<13; h^=h>>>17; h^=h<<5; return ((h>>>0)%1000)/1000; }; }
 function plain(html){ var d=document.createElement('div'); d.innerHTML=html||''; return d.textContent||''; }
-RR.CATS={ielts:'IELTS Cam',content:'Kiến thức'};
+RR.CATS={ielts:'IELTS Cam',content:'Kiến thức',task1:'Mẫu Task 1',task2:'Mẫu Task 2'};
 RR.info=function(L){
   var words=plain(L.html).split(/\s+/).filter(Boolean).length;
   return {title:L.title||'Bài đọc', level:L.level||'', topic:L.topic||'', minutes:Math.max(2,Math.round(words/130)), questions:Object.keys(L.elicits||{}).length, notes:Object.keys(L.notes||{}).length, words:words, cat:L.cat||'', catName:RR.CATS[L.cat]||'', exam:(L.exam&&L.exam.count)||0};
@@ -5845,12 +5845,12 @@ var drop=$('#drop');
 ['dragleave','drop'].forEach(function(ev){ $('#import').addEventListener(ev,function(e){ e.preventDefault(); if(ev==='drop'||e.target===$('#import')) drop.classList.remove('over'); }); });
 $('#import').addEventListener('drop',function(e){ var f=e.dataTransfer&&e.dataTransfer.files[0]; if(f) readFile(f); });
 var impCat='';
-function setImpCat(c){ impCat=c; $$('.cat-pick button').forEach(function(b){ b.setAttribute('aria-checked',String(b.getAttribute('data-cat')===c)); }); if(c){ $('#imp-exam').checked=(c==='ielts'); $('#imp-exam-s').textContent=c==='ielts'?'IELTS Cam mặc định có đề bài. Bỏ chọn nếu bài này chỉ để đọc.':'Kiến thức mặc định không có đề bài. Chọn nếu bài này có câu hỏi.'; } }
+function setImpCat(c){ impCat=c; $$('.cat-pick button').forEach(function(b){ b.setAttribute('aria-checked',String(b.getAttribute('data-cat')===c)); }); if(c){ $('#imp-exam').checked=(c==='ielts'); $('#imp-exam-s').textContent=c==='ielts'?'IELTS Cam mặc định có đề bài. Bỏ chọn nếu bài này chỉ để đọc.':(c==='content'?'Kiến thức mặc định không có đề bài. Chọn nếu bài này có câu hỏi.':'Bài mẫu viết mặc định không có đề bài. Chọn nếu bài này có câu hỏi để học viên làm.'); } }
 $$('.cat-pick button').forEach(function(b){ b.addEventListener('click',function(){ setImpCat(b.getAttribute('data-cat')); }); });
 $('#imp-ok').addEventListener('click',function(){
   if(!impBlocks.length){ toast('Chưa có văn bản để đưa vào',true); $('#imp-text').focus(); return; }
   var starting=$('#import').classList.contains('as-start');
-  if(starting&&!impCat&&!(impLesson&&impLesson.cat)){ var ic=$('.imp-cat'); ic.classList.remove('need'); void ic.offsetWidth; ic.classList.add('need'); ic.scrollIntoView({block:'center',behavior:'smooth'}); toast('Hãy chọn loại bài: IELTS Cam hoặc Kiến thức',true); return; }
+  if(starting&&!impCat&&!(impLesson&&impLesson.cat)){ var ic=$('.imp-cat'); ic.classList.remove('need'); void ic.offsetWidth; ic.classList.add('need'); ic.scrollIntoView({block:'center',behavior:'smooth'}); toast('Hãy chọn loại bài: IELTS Cam, Kiến thức, Mẫu Task 1 hoặc Mẫu Task 2',true); return; }
   var mode=starting?'replace':document.querySelector('input[name="imp-mode"]:checked').value, bl=impBlocks.slice();
   if(impLesson){
     var x=JSON.parse(JSON.stringify(impLesson));
@@ -6304,7 +6304,7 @@ function hubTools(ids){
   return '<div class="tw-tools"><label class="tw-search">'+svg('search')+'<input data-hq placeholder="Tìm theo tên bài" value="'+esc(hubQ)+'" aria-label="Tìm bài"></label>'+
     (function(){ var tp={}; ids.forEach(function(id){ var x=LIB.lessons[id]; if(x&&x.topic) tp[x.topic]=1; }); var tps=Object.keys(tp).sort(function(a,b){ return a.localeCompare(b,'vi'); }); if(hubTp!=='all'&&!tp[hubTp]) hubTp='all'; return tps.length?'<span class="tw-chips" role="group" aria-label="Lọc chủ đề">'+['all'].concat(tps).map(function(k){ return '<button type="button" data-htp="'+esc(k)+'" aria-pressed="'+(hubTp===k)+'">'+(k==='all'?'Mọi chủ đề':esc(k))+'</button>'; }).join('')+'</span>':''; })()+
     (lvs.length>1?'<span class="tw-chips" role="group" aria-label="Lọc trình độ">'+['all'].concat(lvs).map(function(l){ return '<button type="button" data-hlv="'+esc(l)+'" aria-pressed="'+(hubLv===l)+'">'+(l==='all'?'Tất cả':esc(l))+'</button>'; }).join('')+'</span>':'')+
-    '<span class="tw-chips" role="group" aria-label="Lọc loại bài">'+[['all','Mọi loại'],['ielts','IELTS Cam'],['content','Kiến thức'],['exam','Có đề bài']].map(function(c){ return '<button type="button" data-hcat="'+c[0]+'" aria-pressed="'+(hubCat===c[0])+'">'+c[1]+'</button>'; }).join('')+'</span></div>';
+    '<span class="tw-chips" role="group" aria-label="Lọc loại bài">'+[['all','Mọi loại'],['ielts','IELTS Cam'],['content','Kiến thức'],['task1','Mẫu Task 1'],['task2','Mẫu Task 2'],['exam','Có đề bài']].map(function(c){ return '<button type="button" data-hcat="'+c[0]+'" aria-pressed="'+(hubCat===c[0])+'">'+c[1]+'</button>'; }).join('')+'</span></div>';
 }
 function paneLessonsSub(){ var n=doneIds().length; return n?n+' bài đã soạn xong · '+sharedIds().length+' trong Kho chung (thư mục KHO TÀI LIỆU CHUNG)':'Kho bài đã soạn xong của thầy'; }
 function paneLessons(){
