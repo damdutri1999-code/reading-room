@@ -1369,6 +1369,17 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-gl-2{display:flex;flex-direction:column;gap:6px}.rd-gl-2 span{display:block}
 .rd.stg[data-stage="1"] .rd-gl{display:flex}.rd.stg[data-stage="1"] .rd-gl-2{display:none}
 .rd.stg[data-stage="2"] .rd-gl{display:flex}.rd.stg[data-stage="2"] .rd-gl-1{display:none}
+
+.rd-cohov{z-index:6}
+.rd.stg[data-stage="2"] .rd-row.hlon .rd-blk:not(.rd-nb){line-height:2.5}
+.rd.stg[data-stage="2"] .rd-row.hlon mark.hl{cursor:pointer}
+.rd-cohcard{position:absolute;z-index:9;width:min(340px,calc(100% - 16px));box-sizing:border-box;background:var(--rd-paper,#fff);color:var(--rd-ink,#18203a);border:1px solid color-mix(in srgb,var(--rd-ink,#000) 16%,transparent);border-radius:14px;padding:12px 38px 12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.18);font:14px/1.55 var(--rd-ui,system-ui,sans-serif)}
+.rd-cohcard p{margin:6px 0 0}.rd-cohcard .cc-h{display:flex;align-items:center;gap:8px;font-size:13px}
+.rd-cohcard .cc-h i{width:12px;height:12px;border-radius:4px;display:block}
+.rd-cohcard .cc-n,.rd-cohcard .cc-t{font-size:13px;opacity:.85}.rd-cohcard .cc-n b{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;opacity:.65}
+.rd-cohcard .cc-t{padding-top:6px;border-top:1px dashed color-mix(in srgb,var(--rd-ink,#000) 20%,transparent)}
+.rd-cohcard .cc-x{position:absolute;top:6px;right:6px;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:inherit;font-size:20px;line-height:1;cursor:pointer}
+.rd-cohcard .cc-x:hover{background:color-mix(in srgb,currentColor 10%,transparent)}
 </style>
 <style id="rr-css">
 /* Reading Room shell: home, library, teacher hub and themed reading. Everything is scoped under .rr and uses --rr-* tokens so it never touches the Studio editor */
@@ -2006,7 +2017,7 @@ html.rr-fs-on{overflow:hidden}
         <label class="drop" id="drop"><span class="eic"><i data-i="file"></i></span><span><b>Kéo thả tệp vào đây hoặc bấm để chọn</b>.txt · .md · .docx (Word)</span><input type="file" id="imp-file" accept=".txt,.md,.docx,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></label>
         <textarea id="imp-text" placeholder="…hoặc dán File 1 vào đây: bài đã gắn thẻ màu, kèm dòng [gist:] [role:] [link:] [vi:] [vocab:] dưới mỗi đoạn. HTML có tô màu cũng tự hiện màu ở cột xem trước."></textarea>
         <button type="button" class="aihint" data-prompt-all><i data-i="sparkle"></i><span><b>Nhờ AI tô màu và đặt câu hỏi giùm?</b> Lấy câu lệnh mẫu, dán vào ChatGPT hoặc Claude kèm bài đọc, rồi dán cả câu trả lời vào đây. Studio tự tách bài đã tô màu và JSON elicit.</span></button>
-        <details class="imp-guide"><summary>Thẻ và dòng mới cho bốn giai đoạn</summary><div><p><b>Dòng dưới mỗi đoạn:</b> <code>[gist: ý chính]</code> <code>[role: vai trò đoạn]</code> <code>[link: P2 &gt; P3 | cách nối | giải thích]</code> <code>[vi: bản dịch]</code> <code>[vocab: cụm | nghĩa | colloc: … | ex: …]</code></p><p><b>Thẻ trong câu:</b> <code>{conn: However}</code> từ nối, <code>{ref: this -&gt; P3.S1}</code> quy chiếu, <code>{lex: effort}</code> từ vựng nối, <code>{zig: …}</code> zigzag, <code>{fn: point}</code> chức năng câu (point, explain, example, result).</p><p><b>Mã câu:</b> trong JSON, trường evidence có thể ghi <code>P3.S2</code> (đoạn 3, câu 2) thay cho đoạn trích nguyên văn. Đoạn đếm từ đoạn văn đầu tiên, không tính tiêu đề.</p></div></details>
+        <details class="imp-guide"><summary>Thẻ và dòng mới cho bốn giai đoạn</summary><div><p><b>Dòng dưới mỗi đoạn:</b> <code>[gist: ý chính]</code> <code>[role: vai trò đoạn]</code> <code>[link: P2.S1 ~ P3.S1 | cách nối | giải thích]</code> <code>[vi: bản dịch]</code> <code>[vocab: cụm | nghĩa | colloc: … | ex: …]</code></p><p><b>Thẻ trong câu:</b> <code>{conn: However}</code> từ nối, <code>{ref: they -&gt; P1.S2 | challenges}</code> quy chiếu, <code>{lex: hard times -&gt; P1.S1 | a hard time}</code> từ vựng nối, <code>{zig: what we can learn -&gt; P1.S2 | important lessons}</code> zigzag. Sau “-&gt;” là câu mà từ đó nối tới (mã câu), thêm “| cụm” để chỉ đúng cụm; web dùng nó để vẽ đường nét đứt, <code>{fn: point}</code> chức năng câu (point, explain, example, result).</p><p><b>Mã câu:</b> trong JSON, trường evidence có thể ghi <code>P3.S2</code> (đoạn 3, câu 2) thay cho đoạn trích nguyên văn. Đoạn đếm từ đoạn văn đầu tiên, không tính tiêu đề.</p></div></details>
         <label class="imp-json"><span><b>File 2: JSON bốn giai đoạn</b> <em>(không bắt buộc; JSON elicit kiểu cũ vẫn dùng được)</em></span><textarea id="imp-json" rows="3" spellcheck="false" placeholder='{"stage1":{"elicit":[…]}, "stage2":{"map":[…],"elicit":[…]}, "stage3":{"match":[…],"open":[…],"elicit":[…]}, "stage4":{"bank":[…]}}' aria-label="JSON bốn giai đoạn"></textarea><span class="imp-json-s" id="imp-json-s" aria-live="polite"></span></label>
         <label class="imp-json"><span><b>Task đọc hiểu</b> <em>(không bắt buộc, dành cho bài Kiến thức)</em></span><textarea id="imp-task" rows="3" spellcheck="false" placeholder="Questions 1-4&#10;Choose the correct letter, A, B, C or D.&#10;1. …" aria-label="Task đọc hiểu"></textarea><span class="imp-json-s" id="imp-task-s" aria-live="polite"></span></label>
         <label class="chk"><input type="checkbox" id="imp-detect" checked>Tự nhận diện Tiêu đề và Heading</label>
@@ -2353,7 +2364,7 @@ RD.mount = function(root, lesson, init, opts){
   art.querySelectorAll('.el').forEach(function(a){ var id=a.getAttribute('data-el'); if(!seen[id]){ seen[id]=[]; order.push(id); } seen[id].push(a); a.removeAttribute('data-n'); });
   /* ---------- Guided stages: mỗi nhóm câu hỏi thuộc một giai đoạn đọc ---------- */
   var STGN={1:'Đọc lấy ý và từ vựng',2:'Mạch nối trong bài',3:'Luyện hiểu bài',4:'Luyện paraphrase'};
-  var STGD={1:'Nắm ý chính từng đoạn và học các cụm từ hay trong bài.',2:'Nhìn cách các câu trong đoạn được nối với nhau.',3:'Nối, trắc nghiệm và câu mở có gợi ý để biết mình hiểu bài đến đâu. Không tính điểm.',4:'Viết lại các câu quan trọng, rồi xem từng bước người viết đã nghĩ ra sao.'};
+  var STGD={1:'Nắm ý chính từng đoạn và học các cụm từ hay trong bài.',2:'Nhìn cách các câu được nối với nhau. Bấm “Highlight mạch nối” ở mỗi đoạn, rồi bấm vào từ tô màu để xem nó nối tới đâu.',3:'Nối, trắc nghiệm và câu mở có gợi ý để biết mình hiểu bài đến đâu. Không tính điểm.',4:'Viết lại các câu quan trọng, rồi xem từng bước người viết đã nghĩ ra sao.'};
   function stageOf(d){ d=d||{}; if(d.stage>=1&&d.stage<=4) return d.stage|0; var g=(d.group||'').toLowerCase(); if(!g) return 1;
     if(/coherence|mạch|liên kết/.test(g)) return 2;
     if(/paraphrase|định vị|viết thử/.test(g)) return 4;
@@ -2462,7 +2473,7 @@ RD.mount = function(root, lesson, init, opts){
       var gs=(b.getAttribute('data-gist')||'').trim(), rl=(b.getAttribute('data-role')||'').trim(), lk=(b.getAttribute('data-link')||'').trim();
       if(gs||rl||lk){
         var lp=lk.split('|').map(function(x){ return x.trim(); }), gl=h('div','rd-gl');
-        gl.innerHTML=(gs?'<p class="rd-gl-1"><b>Ý chính</b>'+esc(gs)+'</p>':'')+((rl||lk)?'<p class="rd-gl-2">'+(rl?'<span><b>Vai trò của đoạn</b>'+esc(rl)+'</span>':'')+(lk?'<span><b>Nối với đoạn trước</b>'+esc((lp[0]?lp[0]+': ':'')+lp.slice(1).join('. '))+'</span>':'')+'</p>':'');
+        gl.innerHTML=(gs?'<p class="rd-gl-1"><b>Ý chính</b>'+esc(gs)+'</p>':'')+((rl||lk)?'<p class="rd-gl-2">'+(rl?'<span><b>Vai trò của đoạn</b>'+esc(rl)+'</span>':'')+(lk?'<span><b>Nối với đoạn trước</b>'+esc((function(){ var q=/^P(\d+)\.S\d+\s*~\s*P(\d+)/i.exec(lp[0]||''); return (q?'Đoạn '+q[1]+' → đoạn '+q[2]:(lp[0]||''))+': '; })()+lp.slice(1).join('. '))+'</span>':'')+'</p>':'');
         tools.appendChild(gl);
       }
       var vi=row.querySelector('.rd-vi'); if(vi) tools.appendChild(vi);
@@ -2473,10 +2484,116 @@ RD.mount = function(root, lesson, init, opts){
       row.appendChild(tools);
       on(btns,'click',function(e){
         var x=e.target.closest('button'); if(!x) return;
-        if(x.classList.contains('rd-hlp')){ var o=!row.classList.contains('hlon'); row.classList.toggle('hlon',o); [].forEach.call(btns.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed',String(o)); }); if(vp&&STG.cur===1){ vp.hidden=!o; var vb=btns.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded',String(o)); } }
+        if(x.classList.contains('rd-hlp')){ var o=!row.classList.contains('hlon'); row.classList.toggle('hlon',o); [].forEach.call(btns.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed',String(o)); }); drawCoh(true); if(vp&&STG.cur===1){ vp.hidden=!o; var vb=btns.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded',String(o)); } }
         else if(x.classList.contains('rd-vocb')){ var o2=vp.hidden; vp.hidden=!o2; x.setAttribute('aria-expanded',String(o2)); }
       });
     });
+
+    // Cohesion map: dashed lines + explanation card (stage 2)
+    var ovc=document.createElementNS(NS,'svg'); ovc.setAttribute('class','rd-ov rd-cohov'); ovc.setAttribute('aria-hidden','true'); wrapEl.appendChild(ovc);
+    var cohSel=null, cohCardEl=null;
+    var COHL={signal:'Từ nối',ref:'Quy chiếu',lex:'Từ vựng nối',zig:'Zigzag'};
+    var CONNM=[[/^(although|though|even though)\b/i,'nhượng bộ: vế này nêu điều trái ngược, nhưng điều đáng chú ý hơn nằm ở vế sau'],[/^for (example|instance)\b/i,'đưa ví dụ để minh hoạ cho ý vừa nêu'],[/^(in the same way|similarly|likewise)\b/i,'nói một điều tương tự điều vừa nói'],[/^(as a result|therefore|thus|so)\b/i,'chỉ kết quả của điều vừa nói'],[/^(because|since)\b/i,'chỉ nguyên nhân, lý do'],[/^(rather than|instead of)\b/i,'đối lập: chọn cái này thay vì cái kia'],[/^(but|however|yet)\b/i,'đối lập với điều vừa nói'],[/^(as well as|also|and|in addition)\b/i,'bổ sung thêm một ý'],[/^if\b/i,'chỉ điều kiện']];
+    var COHCOL={signal:'#3dbe7a',ref:'#8b5cf6',lex:'#ec4899',zig:'#06b6d4'};
+    function cohColor(id){ var cs=lesson.codes||[]; for(var i=0;i<cs.length;i++) if(cs[i].id===id) return cs[i].color; return COHCOL[id]||'#888'; }
+    function cohTexts(b){
+      var w=document.createTreeWalker(b,NodeFilter.SHOW_TEXT), n, out=[], map=[], sp=true;
+      while((n=w.nextNode())){ var v=n.nodeValue; for(var i=0;i<v.length;i++){ var c=v[i]; if(/\s/.test(c)){ if(sp) continue; sp=true; out.push(' '); map.push({n:n,o:i}); } else { sp=false; out.push(c); map.push({n:n,o:i}); } } }
+      while(out.length&&out[out.length-1]===' '){ out.pop(); map.pop(); }
+      return {s:out.join(''),map:map};
+    }
+    function cohSents(s){
+      var re; try{ re=new RegExp('(?<=[.!?]["”’\')\\]]?)\\s+(?=["“‘\'(\\[]?[A-Z0-9])','g'); }catch(_){ re=/(?<=[.!?])\s+(?=[A-Z0-9])/g; }
+      var out=[], st=0, m; while((m=re.exec(s))){ out.push([st,m.index]); st=m.index+m[0].length; } out.push([st,s.length]); return out;
+    }
+    function cohParas(){
+      var out=[]; art.querySelectorAll('.rd-row').forEach(function(row){ var b=row.querySelector('.rd-blk:not(.rd-nb)'); if(!b||b.tagName!=='P'||/\bps-/.test(b.className||'')) return; var t=cohTexts(b); if(!t.s) return; out.push({row:row,b:b,t:t,ss:cohSents(t.s)}); });
+      return out;
+    }
+    function cohRange(p,a,b){ var A=p.t.map[a], B=p.t.map[b-1]; if(!A||!B) return null; var r=document.createRange(); try{ r.setStart(A.n,A.o); r.setEnd(B.n,B.o+1); }catch(_){ return null; } return r; }
+    function cohSentRange(paras,pn,sn){ var p=paras[pn-1]; if(!p) return null; var ss=p.ss[sn-1]; return ss?cohRange(p,ss[0],ss[1]):null; }
+    function cohResolve(mk,paras){
+      var spec=(mk.getAttribute('data-to')||'').split('|').map(function(x){ return x.trim(); }), m=/^P\s*(\d+)\s*\.\s*S\s*(\d+)$/i.exec(spec[0]||''), res={note:spec[2]||'',phrase:'',range:null,pi:0,si:0};
+      if(!m){ res.phrase=spec[0]||''; return res; }
+      var p=paras[+m[1]-1]; if(!p) return res; var ss=p.ss[+m[2]-1]; if(!ss) return res;
+      var a=ss[0], b=ss[1], sent=p.t.s.slice(a,b); res.pi=+m[1]; res.si=+m[2]; res.sent=sent;
+      if(spec[1]){ var i=sent.toLowerCase().indexOf(spec[1].toLowerCase()); if(i>=0){ a+=i; b=a+spec[1].length; res.phrase=sent.slice(i,i+spec[1].length); } }
+      if(!res.phrase) res.phrase=sent.length>70?sent.slice(0,67)+'…':sent;
+      res.range=cohRange(p,a,b); if(res.range&&res.range.intersectsNode(mk)) res.range=null;
+      return res;
+    }
+    function rpath(pts,r){
+      var q=[pts[0]]; for(var i=1;i<pts.length;i++){ if(Math.abs(pts[i][0]-q[q.length-1][0])+Math.abs(pts[i][1]-q[q.length-1][1])>0.5) q.push(pts[i]); }
+      if(q.length<2) return ''; var d='M'+q[0][0]+' '+q[0][1];
+      for(var k=1;k<q.length-1;k++){ var p0=q[k-1], p1=q[k], p2=q[k+1], l1=Math.hypot(p1[0]-p0[0],p1[1]-p0[1]), l2=Math.hypot(p2[0]-p1[0],p2[1]-p1[1]), rr=Math.min(r,l1/2,l2/2);
+        d+=' L'+(p1[0]+(p0[0]-p1[0])/l1*rr)+' '+(p1[1]+(p0[1]-p1[1])/l1*rr)+' Q'+p1[0]+' '+p1[1]+' '+(p1[0]+(p2[0]-p1[0])/l2*rr)+' '+(p1[1]+(p2[1]-p1[1])/l2*rr); }
+      var z=q[q.length-1]; return d+' L'+z[0]+' '+z[1];
+    }
+    function cohEl(tag,a,parent){ var e=document.createElementNS(NS,tag); for(var k in a) e.setAttribute(k,a[k]); (parent||ovc).appendChild(e); return e; }
+    function cohClose(){ if(cohCardEl){ cohCardEl.remove(); cohCardEl=null; } cohSel=null; }
+    var cohSig='';
+    function drawCoh(force){
+      if(STG.cur!==2){ ovc.innerHTML=''; cohSig=''; cohClose(); return; }
+      var rows=[].filter.call(art.querySelectorAll('.rd-row.hlon'),function(r){ return !r.classList.contains('stg-off'); });
+      if(cohSel&&!(cohSel.isConnected&&cohSel.closest('.rd-row.hlon'))) cohClose();
+      if(!rows.length){ ovc.innerHTML=''; cohSig=''; return; }
+      var paras=cohParas(), wr=wrapEl.getBoundingClientRect(), jobs=[];
+      rows.forEach(function(row){
+        var p=null; for(var i=0;i<paras.length;i++) if(paras[i].row===row){ p=paras[i]; break; } if(!p) return;
+        [].forEach.call(row.querySelectorAll('mark.hl[data-to]'),function(mk){
+          var c=mk.getAttribute('data-c'); if(!COHL[c]) return; var r=cohResolve(mk,paras); if(!r.range) return;
+          var sr=mk.getClientRects()[0], trs=r.range.getClientRects(); if(!sr||!trs.length) return; jobs.push({sr:sr,trs:trs,col:cohColor(c),mk:mk,p:p});
+        });
+        var m=/^\s*P(\d+)\.S(\d+)\s*~\s*P(\d+)\.S(\d+)/i.exec((p.b.getAttribute('data-link')||'').split('|')[0]);
+        if(m){ var A=cohSentRange(paras,+m[1],+m[2]), B=cohSentRange(paras,+m[3],+m[4]); if(A&&B){ var ar=A.getClientRects(), br=B.getClientRects(); if(ar.length&&br.length) jobs.push({sr:br[0],trs:ar,col:'#64748b',mk:null,p:p}); } }
+      });
+      var sg=(cohSel?'s':'')+Math.round(wr.left)+','+Math.round(wr.top)+'|'+jobs.map(function(j){ return Math.round(j.sr.left)+','+Math.round(j.sr.top)+','+Math.round(j.trs[0].left)+','+Math.round(j.trs[0].top); }).join(';');
+      if(!force&&sg===cohSig){ cohPlace(); return; } cohSig=sg; ovc.innerHTML='';
+      jobs.forEach(function(j,k){
+        var ink=getComputedStyle(art).color||'#222', col=j.col, sel=cohSel&&j.mk===cohSel, dim=cohSel&&!sel, tr=j.trs[0], lane=k%3;
+        if(sel&&j.mk) [].forEach.call(j.trs,function(rc){ cohEl('rect',{x:rc.left-wr.left-2,y:rc.top-wr.top+1,width:rc.width+4,height:rc.height-2,rx:5,fill:col,'fill-opacity':0.2,stroke:col,'stroke-opacity':0.8,'stroke-dasharray':'3 3'}); });
+        var sx=sr0(j.sr), tx=tr.left+Math.min(tr.width/2,22)-wr.left, sB=j.sr.bottom-wr.top-1, tB=tr.bottom-wr.top-1, g1=sB+6+lane*3, g2=tB+6+lane*3;
+        function sr0(r){ return r.left+Math.min(r.width/2,22)-wr.left; }
+        var bl=j.p.b.getBoundingClientRect().left-wr.left, x0=Math.max(6,bl-8-5*(k%4)), pts;
+        if(Math.abs(sB-tB)<6) pts=[[sx,sB],[sx,g1],[tx,g1],[tx,tB]]; else pts=[[sx,sB],[sx,g1],[x0,g1],[x0,g2],[tx,g2],[tx,tB]];
+        var d=rpath(pts,6); if(!d) return;
+        cohEl('path',{d:d,fill:'none',stroke:'var(--rd-paper,#fff)','stroke-width':sel?6:4.5,'stroke-opacity':dim?0.4:0.9,'stroke-linecap':'round','stroke-linejoin':'round'});
+        var ln=cohEl('path',{d:d,fill:'none','stroke-width':sel?2.6:1.4,'stroke-dasharray':sel?'6 4':'5 4','stroke-linecap':'round','stroke-linejoin':'round','stroke-opacity':dim?0.25:(sel?1:0.8)}); ln.style.stroke='color-mix(in srgb,'+col+' 72%,#000)';
+        var dot=cohEl('circle',{cx:sx,cy:sB,r:sel?3.6:3,'fill-opacity':dim?0.3:1}); dot.style.fill='color-mix(in srgb,'+col+' 72%,#000)';
+        var ah=cohEl('path',{d:'M'+tx+' '+tB+' l-4.5 7 h9 z','fill-opacity':dim?0.3:1}); ah.style.fill='color-mix(in srgb,'+col+' 72%,#000)';
+      });
+      cohPlace();
+    }
+    function cohPlace(){
+      if(!cohCardEl||!cohSel||!cohSel.isConnected) return;
+      var wr=wrapEl.getBoundingClientRect(), rc=cohSel.getClientRects()[0]; if(!rc) return;
+      var w=cohCardEl.offsetWidth||320, x=Math.max(8,Math.min(rc.left-wr.left,wr.width-w-8)), y=rc.bottom-wr.top+30;
+      cohCardEl.style.left=x+'px'; cohCardEl.style.top=y+'px';
+    }
+    function cohCard(mk){
+      var paras=cohParas(), c=mk.getAttribute('data-c'), w=mk.textContent.trim(), r=cohResolve(mk,paras), col=cohColor(c), tg=r.phrase, why='';
+      if(c==='signal'){ var mean=''; for(var i=0;i<CONNM.length;i++) if(CONNM[i][0].test(w)){ mean=CONNM[i][1]; break; } why='“'+w+'” là từ nối. Nó '+(mean?'dùng để '+mean+'.':'báo cho người đọc biết quan hệ giữa hai ý đứng hai bên.'); }
+      else if(c==='ref') why='“'+w+'” là từ quy chiếu: nó không thêm ý mới mà trỏ về '+(tg?'“'+tg+'”':'điều đã nhắc trước đó')+'. Đọc “'+w+'” là phải hiểu đó chính là '+(tg?'“'+tg+'”':'điều ấy')+'.';
+      else if(c==='lex') why='“'+w+'”'+(tg?' và “'+tg+'”':'')+' nói về cùng một ý bằng từ khác nhau (lặp từ, đồng nghĩa hoặc cùng chủ đề). Nhờ vậy câu văn nối liền với câu trước mà không phải lặp nguyên từ.';
+      else if(c==='zig') why='Ý mới ở cuối câu trước'+(tg?' (“'+tg+'”)':'')+' trở thành ý quen ở đầu câu này (“'+w+'”). Thông tin đi theo đường zigzag: mới, rồi quen, rồi lại mới.';
+      var foot=r.pi?'Nối tới câu '+r.si+' của đoạn '+r.pi+(r.sent?': “'+(r.sent.length>110?r.sent.slice(0,107)+'…':r.sent)+'”':''):'';
+      cohClose(); cohSel=mk;
+      var card=document.createElement('div'); card.className='rd-cohcard'; card.setAttribute('role','dialog'); card.setAttribute('aria-label','Giải thích mạch nối');
+      card.innerHTML='<button type="button" class="cc-x" aria-label="Đóng">×</button><div class="cc-h"><i style="background:'+esc(col)+'"></i><b>'+esc(COHL[c]||'Mạch nối')+'</b></div><p class="cc-e">'+esc(why)+'</p>'+(r.note?'<p class="cc-n"><b>Ghi chú</b>'+esc(r.note)+'</p>':'')+(foot?'<p class="cc-t">'+esc(foot)+'</p>':'');
+      wrapEl.appendChild(card); cohCardEl=card; card.querySelector('.cc-x').addEventListener('click',function(){ cohClose(); drawCoh(true); });
+      drawCoh(true);
+    }
+    art.addEventListener('click',function(e){
+      if(STG.cur!==2) return; var mk=e.target.closest&&e.target.closest('mark.hl'); if(!mk||!COHL[mk.getAttribute('data-c')]) return;
+      var row=mk.closest('.rd-row'); if(!row||!row.classList.contains('hlon')) return;
+      e.stopPropagation(); e.preventDefault(); if(cohSel===mk){ cohClose(); drawCoh(true); } else cohCard(mk);
+    },true);
+    document.addEventListener('click',function(e){ if(cohCardEl&&!cohCardEl.contains(e.target)&&!(e.target.closest&&e.target.closest('mark.hl'))){ cohClose(); drawCoh(true); } });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&cohCardEl){ cohClose(); drawCoh(true); } });
+    window.addEventListener('resize',function(){ drawCoh(); });
+    setInterval(function(){ if(STG.cur===2&&!document.hidden) drawCoh(); },500);
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ drawCoh(true); });
+    if(window.ResizeObserver){ var cohRO=new ResizeObserver(function(){ requestAnimationFrame(drawCoh); }); cohRO.observe(art); }
     function setStage(k){
       STG.cur=k; try{ localStorage.setItem(STK,String(k)); }catch(_){}
       R.classList.remove('stg-pick','nohl'); R.setAttribute('data-stage',k);
@@ -2484,11 +2601,12 @@ RD.mount = function(root, lesson, init, opts){
       order.forEach(function(id){ var c=cards[id]; if(!c) return; var off=stageOf(elicits[id])!==k; c.el.classList.toggle('stg-off',off); if(off){ c.el.classList.remove('open'); anchors_off(id); } });
       art.querySelectorAll('.rd-row').forEach(function(row){ rowSpan(row); row.classList.remove('hlon'); [].forEach.call(row.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed','false'); }); var v=row.querySelector('.rd-voc'); if(v) v.hidden=true; var vb=row.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded','false'); });
       var rb=$('.rd-mode-read'); if(k!==3&&rb&&R.classList.contains('qopen')) rb.click();
+      cohClose(); drawCoh(true);
       window.scrollTo(0,0);
       if(k===3&&EX&&!cnt[3]){ var eb=$('.rd-exam-btn'); if(eb) setTimeout(function(){ eb.click(); },0); }
     }
     function anchors_off(id){ var c=cards[id]; if(!c) return; c.anchors.forEach(function(a){ a.classList.remove('hot'); }); }
-    function backToPick(){ var rb=$('.rd-mode-read'); if(rb&&R.classList.contains('qopen')) rb.click(); STG.cur=0; R.removeAttribute('data-stage'); R.classList.add('stg-pick'); hbar.hidden=true; drawPick(); window.scrollTo(0,0); }
+    function backToPick(){ cohClose(); drawCoh(true); var rb=$('.rd-mode-read'); if(rb&&R.classList.contains('qopen')) rb.click(); STG.cur=0; R.removeAttribute('data-stage'); R.classList.add('stg-pick'); hbar.hidden=true; drawPick(); window.scrollTo(0,0); }
     on(pick,'click',function(e){ var x=e.target.closest('.rd-stg-card'); if(x) setStage(+x.getAttribute('data-s')); });
     on(hbar.querySelector('.rd-stg-out'),'click',backToPick);
   })(); }
@@ -5429,7 +5547,7 @@ function parseInline(src){
     if(n==='color'||n==='colour'||n==='màu'){ if(closing) return {kind:'tc',name:'color'}; var hx=toHex(val); return hx?{kind:'tc',name:'color',v:hx}:{kind:'skip',name:'color'}; }
     if(n==='mark'||n==='hl'||n==='highlight'){ if(closing) return {kind:'hl',name:'mark'}; var cid=val?(codeAlias(val)||(toHex(val)?nearestCode(toHex(val)):null)):(L.codes[0]&&L.codes[0].id); return cid?{kind:'hl',name:'mark',v:cid}:null; }
     if(COH[n]) return closing?{kind:'hl',name:n,v:n}:{kind:'hl',name:n,v:n,to:val};
-    var id2=codeAlias(n); if(id2) return {kind:'hl',name:id2,v:id2};
+    var id2=codeAlias(n); if(id2) return closing?{kind:'hl',name:id2,v:id2}:{kind:'hl',name:id2,v:id2,to:(id2==='signal'&&val)?val:undefined};
     return null;
   }
   while((m=re.exec(src))){
@@ -5876,7 +5994,7 @@ function stgOf(d){ d=d||{}; if(d.stage>=1&&d.stage<=4) return d.stage|0; var g=(
   if(/chất lượng|not given|chọn và gom|xu hướng|lập trường|câu chủ đề|quan sát/.test(g)) return 3; return 1; }
 function pkgStats(){
   var ps=[]; Array.prototype.forEach.call(ed.children,function(e){ if(e.tagName!=='P'||/\bps-/.test(e.className||'')||e.classList.contains('nb')||!e.textContent.trim()) return; ps.push(e); });
-  var st={n:ps.length,noGist:[],noRole:[],noLink:[],noVoc:[],cohLow:[],voc:0,coh:0,link:0,role:0,gist:0};
+  var st={noTo:0,n:ps.length,noGist:[],noRole:[],noLink:[],noVoc:[],cohLow:[],voc:0,coh:0,link:0,role:0,gist:0};
   ps.forEach(function(e,i){
     var k=i+1;
     if((e.getAttribute('data-gist')||'').trim()) st.gist++; else st.noGist.push(k);
@@ -5884,6 +6002,7 @@ function pkgStats(){
     if(i>0){ if((e.getAttribute('data-link')||'').trim()) st.link++; else st.noLink.push(k); }
     var v=[]; try{ v=JSON.parse(e.getAttribute('data-vocab')||'[]'); }catch(_){ v=[]; } if(v.length){ st.voc+=v.length; } else st.noVoc.push(k);
     var c=e.querySelectorAll('mark.hl[data-c="signal"],mark.hl[data-c="ref"],mark.hl[data-c="lex"],mark.hl[data-c="zig"]').length; st.coh+=c; if(c<3) st.cohLow.push(k);
+    st.noTo+=e.querySelectorAll('mark.hl[data-c="ref"]:not([data-to]),mark.hl[data-c="lex"]:not([data-to]),mark.hl[data-c="zig"]:not([data-to])').length;
   });
   var seen={}, by={1:0,2:0,3:0,4:0}, open=0; $$('.el',ed).forEach(function(a){ var id=a.getAttribute('data-el'); if(seen[id]) return; seen[id]=1; var d=L.elicits[id]; if(!d) return; var g=stgOf(d); by[g]++; if(g===3&&d.type==='wh') open++; });
   st.by=by; st.open=open; var pk=L.pkg||{}; st.match=(pk.match||[]).length; st.bank=(pk.bank||[]).length; st.map=(pk.map||[]).length;
@@ -5905,6 +6024,7 @@ function pkgRows(){
     if(st.noRole.length){ ok2=false; m2.push('Thiếu [role:] ở đoạn '+pkgList(st.noRole)); } else m2.push('Đoạn nào cũng có [role:]');
     if(st.noLink.length){ ok2=false; m2.push('Thiếu [link:] ở đoạn '+pkgList(st.noLink)); } else if(N>1) m2.push('Mọi đoạn từ đoạn 2 đều có [link:]');
     if(st.cohLow.length){ ok2=false; m2.push('Đoạn '+pkgList(st.cohLow)+' có dưới 3 thẻ liên kết'); } else m2.push('Đoạn nào cũng có ít nhất 3 thẻ liên kết');
+    if(st.noTo){ ok2=false; m2.push(st.noTo+' thẻ quy chiếu, từ vựng nối hoặc zigzag chưa có đích (thiếu “-> P1.S2”), web không vẽ được đường nối'); }
     if(st.by[2]<6){ ok2=false; m2.push('Mới có '+st.by[2]+' câu hỏi, cần ít nhất 6'); } else m2.push(st.by[2]+' câu hỏi');
   }
   rows.push({k:2,name:'Mạch nối',ok:ok2,m:m2,opt:true});
