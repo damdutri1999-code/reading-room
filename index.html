@@ -2602,6 +2602,7 @@ RD.mount = function(root, lesson, init, opts){
       art.querySelectorAll('.rd-row').forEach(function(row){ rowSpan(row); row.classList.remove('hlon'); [].forEach.call(row.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed','false'); }); var v=row.querySelector('.rd-voc'); if(v) v.hidden=true; var vb=row.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded','false'); });
       var rb=$('.rd-mode-read'); if(k!==3&&rb&&R.classList.contains('qopen')) rb.click();
       cohClose(); drawCoh(true);
+      var tp=$('.rd-tip'); if(tp){ if(tp._o==null) tp._o=tp.textContent; tp.textContent=(k===2)?'Ở giai đoạn này, bấm vào từ tô màu để xem nó nối tới đâu. Bôi đen một cụm từ để ghi chú lên bài.':tp._o; }
       window.scrollTo(0,0);
       if(k===3&&EX&&!cnt[3]){ var eb=$('.rd-exam-btn'); if(eb) setTimeout(function(){ eb.click(); },0); }
     }
@@ -2961,6 +2962,7 @@ RD.mount = function(root, lesson, init, opts){
     }
     on(art,'click',function(e){
       var t=e.target; if(!t||!t.closest) return;
+      if(R.getAttribute('data-stage')==='2'){ if(pop) close(); return; }
       var sel=getSelection(); if(sel&&!sel.isCollapsed) return;
       if(t.closest('a,button,textarea,input,select,.rd-card,.rd-nb,.rd-vi,.nb')){ return; }
       var wd=wordAt(e); if(!wd){ close(); return; }
