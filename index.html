@@ -1818,7 +1818,6 @@ html.rr-fs-on{overflow:hidden}
       <span class="sep"></span>
       <button type="button" class="pill accent" data-act="el" data-tip="Gắn câu hỏi vào chữ đang chọn · Alt+Q"><i data-i="question"></i>Câu hỏi</button>
       <button type="button" class="pill" data-act="upd" data-tip="Mở khung nạp bài, chỉ cập nhật phần bạn dán (chữ, elicit hoặc task)"><i data-i="upload"></i>Cập nhật từ AI</button>
-      <button type="button" class="pill" data-act="pkg" data-tip="Xem bài đã đủ dữ liệu cho bốn giai đoạn đọc chưa, và bật hoặc tắt từng giai đoạn"><i data-i="check"></i>Kiểm tra gói</button>
       <button type="button" class="pill" data-act="nb" data-tip="Chèn ô ghi chú sau đoạn đang đứng"><i data-i="note"></i>Ghi chú</button>
     </div>
 
@@ -5031,7 +5030,6 @@ function act(a,btn){
     case 'style': openStyleMenu(btn); break;
     case 'import': openImport(); break;
     case 'upd': openUpd(); break;
-    case 'pkg': openPkg(); break;
     case 'ul': restoreSel(); document.execCommand('insertUnorderedList'); changed(true); break;
     case 'bold': case 'italic': case 'underline': restoreSel(); document.execCommand(a); changed(true); updStates(); break;
     case 'code': codeAction(btn.getAttribute('data-c')); break;
@@ -7076,7 +7074,8 @@ function loadUI(){
 function syncDone(){ var b=$('#done-btn'); if(!b) return; var d=!!(L&&L.done); b.classList.toggle('on',d); b.setAttribute('aria-pressed',String(d)); b.querySelector('span').textContent=d?'Đã hoàn tất':'Hoàn tất'; b.setAttribute('data-tip',d?'Bài đã hoàn tất. Bấm để chuyển về bản nháp':'Soạn xong: lưu lên Supabase, chưa thuộc kho nào (thầy xếp ở Quản lý bài)'); }
 $('#done-btn').addEventListener('click',function(){
   if(L.done){ delete L.done; saveDraft(); syncDone(); autoPub('Đã chuyển về bản nháp'); return; }
-  L.done=true; delete L.hidden; autoShare(L); saveDraft(); syncDone(); autoPub('Đã hoàn tất, bài đã lưu lên Supabase. Chưa thuộc kho nào, thầy xếp ở Quản lý bài'); hubTab='lessons'; try{ localStorage.setItem('rls:hubtab','lessons'); }catch(e){} showHome('teacher'); setTimeout(function(){ if(rrCtl) rrCtl.toast('Đã đưa bài vào kho bài đọc'); },80);
+  var gapMsg=''; try{ if(ed.querySelector('[data-gist],[data-role],[data-link]')||L.pkg){ var gr=pkgRows().filter(function(r){ return !r.ok&&!(r.empty&&r.opt); }).map(function(r){ return r.k; }); if(gr.length) gapMsg='Gói bài còn thiếu ở giai đoạn '+gr.join(', ')+'. Bài vẫn được lưu; giai đoạn thiếu có thể không hiện cho học viên.'; } }catch(e){}
+  L.done=true; delete L.hidden; autoShare(L); saveDraft(); syncDone(); autoPub('Đã hoàn tất, bài đã lưu lên Supabase. Chưa thuộc kho nào, thầy xếp ở Quản lý bài'); hubTab='lessons'; try{ localStorage.setItem('rls:hubtab','lessons'); }catch(e){} showHome('teacher'); setTimeout(function(){ if(rrCtl) rrCtl.toast(gapMsg||'Đã đưa bài vào kho bài đọc'); },80);
 });
 /* ---------- Owner role + auto publish ---------- */
 var edPubT_=0;
