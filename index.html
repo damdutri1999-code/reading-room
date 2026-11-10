@@ -1302,6 +1302,55 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-mc-fb{margin-top:8px;font-size:13px;line-height:1.5;color:var(--rd-muted);background:var(--rd-bg);border-radius:8px;padding:8px 10px}
 .rd-mc-fb p{margin:0 0 4px}.rd-mc-fb .v{font-weight:700;color:var(--rd-ink)}
 .rd-mc-fb.good .v{color:var(--rd-student)}.rd-mc-fb.wrong .v{color:#c0392b}
+
+/* Guided stages */
+.rd.stg-pick .rd-bar,.rd.stg-pick .rd-tip,.rd.stg-pick .rd-text{display:none}
+.rd:not(.stg-pick) .rd-stgp{display:none}
+.rd.stg .rd-legend,.rd.stg .rd-nohl-btn{display:none}
+.rd.stg:not([data-stage="3"]) .rd-mode{display:none}
+.rd.stg .rd-row:not(.hlon) .hl,.rd.stg[data-stage="3"] .hl,.rd.stg[data-stage="4"] .hl,.rd.stg[data-stage="1"] .hl:not([data-c="main"]):not([data-c="key"]),.rd.stg[data-stage="2"] .hl:not([data-c="signal"]){background-image:none!important;background-color:transparent!important;padding:0;margin:0}
+.rd.stg[data-stage="1"] .hlon .hl[data-c="key"]{font-weight:700}
+.rd-card.stg-off{display:none!important}
+.rd-stgbar{display:flex;gap:10px 16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:0 0 14px;padding:10px 14px;border:1px solid var(--rd-line);background:var(--rd-accent-soft);border-radius:12px}
+.rd-stgbar[hidden]{display:none}
+.rd-stgbar-t{display:flex;gap:4px 10px;align-items:center;flex-wrap:wrap;min-width:0}
+.rd-stgbar-t .n{width:24px;height:24px;border-radius:8px;background:var(--rd-accent);color:var(--rd-paper);display:flex;align-items:center;justify-content:center;font:700 13px/1 var(--rd-ui)}
+.rd-stgbar-t .nm{font:600 14px/1.3 var(--rd-ui)}
+.rd-stgbar-t small{flex-basis:100%;font:400 12.5px/1.45 var(--rd-ui);color:var(--rd-muted)}
+.rd-stgp{max-width:1080px;margin:0 0 8px}
+@media (min-width:1080px){.rd-stgp{margin-left:calc(240px * (1 + (var(--z) - 1) * .5) + 32px);max-width:760px}.rd-stgp-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rd-stgp-h{margin:0 0 6px;font:700 22px/1.25 var(--rd-ui)}
+.rd-stgp-p{margin:0 0 18px;color:var(--rd-muted);font:400 14.5px/1.55 var(--rd-ui);max-width:64ch}
+.rd-stgp-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.rd-stg-card{font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:12px;padding:18px;min-height:240px;background:var(--panel,var(--rd-paper));color:var(--panel-ink,var(--rd-ink));border:0;border-radius:var(--panel-radius,16px);box-shadow:var(--panel-shadow,0 0 0 1px var(--rd-line))}
+.rd-stg-card:hover{box-shadow:0 0 0 1.5px var(--rd-accent)}
+.rd-stg-card.rec{box-shadow:0 0 0 2px var(--rd-accent)}
+.rd-stg-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rd-stg-n{width:36px;height:36px;border-radius:11px;background:var(--rd-accent-soft);color:var(--rd-accent);display:flex;align-items:center;justify-content:center;font:700 17px/1 var(--rd-ui)}
+.rd-stg-tag{font:600 11px/1 var(--rd-ui);padding:5px 9px;border-radius:999px;background:color-mix(in srgb,var(--rd-ink) 9%,transparent)}
+.rd-stg-tag.rec{background:var(--rd-accent);color:var(--rd-paper)}
+.rd-stg-nm{font:700 17px/1.3 var(--rd-ui)}
+.rd-stg-ds{font:400 13.5px/1.55 var(--rd-ui);color:var(--rd-muted)}
+.rd-stg-ft{margin-top:auto;display:flex;flex-direction:column;gap:7px;font:400 12.5px/1.3 var(--rd-ui);color:var(--rd-muted)}
+.rd-stg-bar{height:5px;border-radius:99px;background:var(--rd-line);overflow:hidden;display:block}
+.rd-stg-bar i{display:block;height:100%;background:var(--rd-accent)}
+.rd-stt{grid-column:1;min-width:0;padding:2px 0 8px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+@media (min-width:1080px){.rd-row > .rd-stt{grid-column:2;grid-row:calc(var(--n,1) + 1)}}
+.rd-stt-b{display:flex;gap:8px;flex-wrap:wrap}
+.rd-stt-b:empty{display:none}
+.rd .rd-hlp,.rd .rd-vocb{display:none}
+.rd[data-stage="1"] .rd-hlp[data-s="1"],.rd[data-stage="1"] .rd-vocb,.rd[data-stage="2"] .rd-hlp[data-s="2"]{display:inline-flex}
+.rd-hlp[aria-pressed=true],.rd-vocb[aria-expanded=true]{background:var(--rd-ink);color:var(--rd-paper);border-color:var(--rd-ink)}
+.rd:not([data-stage="1"]) .rd-voc{display:none}
+.rd-voc{width:100%;border:1px solid var(--rd-line);border-radius:12px;background:var(--rd-paper);color:var(--rd-ink);overflow:hidden}
+.rd-voc[hidden]{display:none}
+.rd-voc-h{padding:9px 13px;font:600 12.5px/1.2 var(--rd-ui);color:var(--rd-muted);background:var(--rd-bg)}
+.rd-voc-s{overflow-x:auto}
+.rd-voc-t{width:100%;border-collapse:collapse;font:400 13.5px/1.5 var(--rd-ui);min-width:560px}
+.rd-voc-t th{text-align:left;font-weight:600;font-size:11.5px;color:var(--rd-muted);padding:8px 13px;border-top:1px solid var(--rd-line)}
+.rd-voc-t td{padding:9px 13px;border-top:1px solid var(--rd-line);vertical-align:top}
+.rd-voc-t td:first-child{font-weight:700;width:24%}
+.rd-voc-t td.ex{color:var(--rd-muted);font-style:italic}
 </style>
 <style id="rr-css">
 /* Reading Room shell: home, library, teacher hub and themed reading. Everything is scoped under .rr and uses --rr-* tokens so it never touches the Studio editor */
@@ -2198,7 +2247,7 @@ RD.mount = function(root, lesson, init, opts){
     var nl=0, el=0;
     Array.prototype.forEach.call(row.children,function(c){
       if(c.classList.contains('rd-nb')||c.classList.contains('rd-ccard')) c.style.setProperty('--r',++nl);
-      else if(c.classList.contains('rd-card')) c.style.setProperty('--r',++el);
+      else if(c.classList.contains('rd-card')&&!c.classList.contains('stg-off')) c.style.setProperty('--r',++el);
     });
     row.style.setProperty('--n',Math.max(1,nl,el));
   }
@@ -2275,11 +2324,26 @@ RD.mount = function(root, lesson, init, opts){
   // Elicit cards
   var order = [], seen = {}, cards = {};
   art.querySelectorAll('.el').forEach(function(a){ var id=a.getAttribute('data-el'); if(!seen[id]){ seen[id]=[]; order.push(id); } seen[id].push(a); a.removeAttribute('data-n'); });
+  /* ---------- Guided stages: mỗi nhóm câu hỏi thuộc một giai đoạn đọc ---------- */
+  var STGN={1:'Đọc lấy ý và từ vựng',2:'Mạch nối trong bài',3:'Luyện hiểu bài',4:'Luyện paraphrase'};
+  var STGD={1:'Nắm ý chính từng đoạn và học các cụm từ hay trong bài.',2:'Nhìn cách các câu trong đoạn được nối với nhau.',3:'Nối, trắc nghiệm và câu mở có gợi ý để biết mình hiểu bài đến đâu. Không tính điểm.',4:'Viết lại các câu quan trọng, rồi xem từng bước người viết đã nghĩ ra sao.'};
+  function stageOf(d){ d=d||{}; if(d.stage>=1&&d.stage<=4) return d.stage|0; var g=(d.group||'').toLowerCase(); if(!g) return 1;
+    if(/coherence|mạch|liên kết/.test(g)) return 2;
+    if(/paraphrase|định vị|viết thử/.test(g)) return 4;
+    if(/chất lượng|not given|chọn và gom|xu hướng|lập trường|câu chủ đề|quan sát/.test(g)) return 3;
+    return 1; }
+  var cnt={1:0,2:0,3:0,4:0}, nn={1:0,2:0,3:0,4:0};
+  order.forEach(function(id){ cnt[stageOf(elicits[id])]++; });
+  var hasVoc=!!art.querySelector('[data-vocab]');
+  var avail={1:cnt[1]>0||hasVoc, 2:cnt[2]>0, 3:cnt[3]>0||!!EX, 4:cnt[4]>0};
+  if(Array.isArray(lesson.stages)&&lesson.stages.length) [1,2,3,4].forEach(function(k){ avail[k]=avail[k]&&lesson.stages.indexOf(k)>=0; });
+  var explicit=hasVoc||Array.isArray(lesson.stages)||order.some(function(id){ var d=elicits[id]||{}; return d.group||d.stage; });
+  var STG={on:opts.stages!==false&&explicit&&[1,2,3,4].filter(function(k){ return avail[k]; }).length>=2, cur:0};
   order.forEach(function(id,i){
-    var def = elicits[id]||{}, n = i+1, anchors = seen[id];
+    var def = elicits[id]||{}, sg = stageOf(def), n = STG.on?(++nn[sg]):i+1, gn = i+1, anchors = seen[id];
     anchors[anchors.length-1].setAttribute('data-n','Q'+n);
     var blk = anchors[0].closest('.rd-blk'); if(!blk) return;
-    var c = h('div','rd-card rd-qc'); c.setAttribute('data-el',id);
+    var c = h('div','rd-card rd-qc'); c.setAttribute('data-el',id); c.setAttribute('data-stg',sg);
     var isTick=def.type==='tick'&&Array.isArray(def.opts)&&def.opts.length>=2; var isMc=isTick||(def.type==='mc'&&Array.isArray(def.opts)&&def.opts.length>=2);
     var TL={yn:'Yes/No',wh:'WH',research:'Tra cứu',mc:'Trắc nghiệm',tick:'Chọn nhiều'};
     var LV={literal:'Tìm chi tiết',inferential:'Hiểu ý ngầm'};
@@ -2291,7 +2355,7 @@ RD.mount = function(root, lesson, init, opts){
       (def.hint?'<button type="button" class="rd-link rd-hint-btn" aria-expanded="false">Xem gợi ý</button><div class="rd-hint"><div><p>'+esc(def.hint)+'</p></div></div>':''))+
       '<textarea class="rd-ta"'+(isMc?' hidden':'')+' rows="2" placeholder="Câu trả lời của em…" aria-label="Trả lời Q'+n+'"></textarea><span class="rd-saved">Đã lưu</span></div></div>';
     blk.parentNode.insertBefore(c, blk); rowSpan(blk.parentNode);
-    cards[id] = {el:c, n:n, q:def.q||'', anchors:anchors};
+    cards[id] = {el:c, n:gn, q:def.q||'', anchors:anchors};
     var ta = c.querySelector('textarea'); ta.value = st.answers[id]||''; tas.push(ta);
     function mark(){ c.classList.toggle('done',!!(ta.value||'').trim()); } mark();
     var clb=c.querySelector('.rd-cl');
@@ -2339,6 +2403,62 @@ RD.mount = function(root, lesson, init, opts){
   });
 
   art.querySelectorAll('.rd-row').forEach(rowSpan);
+
+  if(STG.on){ (function(){
+    R.classList.add('stg','stg-pick');
+    var STK='rd:stg:'+lesson.id, lastStage=0; try{ lastStage=+localStorage.getItem(STK)||0; }catch(_){}
+    var head=$('.rd-head'), hbar=h('div','rd-stgbar'); hbar.hidden=true;
+    hbar.innerHTML='<div class="rd-stgbar-t"><b class="n"></b><span class="nm"></span><small></small></div><button type="button" class="rd-btn rd-stg-out">Thoát, chọn lại giai đoạn</button>';
+    head.insertBefore(hbar,head.querySelector('.rd-bar'));
+    var pick=h('section','rd-stgp'); pick.setAttribute('aria-label','Chọn giai đoạn đọc');
+    function done(k){ var d=0; order.forEach(function(id){ if(stageOf(elicits[id])===k&&(st.answers[id]||'').trim()) d++; }); return d; }
+    function recommend(){ var seq=[1,3,2,4]; for(var i=0;i<seq.length;i++){ var k=seq[i]; if(avail[k]&&(k===2||k===4?false:(cnt[k]?done(k)<cnt[k]:true))) return k; } return 1; }
+    function drawPick(){
+      var rec=recommend();
+      pick.innerHTML='<h2 class="rd-stgp-h">Lần đọc này bạn muốn làm gì?</h2><p class="rd-stgp-p">Chọn một giai đoạn để bắt đầu. Bạn đọc lại bài bao nhiêu lần cũng được, mỗi lần chọn một mục đích. Muốn đổi giai đoạn, bạn thoát ra màn này rồi chọn lại.</p><div class="rd-stgp-g">'+
+      [1,2,3,4].filter(function(k){ return avail[k]; }).map(function(k){
+        var tot=cnt[k], dn=done(k), extra=(k===3&&EX)?(tot?' + ':'')+'Task '+EX.count+' câu':'';
+        var meta=(tot?tot+' câu':'')+extra; if(!meta) meta='Từ vựng và bản dịch';
+        var tag=(k===rec?'<span class="rd-stg-tag rec">'+(lastStage?'Gợi ý tiếp theo':'Gợi ý cho lần đầu')+'</span>':(k===2||k===4?'<span class="rd-stg-tag">Tuỳ chọn</span>':''));
+        return '<button type="button" class="rd-stg-card'+(k===rec?' rec':'')+'" data-s="'+k+'"><span class="rd-stg-top"><span class="rd-stg-n">'+k+'</span>'+tag+'</span><b class="rd-stg-nm">'+STGN[k]+'</b><span class="rd-stg-ds">'+STGD[k]+'</span><span class="rd-stg-ft"><span>'+esc(meta)+'</span>'+(tot?'<span class="rd-stg-bar"><i style="width:'+Math.round(100*dn/tot)+'%"></i></span><span>Đã làm '+dn+'/'+tot+'</span>':'')+'</span></button>';
+      }).join('')+'</div>';
+    }
+    wrapEl.insertBefore(pick,art); drawPick();
+    // vocabulary table + per-paragraph highlight buttons
+    art.querySelectorAll('.rd-row').forEach(function(row){
+      var b=row.querySelector('.rd-blk:not(.rd-nb)'); if(!b||b.tagName!=='P'||/\bps-/.test(b.className||'')) return;
+      var voc=[]; try{ voc=JSON.parse(b.getAttribute('data-vocab')||'[]'); }catch(_){ voc=[]; }
+      if(!Array.isArray(voc)) voc=[];
+      var hasHl=!!b.querySelector('.hl'), tools=h('div','rd-stt'), btns=h('div','rd-stt-b');
+      btns.innerHTML=(hasHl?'<button type="button" class="rd-btn rd-hlp" data-s="1" aria-pressed="false">Highlight ý hay</button><button type="button" class="rd-btn rd-hlp" data-s="2" aria-pressed="false">Highlight mạch nối</button>':'')+(voc.length?'<button type="button" class="rd-btn rd-vocb" data-s="1" aria-expanded="false">Từ vựng <span class="rd-count">'+voc.length+'</span></button>':'');
+      tools.appendChild(btns);
+      var vi=row.querySelector('.rd-vi'); if(vi) tools.appendChild(vi);
+      var vp=null;
+      if(voc.length){ vp=h('div','rd-voc'); vp.hidden=true;
+        vp.innerHTML='<div class="rd-voc-h">Từ vựng trong đoạn · '+voc.length+' cụm</div><div class="rd-voc-s"><table class="rd-voc-t"><thead><tr><th>Cụm từ</th><th>Nghĩa</th><th>Collocation</th><th>Ví dụ</th></tr></thead><tbody>'+voc.map(function(r){ r=r||[]; return '<tr><td>'+esc(r[0]||'')+'</td><td>'+esc(r[1]||'')+'</td><td>'+esc(r[2]||'')+'</td><td class="ex">'+esc(r[3]||'')+'</td></tr>'; }).join('')+'</tbody></table></div>';
+        tools.appendChild(vp); }
+      row.appendChild(tools);
+      on(btns,'click',function(e){
+        var x=e.target.closest('button'); if(!x) return;
+        if(x.classList.contains('rd-hlp')){ var o=!row.classList.contains('hlon'); row.classList.toggle('hlon',o); [].forEach.call(btns.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed',String(o)); }); if(vp&&STG.cur===1){ vp.hidden=!o; var vb=btns.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded',String(o)); } }
+        else if(x.classList.contains('rd-vocb')){ var o2=vp.hidden; vp.hidden=!o2; x.setAttribute('aria-expanded',String(o2)); }
+      });
+    });
+    function setStage(k){
+      STG.cur=k; try{ localStorage.setItem(STK,String(k)); }catch(_){}
+      R.classList.remove('stg-pick','nohl'); R.setAttribute('data-stage',k);
+      hbar.hidden=false; hbar.querySelector('.n').textContent=k; hbar.querySelector('.nm').textContent='Giai đoạn '+k+' · '+STGN[k]; hbar.querySelector('small').textContent=STGD[k];
+      order.forEach(function(id){ var c=cards[id]; if(!c) return; var off=stageOf(elicits[id])!==k; c.el.classList.toggle('stg-off',off); if(off){ c.el.classList.remove('open'); anchors_off(id); } });
+      art.querySelectorAll('.rd-row').forEach(function(row){ rowSpan(row); row.classList.remove('hlon'); [].forEach.call(row.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed','false'); }); var v=row.querySelector('.rd-voc'); if(v) v.hidden=true; var vb=row.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded','false'); });
+      var rb=$('.rd-mode-read'); if(k!==3&&rb&&R.classList.contains('qopen')) rb.click();
+      window.scrollTo(0,0);
+      if(k===3&&EX&&!cnt[3]){ var eb=$('.rd-exam-btn'); if(eb) setTimeout(function(){ eb.click(); },0); }
+    }
+    function anchors_off(id){ var c=cards[id]; if(!c) return; c.anchors.forEach(function(a){ a.classList.remove('hot'); }); }
+    function backToPick(){ var rb=$('.rd-mode-read'); if(rb&&R.classList.contains('qopen')) rb.click(); STG.cur=0; R.removeAttribute('data-stage'); R.classList.add('stg-pick'); hbar.hidden=true; drawPick(); window.scrollTo(0,0); }
+    on(pick,'click',function(e){ var x=e.target.closest('.rd-stg-card'); if(x) setStage(+x.getAttribute('data-s')); });
+    on(hbar.querySelector('.rd-stg-out'),'click',backToPick);
+  })(); }
 
   // Saving
   var saveT;
@@ -5719,14 +5839,16 @@ function guess(text,i,prev,detect){
   return {style:'normal',text:text};
 }
 var VI_RE=/^\[(?:vi|vie|vn|dịch|dich|bản dịch|ban dich)\s*[:=]\s*([\s\S]*?)\]\s*$/i;
+var VOC_RE=/^\[(?:vocab|vocabulary|từ vựng|tu vung|tv)\s*[:=]\s*([\s\S]*?)\]\s*$/i;
+function vocRow(s){ var p=s.split('|').map(function(x){ return x.trim(); }), r=[p[0]||'',p[1]||'','','']; p.slice(2).forEach(function(x,i){ var m=/^(colloc(?:ation)?s?|ex(?:ample)?s?|vd|ví dụ)\s*[:=]\s*([\s\S]*)$/i.exec(x); if(m){ if(/^(ex|vd|ví)/i.test(m[1])) r[3]=m[2].trim(); else r[2]=m[2].trim(); } else if(i===0) r[2]=x; else r[3]=x; }); return r[0]?r:null; }
 function parseText(t){
-  var detect=$('#imp-detect').checked, join=$('#imp-join').checked, viOf={};
+  var detect=$('#imp-detect').checked, join=$('#imp-join').checked, viOf={}, vocOf={};
   t=t.replace(/\r\n?/g,'\n').replace(/ /g,' ').replace(/[ \t]+/g,' ');
   var paras=[];
   if(join){
     t.split(/\n\s*\n/).forEach(function(g){
-      var lines=g.split('\n').map(function(s){ return s.trim(); }).filter(Boolean), buf=[], viM=null;
-      lines=lines.filter(function(l){ var m=VI_RE.exec(l); if(m){ viM=m[1].trim(); return false; } return true; });
+      var lines=g.split('\n').map(function(s){ return s.trim(); }).filter(Boolean), buf=[], viM=null, vcM=[];
+      lines=lines.filter(function(l){ var m=VI_RE.exec(l); if(m){ viM=m[1].trim(); return false; } var v=VOC_RE.exec(l); if(v){ var r=vocRow(v[1]); if(r) vcM.push(r); return false; } return true; });
       lines.forEach(function(l,idx){
         var head=/^(#{1,4}\s|>\s|\[note)/i.test(l)||(l.length<=70&&!/[.!?;:,]$/.test(l)&&(idx===0||/[.!?:"”]$/.test(lines[idx-1]))&&lines.length>1&&idx<lines.length-1&&/^[\p{Lu}\d]/u.test(l)&&l.split(' ').length<=10);
         if(head&&idx===0){ paras.push(l); return; }
@@ -5734,13 +5856,14 @@ function parseText(t){
       });
       if(buf.length) paras.push(buf.join(' ').replace(/(\w)- (\w)/g,'$1$2'));
       if(viM&&paras.length) viOf[paras.length-1]=viM;
+      if(vcM.length&&paras.length) vocOf[paras.length-1]=vcM;
     });
-  } else t.split('\n').map(function(s){ return s.trim(); }).filter(Boolean).forEach(function(l){ var m=VI_RE.exec(l); if(m){ if(paras.length) viOf[paras.length-1]=m[1].trim(); } else paras.push(l); });
+  } else t.split('\n').map(function(s){ return s.trim(); }).filter(Boolean).forEach(function(l){ var m=VI_RE.exec(l); if(m){ if(paras.length) viOf[paras.length-1]=m[1].trim(); return; } var v=VOC_RE.exec(l); if(v){ var r=vocRow(v[1]); if(r&&paras.length){ (vocOf[paras.length-1]=vocOf[paras.length-1]||[]).push(r); } return; } paras.push(l); });
   var out=[], prev=null, tagged=hasTags(t);
   paras.forEach(function(p,i){
     var g=guess(p,i,prev,detect&&!tagged); prev=g.style;
     if(g.style==='note'){ out.push({style:'note',html:esc(g.text),text:g.text}); return; }
-    var h=parseInline(g.text), ob={style:g.style,html:h,text:plainOf(h)}; if(viOf[i]&&g.style==='normal') ob.vi=viOf[i]; out.push(ob);
+    var h=parseInline(g.text), ob={style:g.style,html:h,text:plainOf(h)}; if(viOf[i]&&g.style==='normal') ob.vi=viOf[i]; if(vocOf[i]&&g.style==='normal') ob.voc=vocOf[i]; out.push(ob);
   });
   return out;
 }
@@ -5961,7 +6084,7 @@ function applyMap(){
 function blocksHtml(bl){
   return bl.map(function(b){
     if(b.style==='note'){ var nid=uid('n'); L.notes[nid]={prompt:b.text}; return '<div class="nb" contenteditable="false" data-nb="'+nid+'"><span class="nb-tag">Take note</span><span class="nb-p">'+esc(b.text)+'</span></div>'; }
-    var m=RD.STYLE_META[b.style]||RD.STYLE_META.normal; return '<'+m.tag+(m.cls?' class="'+m.cls+'"':'')+(b.vi?' data-vi="'+esc(b.vi)+'"':'')+'>'+b.html+'</'+m.tag+'>';
+    var m=RD.STYLE_META[b.style]||RD.STYLE_META.normal; return '<'+m.tag+(m.cls?' class="'+m.cls+'"':'')+(b.vi?' data-vi="'+esc(b.vi)+'"':'')+(b.voc&&b.voc.length?' data-vocab="'+esc(JSON.stringify(b.voc))+'"':'')+'>'+b.html+'</'+m.tag+'>';
   }).join('');
 }
 /* Prompt for AI */
