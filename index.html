@@ -1350,8 +1350,8 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 @media (min-width:1080px){.rd-row > .rd-stt{grid-column:2;grid-row:calc(var(--n,1) + 1)}}
 .rd-stt-b{display:flex;gap:8px;flex-wrap:wrap}
 .rd-stt-b:empty{display:none}
-.rd .rd-hlp,.rd .rd-vocb,.rd .rd-gstb{display:none}
-.rd[data-stage="1"] .rd-hlp[data-s="1"],.rd[data-stage="1"] .rd-vocb,.rd[data-stage="1"] .rd-gstb,.rd[data-stage="2"] .rd-hlp[data-s="2"]{display:inline-flex}
+.rd .rd-hlp,.rd .rd-vocb,.rd .rd-gstb,.rd .rd-rolb{display:none}
+.rd[data-stage="1"] .rd-hlp[data-s="1"],.rd[data-stage="1"] .rd-vocb,.rd[data-stage="1"] .rd-gstb,.rd[data-stage="2"] .rd-hlp[data-s="2"],.rd[data-stage="2"] .rd-rolb{display:inline-flex}
 .rd-hlp[aria-pressed=true],.rd-vocb[aria-expanded=true]{background:var(--rd-ink);color:var(--rd-paper);border-color:var(--rd-ink)}
 .rd:not([data-stage="1"]) .rd-voc{display:none}
 .rd-voc{width:100%;border:1px solid var(--rd-line);border-radius:12px;background:var(--rd-paper);color:var(--rd-ink);overflow:hidden}
@@ -1369,7 +1369,7 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-gl b{display:block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;opacity:.65;margin-bottom:2px}
 .rd-gl-2{display:flex;flex-direction:row;flex-wrap:wrap;gap:6px 24px}.rd-gl-2 span{display:block;flex:1 1 280px;min-width:0}
 .rd.stg[data-stage="1"] .rd-row.gston .rd-gl{display:flex}.rd.stg[data-stage="1"] .rd-gl-2{display:none}
-.rd.stg[data-stage="2"] .rd-gl{display:flex}.rd.stg[data-stage="2"] .rd-gl-1{display:none}
+.rd.stg[data-stage="2"] .rd-row.rolon .rd-gl{display:flex}.rd.stg[data-stage="2"] .rd-gl-1{display:none}
 
 .rd-wrap{isolation:isolate}
 .rd-cohov{z-index:-1;inset:auto;zoom:calc(1 / var(--z,1))}
@@ -1460,8 +1460,8 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-stt{flex-direction:row;flex-wrap:wrap;gap:6px;align-items:center;padding:0 0 6px}
 .rd-stt-b,.rd-stt .rd-vi{display:contents}
 .rd-stt > .rd-gl,.rd-stt .rd-vi-t,.rd-stt > .rd-voc{flex:0 0 100%;order:5}
-.rd-stt .rd-btn.rd-hlp,.rd-stt .rd-btn.rd-gstb,.rd-stt .rd-btn.rd-vocb,.rd-stt .rd-vi-btn{font:600 12px/1 var(--rd-ui);padding:6px 11px;border:0;border-radius:999px;background:var(--rd-paper);color:var(--rd-ink);box-shadow:none;margin:0;gap:5px}
-.rd-stt .rd-btn.rd-hlp:hover,.rd-stt .rd-btn.rd-gstb:hover,.rd-stt .rd-btn.rd-vocb:hover,.rd-stt .rd-vi-btn:hover{background:color-mix(in srgb,var(--rd-ink) 15%,transparent)}
+.rd-stt .rd-btn.rd-hlp,.rd-stt .rd-btn.rd-gstb,.rd-stt .rd-btn.rd-rolb,.rd-stt .rd-btn.rd-vocb,.rd-stt .rd-vi-btn{font:600 12px/1 var(--rd-ui);padding:6px 11px;border:0;border-radius:999px;background:var(--rd-paper);color:var(--rd-ink);box-shadow:none;margin:0;gap:5px}
+.rd-stt .rd-btn.rd-hlp:hover,.rd-stt .rd-btn.rd-gstb:hover,.rd-stt .rd-btn.rd-rolb:hover,.rd-stt .rd-btn.rd-vocb:hover,.rd-stt .rd-vi-btn:hover{background:color-mix(in srgb,var(--rd-ink) 15%,transparent)}
 .rd-stt .rd-btn[aria-pressed=true],.rd-stt .rd-btn[aria-expanded=true],.rd-stt .rd-vi-btn[aria-expanded=true]{background:var(--rd-ink);color:var(--rd-paper)}
 .rd-stt .rd-vi-btn{background:color-mix(in srgb,var(--rd-accent) 28%,var(--rd-paper));color:var(--rd-ink)}
 .rd-stt .rd-vi-btn svg{width:11px;height:11px}
@@ -2576,7 +2576,7 @@ RD.mount = function(root, lesson, init, opts){
       var voc=[]; try{ voc=JSON.parse(b.getAttribute('data-vocab')||'[]'); }catch(_){ voc=[]; }
       if(!Array.isArray(voc)) voc=[];
       var hasHl=!!b.querySelector('.hl'), tools=h('div','rd-stt'), btns=h('div','rd-stt-b');
-      btns.innerHTML=(hasHl?'<button type="button" class="rd-btn rd-hlp" data-s="1" aria-pressed="false">Highlight ý hay</button><button type="button" class="rd-btn rd-hlp" data-s="2" aria-pressed="false">Highlight mạch nối</button>':'')+((b.getAttribute('data-gist')||'').trim()?'<button type="button" class="rd-btn rd-gstb" data-s="1" aria-pressed="false">Xem ý chính</button>':'')+(voc.length?'<button type="button" class="rd-btn rd-vocb" data-s="1" aria-expanded="false">Từ vựng <span class="rd-count">'+voc.length+'</span></button>':'');
+      btns.innerHTML=(hasHl?'<button type="button" class="rd-btn rd-hlp" data-s="1" aria-pressed="false">Highlight ý hay</button><button type="button" class="rd-btn rd-hlp" data-s="2" aria-pressed="false">Highlight mạch nối</button>':'')+((b.getAttribute('data-gist')||'').trim()?'<button type="button" class="rd-btn rd-gstb" data-s="1" aria-pressed="false">Xem ý chính</button>':'')+(((b.getAttribute('data-role')||'').trim()||(b.getAttribute('data-link')||'').trim())?'<button type="button" class="rd-btn rd-rolb" data-s="2" aria-pressed="false">Xem vai trò của đoạn</button>':'')+(voc.length?'<button type="button" class="rd-btn rd-vocb" data-s="1" aria-expanded="false">Từ vựng <span class="rd-count">'+voc.length+'</span></button>':'');
       tools.appendChild(btns);
       var gs=(b.getAttribute('data-gist')||'').trim(), rl=(b.getAttribute('data-role')||'').trim(), lk=(b.getAttribute('data-link')||'').trim();
       if(gs||rl||lk){
@@ -2592,6 +2592,7 @@ RD.mount = function(root, lesson, init, opts){
       row.appendChild(tools);
       on(btns,'click',function(e){
         var x=e.target.closest('button'); if(!x) return;
+        if(x.classList.contains('rd-rolb')){ var r2=!row.classList.contains('rolon'); row.classList.toggle('rolon',r2); x.setAttribute('aria-pressed',String(r2)); x.textContent=r2?'Ẩn vai trò của đoạn':'Xem vai trò của đoạn'; return; }
         if(x.classList.contains('rd-gstb')){ var g=!row.classList.contains('gston'); row.classList.toggle('gston',g); x.setAttribute('aria-pressed',String(g)); x.textContent=g?'Ẩn ý chính':'Xem ý chính'; return; }
         if(x.classList.contains('rd-hlp')){ var o=!row.classList.contains('hlon'); row.classList.toggle('hlon',o); [].forEach.call(btns.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed',String(o)); }); drawCoh(true); if(vp&&STG.cur===1){ vp.hidden=!o; var vb=btns.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded',String(o)); } }
         else if(x.classList.contains('rd-vocb')){ var o2=vp.hidden; vp.hidden=!o2; x.setAttribute('aria-expanded',String(o2)); }
@@ -2804,7 +2805,7 @@ RD.mount = function(root, lesson, init, opts){
       R.classList.remove('stg-pick','nohl'); R.setAttribute('data-stage',k);
       hbar.hidden=false; hbar.querySelector('.n').textContent=k; hbar.querySelector('.nm').textContent='Giai đoạn '+k+' · '+STGN[k]; hbar.querySelector('small').textContent=STGD[k];
       order.forEach(function(id){ var c=cards[id]; if(!c) return; var off=stageOf(elicits[id])!==k; c.el.classList.toggle('stg-off',off); if(off){ c.el.classList.remove('open'); anchors_off(id); } });
-      art.querySelectorAll('.rd-row').forEach(function(row){ rowSpan(row); row.classList.remove('hlon'); row.classList.remove('gston'); var gb=row.querySelector('.rd-gstb'); if(gb){ gb.setAttribute('aria-pressed','false'); gb.textContent='Xem ý chính'; } [].forEach.call(row.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed','false'); }); var v=row.querySelector('.rd-voc'); if(v) v.hidden=true; var vb=row.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded','false'); });
+      art.querySelectorAll('.rd-row').forEach(function(row){ rowSpan(row); row.classList.remove('hlon'); row.classList.remove('gston'); row.classList.remove('rolon'); var rb2=row.querySelector('.rd-rolb'); if(rb2){ rb2.setAttribute('aria-pressed','false'); rb2.textContent='Xem vai trò của đoạn'; } var gb=row.querySelector('.rd-gstb'); if(gb){ gb.setAttribute('aria-pressed','false'); gb.textContent='Xem ý chính'; } [].forEach.call(row.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed','false'); }); var v=row.querySelector('.rd-voc'); if(v) v.hidden=true; var vb=row.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded','false'); });
       var rb=$('.rd-mode-read'); if(k!==3&&rb&&R.classList.contains('qopen')) rb.click();
       cohClose(); drawCoh(true);
       if(k===3) buildMatch();
