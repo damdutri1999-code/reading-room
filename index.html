@@ -1891,6 +1891,8 @@ html.rr-fs-on{overflow:hidden}
 .rr-actc .sr{position:absolute;left:-9999px}
 .rr-actx{border:0;background:none;color:var(--rr-fg);opacity:.7;font:600 12px var(--rr-ui);text-decoration:underline;cursor:pointer;padding:4px 6px}
 [data-th="notebook"] .rr-ddb{font:400 18px/1 var(--rr-hand);background:#fff}
+/* Theme Sân khấu tạm cất: ẩn nút chọn (code giữ nguyên để bật lại) */
+.rr-themes button[data-th="stage"],.rr-fth button[data-fth="stage"],.tw-th-stage,.ed-themes button[data-th="stage"]{display:none!important}
 </style>
 
 <style id="code-style"></style>
@@ -4840,8 +4842,8 @@ RR.checkHand=function(){
          openLesson(lesson, host, ctl) -> {destroy()}, onShow(view) }
 */
 RR.init=function(opts){
-  var root=opts.root, html=document.documentElement, th=html.getAttribute('data-th')||'stage', view='home', libMode='grid', libLv='all', libCat='all', libTp='all', libQ='', reader=null, current=null;
-  try{ th=localStorage.getItem('rr:theme')||th; libMode=localStorage.getItem('rr:lib')||libMode; }catch(e){}
+  var root=opts.root, html=document.documentElement, th=html.getAttribute('data-th')||'constellation', view='home', libMode='grid', libLv='all', libCat='all', libTp='all', libQ='', reader=null, current=null;
+  try{ th=localStorage.getItem('rr:theme')||th; libMode=localStorage.getItem('rr:lib')||libMode; }catch(e){} if(th==='stage') th='constellation';
   root.classList.add('rr');
   root.innerHTML='<div class="rr-bd rr-skybg"></div><div class="rr-bd rr-stars"></div><div class="rr-bd rr-spot"></div><div class="rr-bd rr-paper"></div>'+
     '<div class="rr-themes" role="radiogroup" aria-label="Chọn theme"><button type="button" role="radio" data-th="stage" title="Sân khấu">'+IC.stage+'<span>Sân khấu</span></button><button type="button" role="radio" data-th="notebook" title="Vở ghi">'+IC.nb+'<span>Vở ghi</span></button><button type="button" role="radio" data-th="constellation" title="Chòm sao">'+IC.star+'<span>Chòm sao</span></button></div>'+
@@ -5003,7 +5005,7 @@ RR.init=function(opts){
       '<div class="ok" data-lok role="status" aria-live="polite">'+esc(loginOk)+'</div><div class="err" data-lerr role="alert" aria-live="polite"></div><button type="submit" class="rr-lgo">'+(up?'Tạo tài khoản':'Đăng nhập')+'</button></form></section>';
   }
   function render(){
-    try{ th=localStorage.getItem('rr:theme')||th; }catch(e){}
+    try{ th=localStorage.getItem('rr:theme')||th; }catch(e){} if(th==='stage') th='constellation';
     html.setAttribute('data-th',th);
     root.querySelectorAll('.rr-themes button').forEach(function(b){ b.setAttribute('aria-checked',String(b.getAttribute('data-th')===th)); });
     if(reader){ try{ reader.destroy(); }catch(e){} reader=null; }
@@ -5157,8 +5159,8 @@ function khoBoot(id){
   window.__kq=pr;
   var cache=null; try{ cache=JSON.parse(localStorage.getItem('rr:kho:'+lid)||'null'); }catch(e){}
   var has=!!(cache&&cache.lessons&&cache.lessons.length);
-  var app=isShared?{name:'Kho chung',klass:'Bài đọc do các giáo viên chia sẻ',tagline:'Chọn một bài và bắt đầu đọc.',theme:'stage'}:((cache&&cache.app)||{name:'Reading Room',klass:'',tagline:'',theme:'stage'});
-  var data={app:app,theme:app.theme||'stage',lessons:has?cache.lessons:[],folders:has?(cache.folders||{}):{},loading:!has,start:'lib',cloud:{url:CLOUD_DEF.url,key:CLOUD_DEF.key,id:lid}};
+  var app=isShared?{name:'Kho chung',klass:'Bài đọc do các giáo viên chia sẻ',tagline:'Chọn một bài và bắt đầu đọc.',theme:'constellation'}:((cache&&cache.app)||{name:'Reading Room',klass:'',tagline:'',theme:'constellation'});
+  var data={app:app,theme:(app.theme&&app.theme!=='stage')?app.theme:'constellation',lessons:has?cache.lessons:[],folders:has?(cache.folders||{}):{},loading:!has,start:'lib',cloud:{url:CLOUD_DEF.url,key:CLOUD_DEF.key,id:lid}};
   var go=function(){ var html=studentDoc(data); document.open(); document.write(html); document.close(); };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
 }
@@ -6906,7 +6908,7 @@ function openForEdit(id){
   L=x; L.elicits=L.elicits||{}; L.notes=L.notes||{}; L.codes=L.codes||clone(CODES); L.styles=RD.styles(L.styles);
   LIB.current=id; saveLib(); loadUI(); leaveHome(); enterEditor();
 }
-function curTheme(){ var t='stage'; try{ t=localStorage.getItem('rr:theme')||t; }catch(e){} return t; }
+function curTheme(){ var t='constellation'; try{ t=localStorage.getItem('rr:theme')||t; }catch(e){} return t==='stage'?'constellation':t; }
 function syncEdTheme(){ var t=curTheme(); document.documentElement.setAttribute('data-th',t); $$('#ed-themes button').forEach(function(b){ b.setAttribute('aria-checked',String(b.getAttribute('data-th')===t)); }); requestAnimationFrame(function(){ growSub(); topH(); }); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(growSub); }
 $('#ed-themes').addEventListener('click',function(e){ var b=e.target.closest('[data-th]'); if(!b) return; try{ localStorage.setItem('rr:theme',b.getAttribute('data-th')); }catch(err){} syncEdTheme(); if(pv){ var x=exportLesson(); pv.destroy(); pv=RD.mount($('#pv-host'),x,{},{persist:false}); } });
 function leaveHome(){ if(rrCtl) rrCtl.hide(); document.body.classList.remove('rr-on'); syncEdTheme(); requestAnimationFrame(function(){ topH(); growSub(); }); }
@@ -7299,7 +7301,7 @@ rrRoot.addEventListener('click',function(e){
   var xt=t.closest('[data-xth]'); if(xt){ LIB.app.theme=xt.getAttribute('data-xth'); saveLib(); rrRoot.querySelectorAll('[data-xth]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===xt)); }); coverPreview(true); return; }
   if(t.closest('[data-cover-reset]')){ var b0=t.closest('[data-cover-reset]'); if(!b0.dataset.arm){ b0.dataset.arm='1'; b0.lastChild.textContent='Bấm lần nữa để khôi phục'; setTimeout(function(){ if(b0.isConnected){ delete b0.dataset.arm; b0.lastChild.textContent='Về nội dung mặc định'; } },3000); return; }
     LIB.app.name=APP_DEF.name; LIB.app.klass=APP_DEF.klass; LIB.app.tagline=APP_DEF.tagline; delete LIB.app.tips; saveLib(); renderPane(); rrCtl.toast('Đã khôi phục nội dung mặc định'); return; }
-  if(t.closest('[data-go-home]')){ try{ if(LIB.app.theme) localStorage.setItem('rr:theme',LIB.app.theme); }catch(err){} rrCtl.go('home'); return; }
+  if(t.closest('[data-go-home]')){ try{ if(LIB.app.theme) localStorage.setItem('rr:theme',LIB.app.theme==='stage'?'constellation':LIB.app.theme); }catch(err){} rrCtl.go('home'); return; }
   if(t.closest('[data-go-lib]')){ rrCtl.go('lib'); return; }
   var clb=t.closest('[data-cl]'); if(clb){ var ka=clb.getAttribute('data-cl'), stEl=rrRoot.querySelector('[data-cl-st]');
     if(ka==='copyshared'){ RD.copy(khoLink('chung')).then(function(ok){ rrCtl.toast(ok?'Đã sao chép link kho chung':'Hãy bấm Ctrl+C để chép'); }); return; }
@@ -7368,14 +7370,14 @@ function buildLibrary(preview){
 }
 function studentDoc(data){
   var get=function(id){ var el=document.getElementById(id); return el?el.textContent:''; };
-  var th=data.theme||'stage';
+  var th=(data.theme&&data.theme!=='stage')?data.theme:'constellation';
   var j=JSON.stringify(data).replace(/</g,'\\u003c');
   return '<!doctype html>\n<html lang="vi" data-th="'+th+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>'+esc(data.app.name||'Reading Room')+'</title>'+'<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20x%3D%229%22%20y%3D%227%22%20width%3D%2240%22%20height%3D%2250%22%20rx%3D%225%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%231f2a4d%22%20stroke-width%3D%223.4%22/%3E%3Cpath%20d%3D%22M38%207h8v20l-4-3.2-4%203.2z%22%20fill%3D%22%23ef7a62%22%20stroke%3D%22%231f2a4d%22%20stroke-width%3D%222.4%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M16%2034H32%22%20stroke%3D%22%23f5c84b%22%20stroke-width%3D%226%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M16%2043H30%22%20stroke%3D%22%23aab3cf%22%20stroke-width%3D%223.4%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M16%2050H34%22%20stroke%3D%22%23aab3cf%22%20stroke-width%3D%223.4%22%20stroke-linecap%3D%22round%22/%3E%3Cg%20transform%3D%22translate%2840%2014%29%20rotate%2832%208%2012%29%22%3E%3Crect%20x%3D%223%22%20y%3D%220%22%20width%3D%2211%22%20height%3D%2221%22%20rx%3D%223%22%20fill%3D%22%233fb56a%22%20stroke%3D%22%231f2a4d%22%20stroke-width%3D%222.6%22/%3E%3Cpath%20d%3D%22M4.5%2021h8l-1.6%206.5H6z%22%20fill%3D%22%231f2a4d%22/%3E%3C/g%3E%3C/svg%3E">'+
    '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lexend:wght@400;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=Patrick+Hand&family=Pangolin&display=swap">'+
    '<style id="rd-css">'+get('rd-css')+'</style><style id="rr-css">'+get('rr-css')+'</style><style>html,body{margin:0}body{-webkit-text-size-adjust:100%}</style></head>'+
    '<body class="rr-on"><div id="rr-root"></div><script id="rr-data" type="application/json">'+j+'<\/script>'+
    '<script id="rd-runtime">'+get('rd-runtime')+'<\/script><script id="rr-runtime">'+get('rr-runtime')+'<\/script>'+
-   '<script>(function(){var D=JSON.parse(document.getElementById("rr-data").textContent);var H0=location.hash;try{if(!localStorage.getItem("rr:theme"))localStorage.setItem("rr:theme",D.theme||"stage");}catch(e){}'+
+   '<script>(function(){var D=JSON.parse(document.getElementById("rr-data").textContent);var H0=location.hash;try{if(!localStorage.getItem("rr:theme"))localStorage.setItem("rr:theme",(D.theme&&D.theme!=="stage")?D.theme:"constellation");}catch(e){}'+
    'function work(L){try{return JSON.parse(localStorage.getItem("rd:"+L.id+":blank"))||null;}catch(e){return null;}}'+
    'var ctl=RR.init({root:document.getElementById("rr-root"),mode:"student",noHome:!!D.start,logoHome:D.start?location.href.split(/[?#]/)[0]:"",share:D.cloud?function(L){return location.href.split(/[?#]/)[0]+"?kho="+D.cloud.id+"#/read/"+encodeURIComponent(L.id);}:null,shareFolder:D.cloud?function(f){var b=location.href.split(/[?#]/)[0]+"?kho="+D.cloud.id;return (!f||f==="chung")?b+"#/lib":b+"#/lib/"+encodeURIComponent(f);}:null,app:function(){return D.app;},lessons:function(){return D.lessons;},folders:function(){return D.folders||{};},foRoot:(D.cloud&&D.cloud.id==="chung")?"chung":"",'+
    'status:function(L){var w=work(L);if(!w)return{st:"new",p:0};var I=RR.info(L),tot=I.questions+I.notes,done=0;Object.keys(w.answers||{}).forEach(function(k){if(String(w.answers[k]).trim())done++;});Object.keys(w.notes||{}).forEach(function(k){if(String(w.notes[k]).trim())done++;});'+
