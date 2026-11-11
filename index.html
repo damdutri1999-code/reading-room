@@ -1380,6 +1380,17 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-cohcard .cc-t{padding-top:6px;border-top:1px dashed color-mix(in srgb,var(--rd-ink,#000) 20%,transparent)}
 .rd-cohcard .cc-x{position:absolute;top:6px;right:6px;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:inherit;font-size:20px;line-height:1;cursor:pointer}
 .rd-cohcard .cc-x:hover{background:color-mix(in srgb,currentColor 10%,transparent)}
+.rd-cohlg{margin:10px 0 2px;padding:12px 14px;border-radius:12px;background:var(--panel2,color-mix(in srgb,currentColor 6%,transparent));font:13.5px/1.5 var(--rd-ui,inherit);display:flex;flex-direction:column;gap:10px}
+.rd-cohlg[hidden]{display:none}
+.rd-cohlg .cl-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 16px}
+.rd-cohlg .cl-i{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:baseline}
+.rd-cohlg .cl-i i{width:11px;height:11px;border-radius:4px;display:block;align-self:center}
+.rd-cohlg .cl-i b{font-weight:600}
+.rd-cohlg .cl-i small{grid-column:2;opacity:.72;font-size:12.5px}
+.rd-cohlg .cl-how{display:flex;flex-wrap:wrap;gap:6px 20px;opacity:.85;font-size:13px;padding-top:8px;border-top:1px solid color-mix(in srgb,currentColor 12%,transparent)}
+.rd-cohlg .cl-how span{display:inline-flex;align-items:center;gap:6px}
+.rd-cohlg .cl-b{font:700 10.5px/1 system-ui,sans-serif;font-style:normal;background:#475569;color:#fff;border-radius:999px;padding:3px 6px}
+
 </style>
 <style id="rr-css">
 /* Reading Room shell: home, library, teacher hub and themed reading. Everything is scoped under .rr and uses --rr-* tokens so it never touches the Studio editor */
@@ -2448,6 +2459,7 @@ RD.mount = function(root, lesson, init, opts){
     var head=$('.rd-head'), hbar=h('div','rd-stgbar'); hbar.hidden=true;
     hbar.innerHTML='<div class="rd-stgbar-t"><b class="n"></b><span class="nm"></span><small></small></div><button type="button" class="rd-btn rd-stg-out">Thoát, chọn lại giai đoạn</button>';
     head.insertBefore(hbar,head.querySelector('.rd-bar'));
+    var cohlg=h('div','rd-cohlg'); cohlg.hidden=true; head.insertBefore(cohlg,head.querySelector('.rd-bar'));
     var pick=h('section','rd-stgp'); pick.setAttribute('aria-label','Chọn giai đoạn đọc');
     function done(k){ var d=0; order.forEach(function(id){ if(stageOf(elicits[id])===k&&(st.answers[id]||'').trim()) d++; }); return d; }
     function recommend(){ var seq=[1,3,2,4]; for(var i=0;i<seq.length;i++){ var k=seq[i]; if(avail[k]&&(k===2||k===4?false:(cnt[k]?done(k)<cnt[k]:true))) return k; } return 1; }
@@ -2607,12 +2619,14 @@ RD.mount = function(root, lesson, init, opts){
       art.querySelectorAll('.rd-row').forEach(function(row){ rowSpan(row); row.classList.remove('hlon'); [].forEach.call(row.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed','false'); }); var v=row.querySelector('.rd-voc'); if(v) v.hidden=true; var vb=row.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded','false'); });
       var rb=$('.rd-mode-read'); if(k!==3&&rb&&R.classList.contains('qopen')) rb.click();
       cohClose(); drawCoh(true);
+      if(k===2){ var LG=[['signal','Từ nối','however, for example… báo quan hệ hai ý'],['ref','Quy chiếu','they, this, one… trỏ về ý đã nói'],['lex','Từ vựng nối','khác chữ, cùng ý'],['zig','Zigzag','mới, rồi quen, rồi mới']];
+        cohlg.innerHTML='<div class="cl-row">'+LG.map(function(x){ return '<span class="cl-i"><i style="background:'+cohColor(x[0])+'"></i><b>'+x[1]+'</b><small>'+x[2]+'</small></span>'; }).join('')+'</div><div class="cl-how"><span><svg width="34" height="12" viewBox="0 0 34 12" aria-hidden="true"><path d="M2 3 Q17 14 32 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Đường cong: nối trong cùng một đoạn</span><span><em class="cl-b">A</em> Chữ cái: nối sang đoạn khác, tìm chữ cái giống ở đầu kia</span></div>'; cohlg.hidden=false; } else { cohlg.hidden=true; }
       var tp=$('.rd-tip'); if(tp){ if(tp._o==null) tp._o=tp.textContent; tp.textContent=(k===2)?'Ở giai đoạn này, bấm vào từ tô màu để xem nó nối tới đâu. Bôi đen một cụm từ để ghi chú lên bài.':tp._o; }
       window.scrollTo(0,0);
       if(k===3&&EX&&!cnt[3]){ var eb=$('.rd-exam-btn'); if(eb) setTimeout(function(){ eb.click(); },0); }
     }
     function anchors_off(id){ var c=cards[id]; if(!c) return; c.anchors.forEach(function(a){ a.classList.remove('hot'); }); }
-    function backToPick(){ cohClose(); drawCoh(true); var rb=$('.rd-mode-read'); if(rb&&R.classList.contains('qopen')) rb.click(); STG.cur=0; R.removeAttribute('data-stage'); R.classList.add('stg-pick'); hbar.hidden=true; drawPick(); window.scrollTo(0,0); }
+    function backToPick(){ cohClose(); drawCoh(true); var rb=$('.rd-mode-read'); if(rb&&R.classList.contains('qopen')) rb.click(); STG.cur=0; R.removeAttribute('data-stage'); R.classList.add('stg-pick'); hbar.hidden=true; cohlg.hidden=true; drawPick(); window.scrollTo(0,0); }
     on(pick,'click',function(e){ var x=e.target.closest('.rd-stg-card'); if(x) setStage(+x.getAttribute('data-s')); });
     on(hbar.querySelector('.rd-stg-out'),'click',backToPick);
   })(); }
