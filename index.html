@@ -1874,7 +1874,24 @@ html.rr-fs-on{overflow:hidden}
 .rr-qrc .u{margin:0;font:500 11px/1.4 ui-monospace,Menlo,monospace;color:#7a8099;word-break:break-all;max-height:3.2em;overflow:hidden}
 .rr-qrb{margin-top:4px;border:0;border-radius:999px;background:#2b3ccc;color:#fff;font:600 13.5px/1 'Be Vietnam Pro',system-ui,sans-serif;padding:12px 22px;cursor:pointer}.rr-qrb:hover{background:#1f2fb8}
 .rr-qrx{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:0;background:#eef0f7;color:#333;font-size:14px;cursor:pointer}
-.rr-qrb:focus-visible,.rr-qrx:focus-visible{outline:2px solid #2b3ccc;outline-offset:2px}</style>
+.rr-qrb:focus-visible,.rr-qrx:focus-visible{outline:2px solid #2b3ccc;outline-offset:2px}
+.rr-dd{position:relative}
+.rr-ddb{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:10px;border:1px solid var(--rr-line);background:transparent;color:var(--rr-fg);font:500 13px/1 var(--rr-ui);cursor:pointer}
+.rr-ddb.on{border-color:var(--rr-fg);font-weight:700}
+.rr-ddb:hover{border-color:var(--rr-fg)}
+.rr-ddm{position:absolute;z-index:30;top:calc(100% + 6px);left:0;min-width:200px;max-height:320px;overflow:auto;padding:6px;border-radius:12px;border:1px solid var(--rr-line);background:var(--rr-bg);box-shadow:0 18px 40px -18px rgba(0,0,0,.55)}
+.rr-ddm[hidden]{display:none}
+.rr-ddm button{display:block;width:100%;text-align:left;height:auto;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:var(--rr-fg);font:500 13px/1.3 var(--rr-ui);cursor:pointer}
+.rr-ddm button:hover{background:color-mix(in srgb,var(--rr-fg) 10%,transparent)}
+.rr-ddm button[aria-pressed="true"]{font-weight:700;background:color-mix(in srgb,var(--rr-fg) 14%,transparent)}
+.rr-act{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-block:6px 2px}
+.rr-act[hidden]{display:none}
+.rr-actc{display:inline-flex;gap:7px;align-items:center;height:28px;padding:0 11px;border-radius:999px;border:0;background:var(--rr-fg);color:var(--rr-bg);font:600 12px/1 var(--rr-ui);cursor:pointer}
+.rr-actc i{font-style:normal;font-size:14px;line-height:1}
+.rr-actc .sr{position:absolute;left:-9999px}
+.rr-actx{border:0;background:none;color:var(--rr-fg);opacity:.7;font:600 12px var(--rr-ui);text-decoration:underline;cursor:pointer;padding:4px 6px}
+[data-th="notebook"] .rr-ddb{font:400 18px/1 var(--rr-hand);background:#fff}
+</style>
 
 <style id="code-style"></style>
 <style id="style-css"></style>
@@ -4898,15 +4915,22 @@ RR.init=function(opts){
   }
   var LOGO='<svg viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect x="9" y="7" width="40" height="50" rx="5" fill="var(--rr-bg)" stroke="currentColor" stroke-width="3.4"/><path d="M38 7h8v20l-4-3.2-4 3.2z" fill="#ef7a62" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 34H32" stroke="#f5c84b" stroke-width="6" stroke-linecap="round"/><path d="M16 43H30" stroke="#aab3cf" stroke-width="3.4" stroke-linecap="round"/><path d="M16 50H34" stroke="#aab3cf" stroke-width="3.4" stroke-linecap="round"/><g transform="translate(40 14) rotate(32 8 12)"><rect x="3" y="0" width="11" height="21" rx="3" fill="#3fb56a" stroke="currentColor" stroke-width="2.6"/><path d="M4.5 21h8l-1.6 6.5H6z" fill="currentColor"/></g></svg>';
   function header(title,extra,back,backLabel){ var lg=opts.logoHome?'<a class="rr-logo" href="'+esc(opts.logoHome)+'" aria-label="Về trang chủ">'+LOGO+'<b>Reading Room</b></a>':''; var bk=(opts.logoHome&&(back||'home')==='home')?'':'<button type="button" class="rr-lbtn" data-go="'+(back||'home')+'">'+IC.back+esc(backLabel||'Trang chủ')+'</button>'; return '<header class="rr-vh rr-gut">'+lg+bk+'<h2>'+esc(title)+'</h2>'+(extra||'')+'</header>'; }
+  var DDC='<svg viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  function ddHtml(k,name,items,attr,cur){ var on=cur!=='all', lab=on?(items.filter(function(x){ return x[0]===cur; })[0]||[0,name])[1]:name;
+    return '<span class="rr-dd" data-dd="'+k+'"><button type="button" class="rr-ddb'+(on?' on':'')+'" data-ddb="'+k+'" aria-haspopup="true" aria-expanded="false"><span class="l">'+lab+'</span>'+DDC+'</button><div class="rr-ddm" role="group" aria-label="'+name+'" hidden>'+items.map(function(x){ return '<button type="button" data-'+attr+'="'+esc(x[0])+'" aria-pressed="'+(cur===x[0])+'">'+x[1]+'</button>'; }).join('')+'</div></span>'; }
+  function ddSync(){ var G=[['tp','Chủ đề',libTp],['lv','Trình độ',libLv],['cat','Loại',libCat]], act=main.querySelector('[data-act]'), h='';
+    G.forEach(function(g){ var d=main.querySelector('[data-dd="'+g[0]+'"]'); if(!d) return; var on=g[2]!=='all', b=d.querySelector('.rr-ddb'), it=d.querySelector('[aria-pressed="true"]'); b.classList.toggle('on',on); b.querySelector('.l').textContent=on&&it?it.textContent:g[1]; if(on&&it) h+='<button type="button" class="rr-actc" data-clr="'+g[0]+'">'+g[1]+': '+it.textContent+'<i aria-hidden="true">×</i><span class="sr">Bỏ lọc</span></button>'; });
+    if(act){ act.innerHTML=h?h+'<button type="button" class="rr-actx" data-clr="all">Xoá tất cả</button>':''; act.hidden=!h; } }
+  function ddClose(){ main.querySelectorAll('.rr-ddm').forEach(function(m){ m.hidden=true; }); main.querySelectorAll('.rr-ddb').forEach(function(b){ b.setAttribute('aria-expanded','false'); }); }
   function libHtml(){
     var lv={}; lessons().forEach(function(L){ if(L.level) lv[L.level]=1; }); var lvs=Object.keys(lv).sort();
     if(libLv!=='all'&&!lv[libLv]) libLv='all';
     return '<section class="rr-view">'+header('Kho bài đọc','<span class="rr-cnt" data-n></span>')+'<div class="rr-gut"><div class="rr-tools"><label class="rr-search">'+IC.search+'<input data-q placeholder="Tìm bài đọc" aria-label="Tìm bài đọc" value="'+esc(libQ)+'"></label>'+
       '<span class="rr-seg" role="group" aria-label="Kiểu hiển thị"><button type="button" data-mode="grid" aria-pressed="'+(libMode==='grid')+'">'+IC.grid+'Lưới</button><button type="button" data-mode="list" aria-pressed="'+(libMode==='list')+'">'+IC.list+'Danh sách</button></span>'+
-      (function(){ var tp={}; lessons().forEach(function(L){ if(L.topic) tp[L.topic]=1; }); var tps=Object.keys(tp).sort(function(a,b){ return a.localeCompare(b,'vi'); }); if(libTp!=='all'&&!tp[libTp]) libTp='all'; return tps.length?'<span class="rr-chips rr-tps" role="group" aria-label="Chủ đề">'+['all'].concat(tps).map(function(k){ return '<button type="button" data-tp="'+esc(k)+'" aria-pressed="'+(libTp===k)+'">'+(k==='all'?'Mọi chủ đề':esc(k))+'</button>'; }).join('')+'</span>':''; })()+
-      (lvs.length?'<span class="rr-chips" role="group" aria-label="Trình độ">'+['all'].concat(lvs).map(function(l){ return '<button type="button" data-lv="'+esc(l)+'" aria-pressed="'+(libLv===l)+'">'+(l==='all'?'Tất cả':esc(l))+'</button>'; }).join('')+'</span>':'')+
-      (function(){ var present={}; lessons().forEach(function(L){ if(L.cat) present[L.cat]=1; }); var any=lessons().some(function(L){ return L.exam&&L.exam.count; }); var keys=Object.keys(RR.CATS).filter(function(k){ return present[k]; }); if(keys.length<2&&!any) return ''; if(libCat!=='all'&&libCat!=='exam'&&!present[libCat]) libCat='all'; return '<span class="rr-chips rr-cats" role="group" aria-label="Loại bài">'+['all'].concat(keys).concat(any?['exam']:[]).map(function(k){ return '<button type="button" data-cat="'+k+'" aria-pressed="'+(libCat===k)+'">'+(k==='all'?'Mọi loại':k==='exam'?'Có đề bài':esc(RR.CATS[k]))+'</button>'; }).join('')+'</span>'; })()+
-      '</div><div data-fo-wrap></div><div class="rr-lib" data-lib></div></div></section>';
+      (function(){ var tp={}; lessons().forEach(function(L){ if(L.topic) tp[L.topic]=1; }); var tps=Object.keys(tp).sort(function(a,b){ return a.localeCompare(b,'vi'); }); if(libTp!=='all'&&!tp[libTp]) libTp='all'; return tps.length?ddHtml('tp','Chủ đề',[['all','Mọi chủ đề']].concat(tps.map(function(k){ return [k,esc(k)]; })),'tp',libTp):''; })()+
+      (lvs.length?ddHtml('lv','Trình độ',[['all','Tất cả']].concat(lvs.map(function(l){ return [l,esc(l)]; })),'lv',libLv):'')+
+      (function(){ var present={}; lessons().forEach(function(L){ if(L.cat) present[L.cat]=1; }); var any=lessons().some(function(L){ return L.exam&&L.exam.count; }); var keys=Object.keys(RR.CATS).filter(function(k){ return present[k]; }); if(keys.length<2&&!any) return ''; if(libCat!=='all'&&libCat!=='exam'&&!present[libCat]) libCat='all'; return ddHtml('cat','Loại',['all'].concat(keys).concat(any?['exam']:[]).map(function(k){ return [k,k==='all'?'Mọi loại':k==='exam'?'Có đề bài':esc(RR.CATS[k])]; }),'cat',libCat); })()+
+      '</div><div class="rr-act" data-act hidden></div><div data-fo-wrap></div><div class="rr-lib" data-lib></div></div></section>';
   }
   var libF=null;
   function FM(){ return (opts.folders&&opts.folders())||{}; }
@@ -4983,7 +5007,7 @@ RR.init=function(opts){
     root.querySelectorAll('.rr-themes button').forEach(function(b){ b.setAttribute('aria-checked',String(b.getAttribute('data-th')===th)); });
     if(reader){ try{ reader.destroy(); }catch(e){} reader=null; }
     if(view==='home') main.innerHTML=homeHtml();
-    else if(view==='lib'){ main.innerHTML=libHtml(); renderLib(); }
+    else if(view==='lib'){ main.innerHTML=libHtml(); ddSync(); renderLib(); }
     else if(view==='teacher'&&opts.gate&&!opts.gate.ok()){ main.innerHTML=loginHtml(); var li=main.querySelector('[name=u]'); if(li&&!li.value) setTimeout(function(){ try{ li.focus({preventScroll:true}); }catch(e){} },60); }
     else if(view==='teacher'){ var nm=opts.gate?String(opts.gate.name()||'').split('@')[0]:'', role=opts.gate&&opts.gate.role?opts.gate.role():'', who=opts.gate?'<span class="rr-who"><i class="av" aria-hidden="true">'+esc((nm.charAt(0)||'G').toUpperCase())+'</i><span class="nm"><small>'+(role?esc(role):'Đang đăng nhập')+'</small><b>'+esc(nm)+'</b></span><button type="button" class="rr-out" data-logout aria-label="Đăng xuất"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>Đăng xuất</span></button></span>':''; main.innerHTML='<section class="rr-view">'+header(nm?'Xin chào, '+nm+(role?' · '+role:''):'Xin chào',who)+'<div class="rr-gut" data-teacher></div></section>'; opts.teacher(main.querySelector('[data-teacher]'),ctl); }
     else if(view==='read'&&current){
@@ -5017,7 +5041,10 @@ RR.init=function(opts){
     else go(view,true);
   });
   main.addEventListener('click',function(e){
-    var t=e.target.closest('[data-go],[data-mode],[data-lv],[data-tp],[data-cat],[data-open],[data-fo]'); if(!t||!main.contains(t)) return;
+    var dd=e.target.closest('[data-ddb]'); if(dd&&main.contains(dd)){ var m=dd.parentNode.querySelector('.rr-ddm'), op=m.hidden; ddClose(); m.hidden=!op; dd.setAttribute('aria-expanded',String(op)); return; }
+    var cl=e.target.closest('[data-clr]'); if(cl&&main.contains(cl)){ var ck=cl.getAttribute('data-clr'); if(ck==='tp'||ck==='all') libTp='all'; if(ck==='lv'||ck==='all') libLv='all'; if(ck==='cat'||ck==='all') libCat='all'; main.querySelectorAll('[data-tp],[data-lv],[data-cat]').forEach(function(x){ var a=x.getAttribute('data-tp')!=null?'data-tp':x.getAttribute('data-lv')!=null?'data-lv':'data-cat'; x.setAttribute('aria-pressed',String(x.getAttribute(a)==='all')); }); ddSync(); renderLib(); return; }
+    var t=e.target.closest('[data-go],[data-mode],[data-lv],[data-tp],[data-cat],[data-open],[data-fo]'); if(!t){ ddClose(); return; } if(!main.contains(t)) return;
+    if(t.closest('.rr-ddm')){ ddClose(); setTimeout(ddSync,0); }
     if(t.hasAttribute('data-go')){ var gv=t.getAttribute('data-go'); if(gv==='lib'&&opts.studentHref&&view==='home'){ var sh=opts.studentHref(); if(sh){ location.assign(sh); return; } } go(gv); }
     else if(t.hasAttribute('data-mode')){ libMode=t.getAttribute('data-mode'); try{ localStorage.setItem('rr:lib',libMode); }catch(err){} main.querySelectorAll('[data-mode]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===t)); }); renderLib(); }
     else if(t.hasAttribute('data-cat')){ libCat=t.getAttribute('data-cat'); main.querySelectorAll('[data-cat]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===t)); }); renderLib(); }
