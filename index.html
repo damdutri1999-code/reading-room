@@ -1322,12 +1322,13 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd.stg .rd-row:not(.hlon) .hl,.rd.stg[data-stage="3"] .hl,.rd.stg[data-stage="4"] .hl,.rd.stg[data-stage="1"] .hl:not([data-c="main"]):not([data-c="key"]),.rd.stg[data-stage="2"] .hl:not([data-c="signal"]):not([data-c="ref"]):not([data-c="lex"]):not([data-c="zig"]){background-image:none!important;background-color:transparent!important;padding:0;margin:0}
 .rd.stg[data-stage="1"] .hlon .hl[data-c="key"]{font-weight:700}
 .rd-card.stg-off{display:none!important}
-.rd-stgbar{display:flex;gap:10px 16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:0 0 14px;padding:10px 14px;border:1px solid var(--rd-line);background:var(--rd-accent-soft);border-radius:12px}
+.rd-stgbar{display:flex;gap:6px 14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:0 0 8px;padding:0}
 .rd-stgbar[hidden]{display:none}
 .rd-stgbar-t{display:flex;gap:4px 10px;align-items:center;flex-wrap:wrap;min-width:0}
-.rd-stgbar-t .n{width:24px;height:24px;border-radius:8px;background:var(--rd-accent);color:var(--rd-paper);display:flex;align-items:center;justify-content:center;font:700 13px/1 var(--rd-ui)}
-.rd-stgbar-t .nm{font:600 14px/1.3 var(--rd-ui)}
-.rd-stgbar-t small{flex-basis:100%;font:400 12.5px/1.45 var(--rd-ui);color:var(--rd-muted)}
+.rd-stgbar-t .n{display:none;width:24px;height:24px;border-radius:8px;background:var(--rd-accent);color:var(--rd-paper);align-items:center;justify-content:center;font:700 13px/1 var(--rd-ui)}
+.rd-stgbar-t .nm{font:600 13px/1.3 var(--rd-ui);color:var(--rd-muted)}
+.rd-stgbar .rd-stg-out{padding:5px 11px;font-size:12.5px}
+.rd-stgbar-t small{display:none;flex-basis:100%;font:400 12.5px/1.45 var(--rd-ui);color:var(--rd-muted)}
 .rd-stgp{max-width:1080px;margin:0 0 8px}
 @media (min-width:1080px){.rd-stgp{margin-left:calc(240px * (1 + (var(--z) - 1) * .5) + 32px);max-width:760px}.rd-stgp-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .rd-stgp-h{margin:0 0 6px;font:700 22px/1.25 var(--rd-ui)}
@@ -1364,7 +1365,7 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-voc-t td.ex{color:var(--rd-muted);font-style:italic}
 
 .rd-gl{display:none;flex-direction:column;gap:6px;max-width:62ch;font:14px/1.55 var(--rd-ui,inherit)}
-.rd-gl p{margin:0;padding:8px 12px;border-radius:10px;background:var(--panel2,color-mix(in srgb,currentColor 7%,transparent))}
+.rd-gl p{margin:0;padding:8px 12px;border-radius:10px;color:var(--rd-ink);background:color-mix(in srgb,var(--rd-ink) 7%,var(--rd-paper))}
 .rd-gl b{display:block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;opacity:.65;margin-bottom:2px}
 .rd-gl-2{display:flex;flex-direction:column;gap:6px}.rd-gl-2 span{display:block}
 .rd.stg[data-stage="1"] .rd-gl{display:flex}.rd.stg[data-stage="1"] .rd-gl-2{display:none}
@@ -1380,7 +1381,7 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-cohcard .cc-t{padding-top:6px;border-top:1px dashed color-mix(in srgb,var(--rd-ink,#000) 20%,transparent)}
 .rd-cohcard .cc-x{position:absolute;top:6px;right:6px;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:inherit;font-size:20px;line-height:1;cursor:pointer}
 .rd-cohcard .cc-x:hover{background:color-mix(in srgb,currentColor 10%,transparent)}
-.rd-cohlg{margin:10px 0 2px;padding:12px 14px;border-radius:12px;background:var(--panel2,color-mix(in srgb,currentColor 6%,transparent));font:13.5px/1.5 var(--rd-ui,inherit);display:flex;flex-direction:column;gap:10px}
+.rd-cohlg{margin:10px 0 2px;padding:12px 14px;border-radius:12px;color:var(--rd-ink);background:color-mix(in srgb,var(--rd-ink) 6%,var(--rd-paper));font:13.5px/1.5 var(--rd-ui,inherit);display:flex;flex-direction:column;gap:10px}
 .rd-cohlg[hidden]{display:none}
 .rd-cohlg .cl-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 16px}
 .rd-cohlg .cl-i{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:baseline}
@@ -1392,7 +1393,7 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-cohlg .cl-b{font:700 10.5px/1 system-ui,sans-serif;font-style:normal;background:#475569;color:#fff;border-radius:999px;padding:3px 6px}
 
 
-.rd-mt{display:none;margin:10px 0 4px;padding:10px 12px;border-radius:12px;background:var(--panel2,color-mix(in srgb,currentColor 6%,transparent));font:14px/1.5 var(--rd-ui,inherit);border-left:3px solid var(--rd-accent,#2a49d6)}
+.rd-mt{display:none;margin:10px 0 4px;padding:10px 12px;border-radius:12px;color:var(--rd-ink);background:color-mix(in srgb,var(--rd-ink) 6%,var(--rd-paper));font:14px/1.5 var(--rd-ui,inherit);border-left:3px solid var(--rd-accent,#2a49d6)}
 .rd.stg[data-stage="3"] .rd-mt{display:block}
 .rd-mt-l{display:block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;opacity:.65;margin-bottom:6px;font-weight:600}
 .rd-mt-r{display:flex;gap:8px;flex-wrap:wrap}
@@ -2512,7 +2513,7 @@ RD.mount = function(root, lesson, init, opts){
     R.classList.add('stg','stg-pick');
     var STK='rd:stg:'+lesson.id, lastStage=0; try{ lastStage=+localStorage.getItem(STK)||0; }catch(_){}
     var head=$('.rd-head'), hbar=h('div','rd-stgbar'); hbar.hidden=true;
-    hbar.innerHTML='<div class="rd-stgbar-t"><b class="n"></b><span class="nm"></span><small></small></div><button type="button" class="rd-btn rd-stg-out">Thoát, chọn lại giai đoạn</button>';
+    hbar.innerHTML='<div class="rd-stgbar-t"><b class="n"></b><span class="nm"></span><small></small></div><button type="button" class="rd-btn rd-stg-out">Đổi giai đoạn</button>';
     head.insertBefore(hbar,head.querySelector('.rd-bar'));
     var cohlg=h('div','rd-cohlg'); cohlg.hidden=true; head.insertBefore(cohlg,head.querySelector('.rd-bar'));
     var pick=h('section','rd-stgp'); pick.setAttribute('aria-label','Chọn giai đoạn đọc');
