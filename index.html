@@ -6966,16 +6966,22 @@ function renderPane(){
   else if(hubTab==='backup') p.innerHTML=paneBackup();
   else if(hubTab==='ai'){ p.innerHTML=paneAI(); p.querySelector('#tw-prompt').value=aiPromptOf(aiKind); }
   else p.innerHTML=paneGuide();
-  if(hubTab==='lessons'||hubTab==='drafts') renderRows();
+  if(hubTab==='lessons'||hubTab==='drafts'){ hubDDSync(); renderRows(); }
 }
 /* Tab 1 — collection of finished lessons; Tab 2 — drafts */
 function hubTools(ids){
   var lv={}; ids.forEach(function(id){ var x=LIB.lessons[id]; if(x&&x.level) lv[x.level]=1; }); var lvs=Object.keys(lv).sort(); if(hubLv!=='all'&&!lv[hubLv]) hubLv='all';
   return '<div class="tw-tools"><label class="tw-search">'+svg('search')+'<input data-hq placeholder="Tìm theo tên bài" value="'+esc(hubQ)+'" aria-label="Tìm bài"></label>'+
-    (function(){ var tp={}; ids.forEach(function(id){ var x=LIB.lessons[id]; if(x&&x.topic) tp[x.topic]=1; }); var tps=Object.keys(tp).sort(function(a,b){ return a.localeCompare(b,'vi'); }); if(hubTp!=='all'&&!tp[hubTp]) hubTp='all'; return tps.length?'<span class="tw-chips" role="group" aria-label="Lọc chủ đề">'+['all'].concat(tps).map(function(k){ return '<button type="button" data-htp="'+esc(k)+'" aria-pressed="'+(hubTp===k)+'">'+(k==='all'?'Mọi chủ đề':esc(k))+'</button>'; }).join('')+'</span>':''; })()+
-    (lvs.length>1?'<span class="tw-chips" role="group" aria-label="Lọc trình độ">'+['all'].concat(lvs).map(function(l){ return '<button type="button" data-hlv="'+esc(l)+'" aria-pressed="'+(hubLv===l)+'">'+(l==='all'?'Tất cả':esc(l))+'</button>'; }).join('')+'</span>':'')+
-    '<span class="tw-chips" role="group" aria-label="Lọc loại bài">'+[['all','Mọi loại'],['ielts','IELTS Cam'],['content','Kiến thức'],['task1','Mẫu Task 1'],['task2','Mẫu Task 2'],['exam','Có đề bài']].map(function(c){ return '<button type="button" data-hcat="'+c[0]+'" aria-pressed="'+(hubCat===c[0])+'">'+c[1]+'</button>'; }).join('')+'</span></div>';
+    (function(){ var tp={}; ids.forEach(function(id){ var x=LIB.lessons[id]; if(x&&x.topic) tp[x.topic]=1; }); var tps=Object.keys(tp).sort(function(a,b){ return a.localeCompare(b,'vi'); }); if(hubTp!=='all'&&!tp[hubTp]) hubTp='all'; return tps.length?hubDD('tp','Chủ đề',[['all','Mọi chủ đề']].concat(tps.map(function(k){ return [k,esc(k)]; })),'htp',hubTp):''; })()+
+    (lvs.length>1?hubDD('lv','Trình độ',[['all','Tất cả']].concat(lvs.map(function(l){ return [l,esc(l)]; })),'hlv',hubLv):'')+
+    hubDD('cat','Loại',[['all','Mọi loại'],['ielts','IELTS Cam'],['content','Kiến thức'],['task1','Mẫu Task 1'],['task2','Mẫu Task 2'],['exam','Có đề bài']],'hcat',hubCat)+'</div><div class="rr-act" data-hact hidden></div>';
 }
+function hubDD(k,name,items,attr,cur){ var on=cur!=='all', lab=on?(items.filter(function(x){ return x[0]===cur; })[0]||[0,name])[1]:name;
+  return '<span class="rr-dd" data-hdd="'+k+'"><button type="button" class="rr-ddb'+(on?' on':'')+'" data-hddb="'+k+'" aria-haspopup="true" aria-expanded="false"><span class="l">'+lab+'</span><svg viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="rr-ddm" role="group" aria-label="'+name+'" hidden>'+items.map(function(x){ return '<button type="button" data-'+attr+'="'+esc(x[0])+'" aria-pressed="'+(cur===x[0])+'">'+x[1]+'</button>'; }).join('')+'</div></span>'; }
+function hubDDSync(){ var G=[['tp','Chủ đề',hubTp],['lv','Trình độ',hubLv],['cat','Loại',hubCat]], act=rrRoot.querySelector('[data-hact]'), h='';
+  G.forEach(function(g){ var d=rrRoot.querySelector('[data-hdd="'+g[0]+'"]'); if(!d) return; var on=g[2]!=='all', b=d.querySelector('.rr-ddb'), it=d.querySelector('[aria-pressed="true"]'); b.classList.toggle('on',on); b.querySelector('.l').textContent=on&&it?it.textContent:g[1]; if(on&&it) h+='<button type="button" class="rr-actc" data-hclr="'+g[0]+'">'+g[1]+': '+it.textContent+'<i aria-hidden="true">×</i></button>'; });
+  if(act){ act.innerHTML=h?h+'<button type="button" class="rr-actx" data-hclr="all">Xoá tất cả</button>':''; act.hidden=!h; } }
+function hubDDClose(){ rrRoot.querySelectorAll('.rr-ddm').forEach(function(m){ m.hidden=true; }); rrRoot.querySelectorAll('.rr-ddb').forEach(function(b){ b.setAttribute('aria-expanded','false'); }); }
 function paneLessonsSub(){ var n=doneIds().length; return n?n+' bài đã soạn xong · '+sharedIds().length+' trong Kho chung (thư mục KHO TÀI LIỆU CHUNG)':'Kho bài đã soạn xong của thầy'; }
 function paneLessons(){
   var ids=doneIds(), pub=pubIds().length;
@@ -7294,9 +7300,12 @@ rrRoot.addEventListener('click',function(e){
     else if(k==='export') exportLibrary();
     return; }
   if(t.closest('[data-more]')){ var m=t.closest('.tw-more'), was=m.classList.contains('open'); rrRoot.querySelectorAll('.tw-more.open').forEach(function(x){ x.classList.remove('open'); }); if(!was){ m.classList.add('open'); var mr=m.querySelector('.tw-menu'); mr.classList.toggle('up',m.getBoundingClientRect().bottom+mr.offsetHeight+16>innerHeight); } return; }
-  var hc=t.closest('[data-hcat]'); if(hc){ hubCat=hc.getAttribute('data-hcat'); rrRoot.querySelectorAll('[data-hcat]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===hc)); }); renderRows(); return; }
-  var tpb=t.closest('[data-htp]'); if(tpb){ hubTp=tpb.getAttribute('data-htp'); rrRoot.querySelectorAll('[data-htp]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===tpb)); }); renderRows(); return; }
-  var lv=t.closest('[data-hlv]'); if(lv){ hubLv=lv.getAttribute('data-hlv'); rrRoot.querySelectorAll('[data-hlv]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===lv)); }); renderRows(); return; }
+  if(!t.closest('.rr-dd')) hubDDClose();
+  var hdb=t.closest('[data-hddb]'); if(hdb){ var hm=hdb.parentNode.querySelector('.rr-ddm'), hop=hm.hidden; hubDDClose(); hm.hidden=!hop; hdb.setAttribute('aria-expanded',String(hop)); return; }
+  var hcl=t.closest('[data-hclr]'); if(hcl){ var hk=hcl.getAttribute('data-hclr'); if(hk==='tp'||hk==='all') hubTp='all'; if(hk==='lv'||hk==='all') hubLv='all'; if(hk==='cat'||hk==='all') hubCat='all'; rrRoot.querySelectorAll('[data-htp],[data-hlv],[data-hcat]').forEach(function(x){ x.setAttribute('aria-pressed',String((x.getAttribute('data-htp')||x.getAttribute('data-hlv')||x.getAttribute('data-hcat'))==='all')); }); hubDDSync(); renderRows(); return; }
+  var hc=t.closest('[data-hcat]'); if(hc){ hubCat=hc.getAttribute('data-hcat'); rrRoot.querySelectorAll('[data-hcat]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===hc)); }); hubDDClose(); hubDDSync(); renderRows(); return; }
+  var tpb=t.closest('[data-htp]'); if(tpb){ hubTp=tpb.getAttribute('data-htp'); rrRoot.querySelectorAll('[data-htp]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===tpb)); }); hubDDClose(); hubDDSync(); renderRows(); return; }
+  var lv=t.closest('[data-hlv]'); if(lv){ hubLv=lv.getAttribute('data-hlv'); rrRoot.querySelectorAll('[data-hlv]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===lv)); }); hubDDClose(); hubDDSync(); renderRows(); return; }
   var dv=t.closest('[data-dev]'); if(dv){ hubDev=dv.getAttribute('data-dev'); rrRoot.querySelectorAll('[data-dev]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===dv)); }); var f=rrRoot.querySelector('.tw-pv-frame'); f.className='tw-pv-frame '+hubDev; coverPreview(true); return; }
   var xt=t.closest('[data-xth]'); if(xt){ LIB.app.theme=xt.getAttribute('data-xth'); saveLib(); rrRoot.querySelectorAll('[data-xth]').forEach(function(x){ x.setAttribute('aria-pressed',String(x===xt)); }); coverPreview(true); return; }
   if(t.closest('[data-cover-reset]')){ var b0=t.closest('[data-cover-reset]'); if(!b0.dataset.arm){ b0.dataset.arm='1'; b0.lastChild.textContent='Bấm lần nữa để khôi phục'; setTimeout(function(){ if(b0.isConnected){ delete b0.dataset.arm; b0.lastChild.textContent='Về nội dung mặc định'; } },3000); return; }
