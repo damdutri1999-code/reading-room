@@ -1391,6 +1391,16 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-cohlg .cl-how span{display:inline-flex;align-items:center;gap:6px}
 .rd-cohlg .cl-b{font:700 10.5px/1 system-ui,sans-serif;font-style:normal;background:#475569;color:#fff;border-radius:999px;padding:3px 6px}
 
+
+.rd-mt{display:none;margin:10px 0 4px;padding:10px 12px;border-radius:12px;background:var(--panel2,color-mix(in srgb,currentColor 6%,transparent));font:14px/1.5 var(--rd-ui,inherit);border-left:3px solid var(--rd-accent,#2a49d6)}
+.rd.stg[data-stage="3"] .rd-mt{display:block}
+.rd-mt-l{display:block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;opacity:.65;margin-bottom:6px;font-weight:600}
+.rd-mt-r{display:flex;gap:8px;flex-wrap:wrap}
+.rd-mt-s{flex:1 1 260px;min-width:0;padding:8px 10px;border-radius:9px;border:1px solid var(--rd-line,#dde2ea);background:var(--rd-paper,#fff);color:inherit;font:inherit}
+.rd-mt-f{margin:8px 0 0;padding:8px 10px;border-radius:9px;font-size:13.5px}
+.rd-mt[data-r="ok"] .rd-mt-f{background:color-mix(in srgb,#0e9f6e 14%,transparent)}
+.rd-mt[data-r="no"] .rd-mt-f{background:color-mix(in srgb,#d9822b 16%,transparent)}
+.rd-mt[data-r="ok"]{border-left-color:#0e9f6e}.rd-mt[data-r="no"]{border-left-color:#d9822b}
 </style>
 <style id="rr-css">
 /* Reading Room shell: home, library, teacher hub and themed reading. Everything is scoped under .rr and uses --rr-* tokens so it never touches the Studio editor */
@@ -2384,7 +2394,8 @@ RD.mount = function(root, lesson, init, opts){
   var cnt={1:0,2:0,3:0,4:0}, nn={1:0,2:0,3:0,4:0};
   order.forEach(function(id){ cnt[stageOf(elicits[id])]++; });
   var hasVoc=!!art.querySelector('[data-vocab]');
-  var avail={1:cnt[1]>0||hasVoc, 2:cnt[2]>0, 3:cnt[3]>0||!!EX, 4:cnt[4]>0};
+  var MT=((lesson.pkg||{}).match||[]).filter(function(x){ return x&&x.heading&&/^P\d+$/i.test(String(x.para||'')); });
+  var avail={1:cnt[1]>0||hasVoc, 2:cnt[2]>0, 3:cnt[3]>0||!!EX||MT.length>0, 4:cnt[4]>0};
   if(Array.isArray(lesson.stages)&&lesson.stages.length) [1,2,3,4].forEach(function(k){ avail[k]=avail[k]&&lesson.stages.indexOf(k)>=0; });
   var explicit=hasVoc||Array.isArray(lesson.stages)||order.some(function(id){ var d=elicits[id]||{}; return d.group||d.stage; });
   var STG={on:opts.stages!==false&&explicit&&[1,2,3,4].filter(function(k){ return avail[k]; }).length>=2, cur:0};
@@ -2611,6 +2622,32 @@ RD.mount = function(root, lesson, init, opts){
     setInterval(function(){ if(STG.cur===2&&!document.hidden) drawCoh(); },500);
     if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ drawCoh(true); });
     if(window.ResizeObserver){ var cohRO=new ResizeObserver(function(){ requestAnimationFrame(drawCoh); }); cohRO.observe(art); }
+    // Giai đoạn 3: nối tiêu đề với đoạn (không chấm điểm, có phản hồi ngay)
+    st.match=st.match||{}; var mtBuilt=false;
+    function buildMatch(){
+      if(mtBuilt||!MT.length) return; mtBuilt=true;
+      var paras=cohParas(), heads=MT.map(function(x){ return String(x.heading); }), seed=0, i;
+      for(i=0;i<String(lesson.id||'x').length;i++) seed=(seed*31+String(lesson.id).charCodeAt(i))%9973;
+      var order2=heads.map(function(_,k){ return k; }).sort(function(a,b){ return ((a+1)*seed*7919)%101-((b+1)*seed*7919)%101||a-b; });
+      MT.forEach(function(m){
+        var pn=+String(m.para).slice(1), p=paras[pn-1]; if(!p) return;
+        var key='P'+pn, box=h('div','rd-mt'), gist=(p.b.getAttribute('data-gist')||'').trim();
+        box.innerHTML='<label class="rd-mt-l" for="mt-'+pn+'">Tiêu đề hợp với đoạn này</label><div class="rd-mt-r"><select id="mt-'+pn+'" class="rd-mt-s"><option value="">Chọn một tiêu đề…</option>'+order2.map(function(k){ return '<option value="'+k+'">'+esc(heads[k])+'</option>'; }).join('')+'</select><button type="button" class="rd-btn rd-mt-a">Xem đáp án</button></div><p class="rd-mt-f" aria-live="polite" hidden></p>';
+        var sel=box.querySelector('select'), fb=box.querySelector('.rd-mt-f'), correct=heads.indexOf(String(m.heading));
+        function show(why){
+          var v=st.match[key]; if(v==null||v===''){ fb.hidden=true; box.removeAttribute('data-r'); return; }
+          var ok=+v===correct||why==='reveal';
+          fb.hidden=false; box.setAttribute('data-r',ok?'ok':'no');
+          if(why==='reveal') fb.innerHTML='<b>Đáp án:</b> “'+esc(heads[correct])+'”.'+(gist?' '+esc(gist):'');
+          else if(ok) fb.innerHTML='<b>Khớp.</b> '+(gist?esc(gist):'Tiêu đề này nói đúng ý chính của đoạn.');
+          else fb.innerHTML='<b>Chưa khớp.</b> Đọc lại câu đầu hoặc câu cuối của đoạn, rồi thử tiêu đề khác.';
+        }
+        if(st.match[key]!=null&&st.match[key]!==''){ sel.value=st.match[key]; show(); }
+        on(sel,'change',function(){ st.match[key]=sel.value; show(); save(); });
+        on(box.querySelector('.rd-mt-a'),'click',function(){ if(!sel.value){ st.match[key]=String(correct); sel.value=String(correct); } else { st.match[key]=String(correct); sel.value=String(correct); } show('reveal'); save(); });
+        var tl=p.row.querySelector('.rd-stt'); if(tl) tl.insertBefore(box,tl.firstChild); else p.row.appendChild(box);
+      });
+    }
     function setStage(k){
       STG.cur=k; try{ localStorage.setItem(STK,String(k)); }catch(_){}
       R.classList.remove('stg-pick','nohl'); R.setAttribute('data-stage',k);
@@ -2619,6 +2656,7 @@ RD.mount = function(root, lesson, init, opts){
       art.querySelectorAll('.rd-row').forEach(function(row){ rowSpan(row); row.classList.remove('hlon'); [].forEach.call(row.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed','false'); }); var v=row.querySelector('.rd-voc'); if(v) v.hidden=true; var vb=row.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded','false'); });
       var rb=$('.rd-mode-read'); if(k!==3&&rb&&R.classList.contains('qopen')) rb.click();
       cohClose(); drawCoh(true);
+      if(k===3) buildMatch();
       if(k===2){ var LG=[['signal','Từ nối','however, for example… báo quan hệ hai ý'],['ref','Quy chiếu','they, this, one… trỏ về ý đã nói'],['lex','Từ vựng nối','khác chữ, cùng ý'],['zig','Zigzag','mới, rồi quen, rồi mới']];
         cohlg.innerHTML='<div class="cl-row">'+LG.map(function(x){ return '<span class="cl-i"><i style="background:'+cohColor(x[0])+'"></i><b>'+x[1]+'</b><small>'+x[2]+'</small></span>'; }).join('')+'</div><div class="cl-how"><span><svg width="34" height="12" viewBox="0 0 34 12" aria-hidden="true"><path d="M2 3 Q17 14 32 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Đường cong: nối trong cùng một đoạn</span><span><em class="cl-b">A</em> Chữ cái: nối sang đoạn khác, tìm chữ cái giống ở đầu kia</span></div>'; cohlg.hidden=false; } else { cohlg.hidden=true; }
       var tp=$('.rd-tip'); if(tp){ if(tp._o==null) tp._o=tp.textContent; tp.textContent=(k===2)?'Ở giai đoạn này, bấm vào từ tô màu để xem nó nối tới đâu. Bôi đen một cụm từ để ghi chú lên bài.':tp._o; }
