@@ -576,6 +576,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .tw-search:focus-within{border-color:var(--rr-accent)}
 .tw-search input{flex:1;min-width:0;border:0;background:transparent;color:var(--rr-fg);font:14px var(--rr-ui);outline:none}
 .tw-chips{display:flex;flex-wrap:wrap;gap:6px}
+.tw-sz{font-style:normal;font:600 12px var(--rr-ui);color:var(--rr-muted);padding:2px 8px;border-radius:6px;border:1px dashed var(--rr-line);font-variant-numeric:tabular-nums}
 .tw-chips button,.tw-seg button{height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--rr-line);background:transparent;color:var(--rr-muted);font:500 12.5px/1 var(--rr-ui);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .tw-chips button[aria-pressed="true"],.tw-seg button[aria-pressed="true"]{background:var(--rr-soft);border-color:var(--rr-accent);color:var(--rr-fg)}
 .tw-hint{margin:6px 2px 12px;font-size:12.5px;line-height:1.5;color:var(--rr-muted)}
@@ -6969,6 +6970,9 @@ function renderPane(){
   if(hubTab==='lessons'||hubTab==='drafts'){ hubDDSync(); renderRows(); }
 }
 /* Tab 1 — collection of finished lessons; Tab 2 — drafts */
+var SZC={};
+function lsSizeTxt(x){ var k=x.id+'|'+(x.updated||0)+'|'+((x.html||'').length); var b=SZC[k]; if(b==null){ try{ b=new Blob([JSON.stringify(x)]).size; }catch(e){ b=0; } SZC[k]=b; }
+  return b>=1048576?(b/1048576).toFixed(1).replace('.',',')+' MB':b>=1024?Math.round(b/1024)+' KB':b+' B'; }
 function hubTools(ids){
   var lv={}; ids.forEach(function(id){ var x=LIB.lessons[id]; if(x&&x.level) lv[x.level]=1; }); var lvs=Object.keys(lv).sort(); if(hubLv!=='all'&&!lv[hubLv]) hubLv='all';
   return '<div class="tw-tools"><label class="tw-search">'+svg('search')+'<input data-hq placeholder="Tìm theo tên bài" value="'+esc(hubQ)+'" aria-label="Tìm bài"></label>'+
@@ -7003,7 +7007,7 @@ function renderRows(){
   box.classList.toggle('filtered',filtered||drafts);
   if(!ids.length){ box.innerHTML='<div class="tw-empty">'+(base.length?'Không có bài nào khớp.':drafts?'Chưa có bài nào đang soạn. Bấm “Bài mới” để bắt đầu.':'Chưa có bài nào soạn xong. Vào “Soạn bài đọc”, soạn bài rồi bấm “Hoàn tất” để đưa bài vào đây.')+'</div>'; return; }
   box.innerHTML=ids.map(function(id){ var x=LIB.lessons[id], I=RR.info(cleanLessonOf(x)), pos=pubIds().indexOf(id);
-    var meta=(x.cat?'<i class="tw-lv tw-cat">'+esc(RR.CATS[x.cat])+'</i>':drafts?'':'<i class="tw-lv tw-nocat">Chưa phân loại</i>')+(I.exam?'<i class="tw-lv tw-exq">Có đề · '+I.exam+' câu</i>':'')+(x.topic?'<i class="tw-lv tw-tp">'+esc(x.topic)+'</i>':'')+(x.level?'<i class="tw-lv">'+esc(x.level)+'</i>':'')+(drafts?I.minutes+' phút · '+I.questions+' câu hỏi · '+I.notes+' ô ghi chú'+(x.updated?' · '+fmtDate(x.updated):''):'');
+    var meta=(x.cat?'<i class="tw-lv tw-cat">'+esc(RR.CATS[x.cat])+'</i>':drafts?'':'<i class="tw-lv tw-nocat">Chưa phân loại</i>')+(I.exam?'<i class="tw-lv tw-exq">Có đề · '+I.exam+' câu</i>':'')+(x.topic?'<i class="tw-lv tw-tp">'+esc(x.topic)+'</i>':'')+(x.level?'<i class="tw-lv">'+esc(x.level)+'</i>':'')+(drafts?I.minutes+' phút · '+I.questions+' câu hỏi · '+I.notes+' ô ghi chú'+(x.updated?' · '+fmtDate(x.updated):''):'<i class="tw-sz">'+lsSizeTxt(x)+'</i>');
     return '<div class="tw-row'+(drafts?' draft':'')+'" data-id="'+esc(id)+'"'+(filtered||drafts?'':' draggable="true"')+'>'+
       (drafts?'':'<span class="tw-grip" aria-hidden="true">'+svg('grip')+'</span><span class="tw-no">'+(pos>=0?pos+1:'–')+'</span>')+RR.thumb(x,'width:52px;flex:none')+
       '<div class="tw-ri"><b>'+esc(x.title||'Bài chưa đặt tên')+(drafts&&id===L.id?' <i class="tw-cur">Đang mở</i>':'')+'</b><span>'+meta+'</span></div>'+
