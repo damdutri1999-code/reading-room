@@ -2608,7 +2608,7 @@ RD.mount = function(root, lesson, init, opts){
         var x=e.target.closest('button'); if(!x) return;
         if(x.classList.contains('rd-rolb')){ var r2=!row.classList.contains('rolon'); row.classList.toggle('rolon',r2); x.setAttribute('aria-pressed',String(r2)); x.textContent=r2?'Ẩn vai trò của đoạn':'Xem vai trò của đoạn'; return; }
         if(x.classList.contains('rd-gstb')){ var g=!row.classList.contains('gston'); row.classList.toggle('gston',g); x.setAttribute('aria-pressed',String(g)); x.textContent=g?'Ẩn ý chính':'Xem ý chính'; return; }
-        if(x.classList.contains('rd-hlp')){ var o=!row.classList.contains('hlon'); row.classList.toggle('hlon',o); [].forEach.call(btns.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed',String(o)); }); drawCoh(true); if(vp&&STG.cur===1){ vp.hidden=!o; var vb=btns.querySelector('.rd-vocb'); if(vb) vb.setAttribute('aria-expanded',String(o)); } }
+        if(x.classList.contains('rd-hlp')){ var o=!row.classList.contains('hlon'); row.classList.toggle('hlon',o); [].forEach.call(btns.querySelectorAll('.rd-hlp'),function(y){ y.setAttribute('aria-pressed',String(o)); }); drawCoh(true); }
         else if(x.classList.contains('rd-vocb')){ var o2=vp.hidden; vp.hidden=!o2; x.setAttribute('aria-expanded',String(o2)); }
       });
     });
