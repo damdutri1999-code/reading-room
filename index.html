@@ -842,8 +842,19 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .dv-dlg.wide .dv-tg{margin-top:12px}.dv-dlg.wide .dv-tg .dv-tl{display:block;margin-bottom:6px}.dv-dlg.wide .dv-tchips{margin-top:0}.dv-dlg.wide .dv-tin{margin:0 0 8px}
 .kp{display:inline-flex;align-items:center;justify-content:space-between;gap:8px;height:34px;max-width:190px;min-width:130px;padding:0 10px 0 12px;border:1px solid var(--rr-line);border-radius:10px;background:transparent;color:var(--rr-fg);font:500 12.5px/1 var(--rr-ui);cursor:pointer}.kp:hover{background:color-mix(in srgb,var(--rr-fg) 6%,transparent)}.kp[aria-expanded=true]{border-color:var(--rr-accent);box-shadow:0 0 0 1px var(--rr-accent)}.kp:focus-visible{outline:2px solid var(--rr-accent);outline-offset:2px}.kp .kp-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kp .kp-c{flex:none;opacity:.65;transition:transform .15s}.kp[aria-expanded=true] .kp-c{transform:rotate(180deg)}
 .kp-pop{position:fixed;z-index:200;max-height:min(340px,60vh);overflow:auto;padding:6px;border:1px solid var(--rr-line);border-radius:12px;background:var(--rr-bg);color:var(--rr-fg);box-shadow:0 18px 40px -12px rgba(0,0,0,.45);font-family:var(--rr-ui)}.kp-h{font:600 11.5px var(--rr-ui);opacity:.6;padding:6px 10px 8px}
+.kp-pop{max-height:min(620px,78vh);width:min(420px,calc(100vw - 16px))}
+.kp-root{margin-bottom:6px}.kp-root em{margin-left:auto;font-style:normal;font-size:11.5px;color:var(--rr-muted)}
+.kp-g{border:1px solid var(--rr-line);border-radius:12px;margin:0 0 8px;overflow:hidden}
+.kp-gh{display:flex;align-items:center;gap:10px;width:100%;min-height:38px;padding:7px 10px;border:0;background:none;color:inherit;font:600 13px var(--rr-ui);text-align:left;cursor:pointer}
+.kp-gh b{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:600}
+.kp-gh:hover{background:color-mix(in srgb,var(--rr-fg) 8%,transparent)}
+.kp-n{font-style:normal;font-size:11.5px;color:var(--rr-muted);padding:1px 7px;border-radius:999px;background:color-mix(in srgb,var(--rr-fg) 10%,transparent)}
+.kp-ch{display:flex;flex-wrap:wrap;gap:6px;padding:2px 10px 10px}
+.kp-c{font:500 12px var(--rr-ui);padding:5px 10px;border-radius:999px;border:1px solid var(--rr-line);background:transparent;color:inherit;cursor:pointer;max-width:100%;overflow-wrap:anywhere;text-align:left}
+.kp-c:hover{border-color:var(--rr-fg)}
+.kp-c.on{background:var(--rr-fg);color:var(--rr-bg);border-color:var(--rr-fg);font-weight:600}
 .kp-o{display:flex;align-items:center;gap:10px;width:100%;min-height:34px;border:0;border-radius:8px;background:none;color:inherit;font:500 13px var(--rr-ui);text-align:left;cursor:pointer;padding-right:10px}.kp-o:hover{background:color-mix(in srgb,var(--rr-fg) 8%,transparent)}.kp-o span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kp-o em{font:400 11px var(--rr-ui);opacity:.55;font-style:normal}
-.kp-k{width:18px;height:18px;border:1.5px solid color-mix(in srgb,var(--rr-fg) 35%,transparent);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:#fff}.kp-o.on .kp-k{background:var(--rr-accent);border-color:var(--rr-accent)}
+.kp-k{width:18px;height:18px;border:1.5px solid color-mix(in srgb,var(--rr-fg) 35%,transparent);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:#fff}.kp-o.on .kp-k,.kp-gh.on .kp-k{background:var(--rr-accent);border-color:var(--rr-accent)}
 .tw-warnb{margin:0 0 14px;padding:12px 14px;border-radius:12px;border:1px solid #d9534f;background:color-mix(in srgb,#d9534f 14%,transparent);color:var(--rr-fg);font:13.5px/1.5 var(--rr-ui)}
 .tw-stiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:6px 0 22px}.tw-stile{padding:16px 18px;border-radius:14px;border:1px solid var(--rr-line);background:color-mix(in srgb,var(--rr-fg) 4%,transparent);display:flex;flex-direction:column;gap:6px;min-width:0}.tw-stile b{font:700 26px/1.1 var(--rr-ui);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.tw-stile span{font:500 12.5px var(--rr-ui);color:var(--rr-muted)}
 .tw-sh{margin:22px 0 10px;font:600 15px var(--rr-ui)}.tw-days{display:grid;grid-template-columns:repeat(30,minmax(0,1fr));gap:4px;height:120px;align-items:end;padding:10px;border:1px solid var(--rr-line);border-radius:12px}.tw-day{height:100%;display:flex;align-items:flex-end;gap:1px}.tw-day i{flex:1;border-radius:2px 2px 0 0;min-height:0}.tw-day i.a,.tw-leg i.a{background:var(--rr-accent)}.tw-day i.b,.tw-leg i.b{background:#f2c230}
@@ -6717,12 +6728,20 @@ function khoOpen(btn){
   var id=btn.getAttribute('data-kp'), x=LIB.lessons[id]; if(!x) return;
   if(rrRoot.querySelector('.kp-pop')){ var same=btn.getAttribute('aria-expanded')==='true'; khoClose(); if(same) return; }
   var pop=document.createElement('div'); pop.className='kp-pop'; pop.setAttribute('role','listbox'); pop.setAttribute('aria-multiselectable','true');
+  function kids(par){ return Object.keys(LIB.folders).map(function(i){ return LIB.folders[i]; }).filter(function(f){ return (f.parent||'')===par&&!f.trashed; }).sort(function(a,b){ if(a.id===CH) return -1; if(b.id===CH) return 1; return String(a.name).localeCompare(String(b.name),'vi'); }); }
+  function desc(id,pre,out){ kids(id).forEach(function(f){ out.push({f:f,lab:pre+khoName(f.id)}); desc(f.id,pre+khoName(f.id)+' › ',out); }); return out; }
+  function ck(on){ return '<i class="kp-k">'+(on?'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>':'')+'</i>'; }
+  function group(f){ var on=hasF(x,f.id), ds=desc(f.id,'',[]), n=ds.filter(function(d){ return hasF(x,d.f.id); }).length;
+    var fw=ds.filter(function(d){ return d.lab===khoName(d.f.id); }).map(function(d){ return khoName(d.f.id).split(' ')[0]; }), sp=fw.length>1&&fw.every(function(w){ return w===fw[0]; })&&/^(topic|chủ đề)$/i.test(fw[0])?fw[0]+' ':'';
+    return '<div class="kp-g"><button type="button" role="option" aria-selected="'+on+'" class="kp-gh'+(on?' on':'')+'" data-kf="'+esc(f.id)+'">'+ck(on)+'<b>'+esc(khoName(f.id))+'</b>'+(ds.length?'<em class="kp-n">'+(n?n+' / ':'')+ds.length+'</em>':'')+'</button>'+
+      (ds.length?'<div class="kp-ch">'+ds.map(function(d){ var o=hasF(x,d.f.id), lab=d.lab; if(sp&&lab.indexOf(sp)===0) lab=lab.slice(sp.length); return '<button type="button" role="option" aria-selected="'+o+'" class="kp-c'+(o?' on':'')+'" data-kf="'+esc(d.f.id)+'" title="'+esc(d.lab)+'">'+esc(lab)+'</button>'; }).join('')+'</div>':'')+'</div>'; }
   function rows(){ var h='<div class="kp-h">Kho / thư mục chứa bài này</div>';
-    (function walk(par,dep){ Object.keys(LIB.folders).map(function(i){ return LIB.folders[i]; }).filter(function(f){ return (f.parent||'')===par&&!f.trashed; }).sort(function(a,b){ if(a.id===CH) return -1; if(b.id===CH) return 1; return String(a.name).localeCompare(String(b.name),'vi'); }).forEach(function(f){
-      var on=hasF(x,f.id); h+='<button type="button" role="option" aria-selected="'+on+'" class="kp-o'+(on?' on':'')+'" data-kf="'+esc(f.id)+'" style="padding-left:'+(10+dep*16)+'px"><i class="kp-k">'+(on?'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>':'')+'</i><span>'+esc(khoName(f.id))+'</span>'+(f.id===CH?'<em>mọi người đọc được</em>':'')+'</button>'; walk(f.id,dep+1); }); })('',0);
+    kids('').forEach(function(f){ var on=hasF(x,f.id);
+      if(f.id===CH){ h+='<button type="button" role="option" aria-selected="'+on+'" class="kp-o kp-root'+(on?' on':'')+'" data-kf="'+esc(f.id)+'">'+ck(on)+'<span>'+esc(khoName(f.id))+'</span><em>mọi người đọc được</em></button><div class="kp-gs">'+kids(CH).map(group).join('')+'</div>'; }
+      else h+=group(f); });
     return h; }
   pop.innerHTML=rows(); rrRoot.appendChild(pop); btn.setAttribute('aria-expanded','true');
-  var r=btn.getBoundingClientRect(), pw=Math.max(240,r.width), ph=pop.offsetHeight;
+  var r=btn.getBoundingClientRect(), pw=Math.max(380,r.width), ph=pop.offsetHeight;
   var left=Math.min(Math.max(8,r.right-pw),innerWidth-pw-8), top=r.bottom+6; if(top+ph>innerHeight-8&&r.top-ph-6>8) top=r.top-ph-6;
   pop.style.cssText='left:'+left+'px;top:'+top+'px;min-width:'+pw+'px';
   pop.addEventListener('click',function(e){ var o=e.target.closest('[data-kf]'); if(!o) return; var f=o.getAttribute('data-kf');
