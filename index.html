@@ -1339,14 +1339,14 @@ html.rd-ex-open .rd-tts{left:0;right:424px;transform:none;margin:0 auto;width:mi
 .rd-stg-card:hover{box-shadow:0 0 0 1.5px var(--rd-accent)}
 .rd-stg-card.rec{box-shadow:0 0 0 2px var(--rd-accent)}
 .rd-stg-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.rd-stg-n{width:36px;height:36px;border-radius:11px;background:var(--rd-accent-soft);color:var(--rd-accent);display:flex;align-items:center;justify-content:center;font:700 17px/1 var(--rd-ui)}
-.rd-stg-tag{font:600 11px/1 var(--rd-ui);padding:5px 9px;border-radius:999px;background:color-mix(in srgb,var(--rd-ink) 9%,transparent)}
+.rd-stg-n{width:36px;height:36px;border-radius:11px;background:color-mix(in srgb,var(--panel-ink,var(--rd-ink)) 10%,transparent);color:var(--panel-ink,var(--rd-ink));display:flex;align-items:center;justify-content:center;font:700 17px/1 var(--rd-ui)}
+.rd-stg-tag{font:600 11px/1 var(--rd-ui);padding:5px 9px;border-radius:999px;background:color-mix(in srgb,var(--panel-ink,var(--rd-ink)) 9%,transparent);color:var(--panel-ink,var(--rd-ink))}
 .rd-stg-tag.rec{background:var(--rd-accent);color:var(--rd-paper)}
 .rd-stg-nm{font:700 17px/1.3 var(--rd-ui)}
-.rd-stg-ds{font:400 13.5px/1.55 var(--rd-ui);color:var(--rd-muted)}
-.rd-stg-ft{margin-top:auto;display:flex;flex-direction:column;gap:7px;font:400 12.5px/1.3 var(--rd-ui);color:var(--rd-muted)}
-.rd-stg-bar{height:5px;border-radius:99px;background:var(--rd-line);overflow:hidden;display:block}
-.rd-stg-bar i{display:block;height:100%;background:var(--rd-accent)}
+.rd-stg-ds{font:400 13.5px/1.55 var(--rd-ui);color:color-mix(in srgb,var(--panel-ink,var(--rd-ink)) 72%,transparent)}
+.rd-stg-ft{margin-top:auto;display:flex;flex-direction:column;gap:7px;font:400 12.5px/1.3 var(--rd-ui);color:color-mix(in srgb,var(--panel-ink,var(--rd-ink)) 72%,transparent)}
+.rd-stg-bar{height:5px;border-radius:99px;background:color-mix(in srgb,var(--panel-ink,var(--rd-ink)) 14%,transparent);overflow:hidden;display:block}
+.rd-stg-bar i{display:block;height:100%;background:var(--panel-ink,var(--rd-ink))}
 .rd-stt{grid-column:1;min-width:0;padding:2px 0 8px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 @media (min-width:1080px){.rd-row > .rd-stt{grid-column:2;grid-row:calc(var(--n,1) + 1)}}
 .rd-stt-b{display:flex;gap:8px;flex-wrap:wrap}
