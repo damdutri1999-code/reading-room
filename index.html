@@ -6741,9 +6741,10 @@ function khoOpen(btn){
       else h+=group(f); });
     return h; }
   pop.innerHTML=rows(); rrRoot.appendChild(pop); btn.setAttribute('aria-expanded','true');
-  var r=btn.getBoundingClientRect(), pw=Math.max(380,r.width), ph=pop.offsetHeight;
-  var left=Math.min(Math.max(8,r.right-pw),innerWidth-pw-8), top=r.bottom+6; if(top+ph>innerHeight-8&&r.top-ph-6>8) top=r.top-ph-6;
-  pop.style.cssText='left:'+left+'px;top:'+top+'px;min-width:'+pw+'px';
+  var r=btn.getBoundingClientRect(), pw=Math.min(420,innerWidth-16), ph=pop.scrollHeight+14;
+  var below=innerHeight-r.bottom-14, above=r.top-14, up=ph>below&&above>below, room=Math.max(180,up?above:below), mh=Math.min(ph,room);
+  var left=Math.min(Math.max(8,r.right-pw),innerWidth-pw-8), top=up?Math.max(8,r.top-6-mh):r.bottom+6;
+  pop.style.cssText='left:'+left+'px;top:'+top+'px;width:'+pw+'px;max-height:'+mh+'px';
   pop.addEventListener('click',function(e){ var o=e.target.closest('[data-kf]'); if(!o) return; var f=o.getAttribute('data-kf');
     if(f===CH) setChung(x,!hasF(x,CH)); else if(hasF(x,f)) remF(x,f); else addF(x,f);
     x.updated=Date.now(); saveLib(); pop.innerHTML=rows(); var t=btn.querySelector('.kp-t'); if(t) t.textContent=khoLabel(x);
