@@ -6360,12 +6360,12 @@ function pkgRows(){
   }
   rows.push({k:2,name:'Mạch nối',ok:ok2,m:m2,opt:true});
   var mm=st.mm||{br:0,cards:0,extra:0,noSrc:0,thin:0}, m5=[], ok5=mm.br>=3&&mm.thin===0&&mm.cards>=8&&mm.extra>=2&&mm.noSrc===0;
-  if(!mm.br) m5.push('Chưa có sơ đồ ý (mindmap). Giai đoạn này tuỳ chọn nên sẽ ẩn'); else {
+  if(!mm.br) m5.push('Chưa có sơ đồ ý (mindmap). Bài nào cũng cần có; thiếu thì học viên không thấy giai đoạn này'); else {
     m5.push('Nhánh: '+mm.br+(mm.br<3?' (cần ≥ 3)':''));
     m5.push('Thẻ ý: '+mm.cards+(mm.cards<8?' (cần ≥ 8)':'')+(mm.thin?', có '+mm.thin+' nhánh dưới 2 thẻ':''));
     m5.push('Thẻ gây nhiễu: '+mm.extra+(mm.extra<2?' (cần ≥ 2)':''));
     if(mm.noSrc) m5.push(mm.noSrc+' thẻ chưa có "src" (mã câu gốc, ví dụ P2.S3)'); }
-  rows.push({k:5,name:'Sơ đồ ý (mindmap)',ok:ok5,m:m5,opt:true,empty:!mm.br});
+  rows.push({k:5,name:'Sơ đồ ý (mindmap)',ok:ok5,m:m5});
   var m3=[], ok3=true, tot3=st.by[3]+st.match+st.exam;
   if(tot3<4){ ok3=false; m3.push('Mới có '+tot3+' câu luyện hiểu, cần ít nhất 4'); } else m3.push(tot3+' câu luyện hiểu ('+st.by[3]+' elicit, '+st.match+' nối ý, '+st.exam+' câu task)');
   if(st.open<2){ ok3=false; m3.push('Câu mở có gợi ý: '+st.open+', nên có ít nhất 2'); } else m3.push(st.open+' câu mở có gợi ý');
