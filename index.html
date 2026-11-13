@@ -6252,7 +6252,8 @@ function elResolve(items,src){
 }
 function elApplyEx(ex,mode){
   if(!ex) return 0; var n=0; if(mode==='replace'||!L.pkg) L.pkg={};
-  ['map','match','bank'].forEach(function(k){ if(ex[k]&&ex[k].length){ L.pkg[k]=(L.pkg[k]||[]).concat(ex[k]); n+=ex[k].length; } });
+  /* File 2 là trọn gói của bài: phần nào có trong File 2 thì THAY phần cũ (không cộng dồn, tránh trùng và sót mục cũ thiếu cách gợi ý) */
+  ['map','match','bank'].forEach(function(k){ if(ex[k]&&ex[k].length){ L.pkg[k]=ex[k].slice(); n+=ex[k].length; } });
   if(ex.mm){ L.pkg.mm=ex.mm; n++; }
   return n;
 }
