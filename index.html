@@ -1863,7 +1863,7 @@ html.rr-fs-on{overflow:hidden}
 }
 @media (min-width:1280px){
   html.rd-ex-open .rr-main{padding-right:424px;transition:padding-right .45s cubic-bezier(.2,.8,.2,1)}
-  html.rd-ex-open .rr-main .rd.qopen .rd-wrap{margin-right:auto;max-width:100%}
+  html.rd-ex-open .rr-main .rd.qopen .rd-wrap,html.rd-ex-open .rr-main .rd.mm-on .rd-wrap{margin-right:auto;max-width:100%}
   html.rd-ex-open .rr-read.rr-fs .rd-wrap{margin-right:calc(424px / var(--fsz,1.2))!important}
   html.rd-ex-open .rr-fsbar{right:calc(410px + 14px)}
   html.rd-ex-open .rr-read.rr-fs::before,html.rd-ex-open .rr-read.rr-fs .rd-progress{right:410px}
@@ -2548,11 +2548,12 @@ RD.mount = function(root, lesson, init, opts){
   var hasVoc=!!art.querySelector('[data-vocab]');
   var BK=((lesson.pkg||{}).bank||[]).filter(function(x){ return x&&/^(rewrite|choose|pairs|name)$/.test(x.type); });
   var MT=((lesson.pkg||{}).match||[]).filter(function(x){ return x&&x.heading&&/^P\d+$/i.test(String(x.para||'')); });
+  function mmBi(x){ var en,vi=''; if(x==null) return {text:'',vi:''}; if(typeof x==='object'){ en=x.text!=null?x.text:(x.en!=null?x.en:x.english); vi=x.vi!=null?x.vi:(x.vn!=null?x.vn:(x.viet||'')); if(en&&typeof en==='object'){ vi=vi||en.vi||''; en=en.en!=null?en.en:(en.text||''); } } else en=x; return {text:String(en==null?'':en).trim(),vi:String(vi==null?'':vi).trim()}; }
   var MM=(function(){ var m=(lesson.pkg||{}).mm; if(!m||!Array.isArray(m.branches)) return null;
-    var br=m.branches.map(function(b){ if(!b||!(b.label||b.vi||b.en)) return null; var sl=(Array.isArray(b.slots)?b.slots:[]).map(function(x){ return typeof x==='string'?{text:x}:x; }).filter(function(x){ return x&&String(x.text||'').trim(); }).map(function(x){ return {text:String(x.text),vi:String(x.vi||''),src:String(x.src||'')}; });
+    var br=m.branches.map(function(b){ if(!b||!(b.label||b.vi||b.en)) return null; var sl=(Array.isArray(b.slots)?b.slots:[]).map(function(x){ var q=mmBi(x); q.src=(x&&typeof x==='object')?String(x.src||''):''; return q; }).filter(function(x){ return x.text; });
       return sl.length?{label:String(b.label||b.vi||b.en),en:String(b.en||''),slots:sl}:null; }).filter(Boolean);
     if(br.length<2) return null;
-    var ex=(Array.isArray(m.extra)?m.extra:(Array.isArray(m.distractors)?m.distractors:[])).map(function(t){ return (t&&typeof t==='object')?{text:String(t.text||''),vi:String(t.vi||'')}:{text:String(t==null?'':t),vi:''}; }).filter(function(t){ return t.text.trim(); });
+    var ex=(Array.isArray(m.extra)?m.extra:(Array.isArray(m.distractors)?m.distractors:[])).map(mmBi).filter(function(t){ return t.text; });
     return {center:String(m.center||m.title||''),centerVi:String(m.center_vi||m.centerVi||''),branches:br,extra:ex}; })();
   var ORD=[1,5,2,3,4];
   var avail={1:cnt[1]>0||hasVoc, 5:!!MM, 2:cnt[2]>0, 3:cnt[3]>0||!!EX||MT.length>0, 4:cnt[4]>0||BK.length>0};
@@ -2957,7 +2958,7 @@ RD.mount = function(root, lesson, init, opts){
       cohClose(); drawCoh(true);
       if(k===3) buildMatch();
       if(ppBox) ppBox.hidden=(k!==4); if(k===4) buildPP();
-      R.classList.remove('mm-read'); R.classList.toggle('mm-on',k===5); if(mmBox) mmBox.hidden=(k!==5); if(mmPan) mmPan.hidden=(k!==5); if(k===5) buildMM();
+      R.classList.remove('mm-read'); R.classList.toggle('mm-on',k===5); document.documentElement.classList.toggle('rd-dr-open',k===5); document.documentElement.classList.toggle('rd-ex-open',k===5); if(mmBox) mmBox.hidden=(k!==5); if(mmPan) mmPan.hidden=(k!==5); if(k===5) buildMM();
       if(k===2){ var LG=[['signal','Từ nối','however, for example… báo quan hệ hai ý'],['ref','Quy chiếu','they, this, one… trỏ về ý đã nói'],['lex','Từ vựng nối','khác chữ, cùng ý'],['zig','Zigzag','mới, rồi quen, rồi mới']];
         cohlg.innerHTML='<div class="cl-row">'+LG.map(function(x){ return '<span class="cl-i"><i style="background:'+cohColor(x[0])+'"></i><b>'+x[1]+'</b><small>'+x[2]+'</small></span>'; }).join('')+'</div><div class="cl-how"><span><svg width="34" height="12" viewBox="0 0 34 12" aria-hidden="true"><path d="M2 3 Q17 14 32 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Đường cong: nối trong cùng một đoạn</span><span><em class="cl-b">A</em> Chữ cái: nối sang đoạn khác, tìm chữ cái giống ở đầu kia</span></div>'; cohlg.hidden=false; } else { cohlg.hidden=true; }
       var tp=$('.rd-tip'); if(tp){ if(tp._o==null) tp._o=tp.textContent; tp.textContent=(k===2)?'Ở giai đoạn này, bấm vào từ tô màu để xem nó nối tới đâu. Bôi đen một cụm từ để ghi chú lên bài.':tp._o; }
@@ -2965,7 +2966,7 @@ RD.mount = function(root, lesson, init, opts){
       if(k===3&&EX){ var eb=$('.rd-exam-btn'); if(eb) setTimeout(function(){ eb.click(); },0); }
     }
     function anchors_off(id){ var c=cards[id]; if(!c) return; c.anchors.forEach(function(a){ a.classList.remove('hot'); }); }
-    function backToPick(){ cohClose(); drawCoh(true); var rb=$('.rd-mode-read'); if(rb&&R.classList.contains('qopen')) rb.click(); STG.cur=0; R.removeAttribute('data-stage'); R.classList.add('stg-pick'); hbar.hidden=true; cohlg.hidden=true; if(ppBox) ppBox.hidden=true; if(mmBox) mmBox.hidden=true; if(mmPan) mmPan.hidden=true; R.classList.remove('mm-read','mm-on'); drawPick(); window.scrollTo(0,0); }
+    function backToPick(){ cohClose(); drawCoh(true); var rb=$('.rd-mode-read'); if(rb&&R.classList.contains('qopen')) rb.click(); STG.cur=0; R.removeAttribute('data-stage'); R.classList.add('stg-pick'); hbar.hidden=true; cohlg.hidden=true; if(ppBox) ppBox.hidden=true; if(mmBox) mmBox.hidden=true; if(mmPan) mmPan.hidden=true; R.classList.remove('mm-read','mm-on'); document.documentElement.classList.remove('rd-dr-open','rd-ex-open'); drawPick(); window.scrollTo(0,0); }
     on(pick,'click',function(e){ var x=e.target.closest('.rd-stg-card'); if(x) setStage(+x.getAttribute('data-s')); });
     on(hbar.querySelector('.rd-stg-out'),'click',backToPick);
   })(); }
@@ -3454,7 +3455,7 @@ RD.mount = function(root, lesson, init, opts){
     list.innerHTML=html;
   }
   function openDrawer(){ renderList(); drawer.classList.add('open'); document.documentElement.classList.add('rd-dr-open'); setTimeout(function(){ nameI.focus({preventScroll:true}); },300); }
-  function closeDrawer(){ drawer.classList.remove('open'); document.documentElement.classList.remove('rd-dr-open'); }
+  function closeDrawer(){ drawer.classList.remove('open'); if(!R.classList.contains('mm-on')) document.documentElement.classList.remove('rd-dr-open'); }
   cleanup.push(function(){ document.documentElement.classList.remove('rd-dr-open'); });
   on($('.rd-work-btn'),'click',function(){ if(EX&&R.classList.contains('qopen')) R.exOpen(false); openDrawer(); });
   // ---- Exam panel (to the right of the elicit column; hidden until the student opens it)
@@ -6231,8 +6232,9 @@ function elParse(raw){
       if(k===3){ if(Array.isArray(b.match)) ex.match=b.match; if(Array.isArray(b.open)) b.open.forEach(function(x){ if(x&&typeof x==='object') arr.push({q:x.q||x.question,type:'wh',answer:x.suggested||x.answer||x.hint||'',evidence:x.evidence,group:x.group||'Câu mở',stage:3,level:x.level}); }); }
       if(k===4&&Array.isArray(b.bank)) ex.bank=b.bank; });
   }
-  if(ex&&o.mindmap&&typeof o.mindmap==='object'){ var mo=o.mindmap, bs=(Array.isArray(mo.branches)?mo.branches:[]).map(function(b){ if(!b||typeof b!=='object') return null; var sl=(Array.isArray(b.slots)?b.slots:(Array.isArray(b.cards)?b.cards:[])).map(function(x){ if(typeof x==='string') x={text:x}; return x&&typeof x==='object'?{text:String(x.text||x.t||'').trim(),vi:String(x.vi||'').trim(),src:String(x.src||x.source||'').trim()}:null; }).filter(function(x){ return x&&x.text; }); var lb=String(b.label||b.vi||b.title||'').trim(); return lb&&sl.length?{label:lb,en:String(b.en||'').trim(),slots:sl}:null; }).filter(Boolean);
-    if(bs.length) ex.mm={center:String(mo.center||mo.title||'').trim(),center_vi:String(mo.center_vi||'').trim(),branches:bs,extra:(Array.isArray(mo.extra)?mo.extra:(Array.isArray(mo.distractors)?mo.distractors:[])).map(function(t){ return (t&&typeof t==='object')?{text:String(t.text||'').trim(),vi:String(t.vi||'').trim()}:{text:String(t==null?'':t).trim(),vi:''}; }).filter(function(t){ return t.text; })}; }
+  function mmBi(x){ var en,vi=''; if(x==null) return {text:'',vi:''}; if(typeof x==='object'){ en=x.text!=null?x.text:(x.en!=null?x.en:x.english); vi=x.vi!=null?x.vi:(x.vn!=null?x.vn:(x.viet||'')); if(en&&typeof en==='object'){ vi=vi||en.vi||''; en=en.en!=null?en.en:(en.text||''); } } else en=x; return {text:String(en==null?'':en).trim(),vi:String(vi==null?'':vi).trim()}; }
+  if(ex&&o.mindmap&&typeof o.mindmap==='object'){ var mo=o.mindmap, bs=(Array.isArray(mo.branches)?mo.branches:[]).map(function(b){ if(!b||typeof b!=='object') return null; var sl=(Array.isArray(b.slots)?b.slots:(Array.isArray(b.cards)?b.cards:[])).map(function(x){ var q=mmBi(x); q.src=(x&&typeof x==='object')?String(x.src||x.source||'').trim():''; return q; }).filter(function(x){ return x.text; }); var lb=String(b.label||b.vi||b.title||'').trim(); return lb&&sl.length?{label:lb,en:String(b.en||'').trim(),slots:sl}:null; }).filter(Boolean);
+    if(bs.length) ex.mm={center:String(mo.center||mo.title||'').trim(),center_vi:String(mo.center_vi||'').trim(),branches:bs,extra:(Array.isArray(mo.extra)?mo.extra:(Array.isArray(mo.distractors)?mo.distractors:[])).map(mmBi).filter(function(t){ return t.text; })}; }
   var exN=ex?ex.map.length+ex.match.length+ex.bank.length+(ex.mm?1:0):0;
   if(!Array.isArray(arr)||(!arr.length&&!exN)) return {err:'Không thấy danh sách câu hỏi. Dữ liệu cần có trường "elicits" là một mảng, hoặc các khối "stage1" đến "stage4".'};
   var items=[], skip=0;
