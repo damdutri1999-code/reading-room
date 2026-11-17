@@ -3390,14 +3390,14 @@ RD.mount = function(root, lesson, init, opts){
       var u=tt.units[tt.idx]; if(!u){ tt.play=false; tUI(); return; }
       if(!tt.sents.length) tPrep(u); tMark(); tt.play=true; tUI();
       if(tt.si>=tt.sents.length){ tt.idx++; tt.si=0; tt.sents=[]; if(tt.idx>=tt.units.length){ tt.idx=0; tt.play=false; tMark(); tUI(); toast('Đã đọc hết bài'); return; } tSay(); return; }
-      var vo=tt.voices.filter(function(v){ return (v.voiceURI||v.name)===tt.voice; })[0], last=tt.sents.length-1;
+      var vo=tt.voices.filter(function(v){ return (v.voiceURI||v.name)===tt.voice; })[0], last=tt.sents.length-1; try{ tt.cps=parseFloat(localStorage.getItem('rd:tts:cps:'+tt.voice))||tt.cps||0; }catch(_){}
       for(var k=tt.si;k<=last;k++){ (function(k){
         var ut=new SpeechSynthesisUtterance(tt.sents[k]); ut.rate=tt.rate; if(vo){ ut.voice=vo; ut.lang=vo.lang; } else ut.lang='en-US';
-        var gotB=false, est=0, cs=tt.starts[k]||0;
-        function estStep(pos){ if(tok!==tt.tok||gotB) return; var txt=tt.sents[k], m=/\S+/g, w, words=[]; while((w=m.exec(txt))) words.push({i:w.index,l:w[0].length}); var wi=0; (function nx(){ if(tok!==tt.tok||gotB||wi>=words.length) return; tWordAt(k,cs+words[wi].i); tt.wOff=words[wi].i; var d=(60/(150*tt.rate))*Math.min(1.9,Math.max(.55,words[wi].l/4.6))*1000; wi++; est=setTimeout(nx,d); })(); }
+        var gotB=false, est=0, t0=0, cs=tt.starts[k]||0;
+        function estStep(){ if(tok!==tt.tok||gotB) return; var txt=tt.sents[k], m=/\S+/g, w, words=[]; while((w=m.exec(txt))) words.push({i:w.index,l:w[0].length,p:/[,;:]$/.test(w[0])?150:0}); var wi=0, cps=(tt.cps||14)*tt.rate; (function nx(){ if(tok!==tt.tok||gotB||wi>=words.length) return; tWordAt(k,cs+words[wi].i); tt.wOff=words[wi].i; var d=(words[wi].l+1)/cps*1000+words[wi].p; wi++; est=setTimeout(nx,d); })(); }
         ut.onboundary=function(e){ if(tok!==tt.tok) return; if(e&&e.name&&e.name!=='word') return; gotB=true; clearTimeout(est); tt.wOff=e.charIndex||0; tWordAt(k,cs+(e.charIndex||0)); };
-        ut.onstart=function(){ if(tok!==tt.tok) return; tt.si=k; tt.wOff=0; tHide(); setTimeout(function(){ if(tok===tt.tok&&!gotB) estStep(); },700); };
-        ut.onend=function(){ if(tok!==tt.tok||k!==last) return; tt.si=tt.sents.length; setTimeout(function(){ if(tok!==tt.tok) return; tSay(); },380); };
+        ut.onstart=function(){ if(tok!==tt.tok) return; t0=performance.now(); tt.si=k; tt.wOff=0; tHide(); estStep(); };
+        ut.onend=function(){ if(tok===tt.tok&&!gotB&&t0){ var du=performance.now()-t0, ch=tt.sents[k]?tt.sents[k].length:0; if(du>500&&ch>20){ var c1=ch/(du/1000)/tt.rate; tt.cps=tt.cps?(tt.cps*.5+c1*.5):c1; try{ localStorage.setItem('rd:tts:cps:'+tt.voice,String(tt.cps)); }catch(_){} } } if(tok!==tt.tok||k!==last) return; tt.si=tt.sents.length; setTimeout(function(){ if(tok!==tt.tok) return; tSay(); },380); };
         ut.onerror=function(e){ if(tok!==tt.tok) return; if(e&&(e.error==='canceled'||e.error==='interrupted')) return; tt.play=false; tUI(); toast('Không đọc được trên thiết bị này'); };
         SS.speak(ut); })(k); }
     }
