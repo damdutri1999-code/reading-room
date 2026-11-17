@@ -862,6 +862,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .tw-stab{border:1px solid var(--rr-line);border-radius:12px;overflow:hidden}.tw-str{display:grid;grid-template-columns:minmax(0,1fr) 90px 130px 110px;gap:10px;padding:11px 14px;align-items:center;border-top:1px solid var(--rr-line);font:13.5px var(--rr-ui)}.tw-str:first-child{border-top:0}.tw-str.hd{font:600 12px var(--rr-ui);color:var(--rr-muted);background:color-mix(in srgb,var(--rr-fg) 4%,transparent)}
 .tw-str .t{position:relative;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-bottom:6px}.tw-str .t em{position:absolute;left:0;bottom:0;height:3px;border-radius:2px;background:var(--rr-accent);opacity:.7}.tw-str .t.gone{opacity:.6;font-style:italic}
 @media (max-width:640px){.tw-str{grid-template-columns:minmax(0,1fr) 60px 80px;}.tw-str>span:nth-child(4){display:none}.tw-days{gap:2px}}
+#pkg-mode{font:inherit;padding:7px 10px;border-radius:9px;border:1px solid currentColor;background:transparent;color:inherit;max-width:100%;margin-left:6px}#pkg-mode option{color:#182132;background:#fff}
 </style>
 <style id="rd-css">
 :root{--rd-bg:#f4f6f8;--rd-paper:#ffffff;--rd-ink:#182132;--rd-muted:#5d6779;--rd-line:#dde2ea;--rd-accent:#2a49d6;--rd-accent-soft:#e6eaff;--rd-note:#fff7d6;--rd-note-ink:#5a4500;--rd-student:#0e9f6e;--rd-student-soft:#e3f6ee;--rd-read:'Literata',Georgia,'Times New Roman',serif;--rd-ui:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -1978,6 +1979,7 @@ html.rr-fs-on{overflow:hidden}
     <span class="ed-themes" role="radiogroup" aria-label="Theme" id="ed-themes"><button type="button" role="radio" data-th="stage" data-tip="Sân khấu" aria-label="Sân khấu"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v3"/><path d="M5 21l4-11h6l4 11"/><path d="M8 14h8"/></svg></button><button type="button" role="radio" data-th="notebook" data-tip="Vở ghi" aria-label="Vở ghi"><svg class="i" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6z"/><path d="M6 3v18"/><path d="M10 8h6"/><path d="M10 12h6"/></svg></button><button type="button" role="radio" data-th="constellation" data-tip="Chòm sao" aria-label="Chòm sao"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l2.1 5.4 5.9.4-4.5 3.8 1.4 5.8L12 15.3 7.1 18.4l1.4-5.8L4 8.8l5.9-.4z"/></svg></button></span>
     <button type="button" class="ib" id="home-btn" data-tip="Trang chủ" aria-label="Trang chủ"><svg class="i" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M10 20v-6h4v6"/></svg></button>
     <span class="saved" id="saved"><i data-i="check"></i><span id="saved-t">Đã lưu</span></span>
+    <button type="button" class="ib" id="pkg-btn" data-tip="Kiểu bài và kiểm tra gói" aria-label="Kiểu bài và kiểm tra gói"><svg class="i" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/></svg></button>
     <button type="button" class="ib" id="help-btn" data-tip="Hướng dẫn nhanh" aria-label="Hướng dẫn nhanh"><i data-i="help"></i></button>
     <button type="button" class="btn" id="done-btn" aria-pressed="false"><i data-i="check"></i><span>Hoàn tất</span></button>
     <button type="button" class="btn solid" id="open-export"><i data-i="download"></i>Xuất file</button>
@@ -6463,6 +6465,7 @@ function renderPkg(){
   }).join('');
 }
 function openPkg(){ closePops(); renderPkg(); $('#pkg').hidden=false; }
+$('#pkg-btn').addEventListener('click',openPkg);
 $('#pkg-close').addEventListener('click',function(){ $('#pkg').hidden=true; });
 $('#pkg').addEventListener('click',function(e){ if(e.target===$('#pkg')) $('#pkg').hidden=true; });
 $('#pkg-body').addEventListener('change',function(e){
