@@ -2179,7 +2179,7 @@ html.rr-fs-on{overflow:hidden}
 
 <div class="modal" id="pkg" hidden>
   <div class="msheet" role="dialog" aria-modal="true" aria-labelledby="pkg-h" style="max-width:680px">
-    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v159</span></p></div></div>
+    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v161</span></p></div></div>
     <div id="pkg-body" class="pkg-body"></div>
     <div class="mrow"><span class="sp"></span><button type="button" class="btn solid" id="pkg-close">Xong</button></div>
   </div>
@@ -3335,6 +3335,7 @@ RD.mount = function(root, lesson, init, opts){
     on(art,'click',function(e){
       var t=e.target; if(!t||!t.closest) return;
       if(R.getAttribute('data-stage')==='2'){ if(pop) close(); return; }
+      if(R.classList.contains('tts-on')){ if(pop) close(); return; } /* đang nghe: bấm từ để đọc tiếp từ đó, không mở từ điển */
       var sel=getSelection(); if(sel&&!sel.isCollapsed) return;
       if(t.closest('a,button,textarea,input,select,.rd-card,.rd-nb,.rd-vi,.nb')){ return; }
       var wd=wordAt(e); if(!wd){ close(); return; }
@@ -3422,7 +3423,12 @@ RD.mount = function(root, lesson, init, opts){
       if(a==='play'){ if(tt.play) tStop(); else tSay(); } else if(a==='prev'){ tGo(tt.idx-(tt.si>0?0:1)); } else if(a==='next'){ tGo(tt.idx+1); } else if(a==='close'){ tOpen(false); } });
     on(rateS,'change',function(){ tt.rate=parseFloat(rateS.value)||1; try{ localStorage.setItem('rd:tts:rate',String(tt.rate)); }catch(_){} if(tt.play){ tCut(); tSay(); } });
     on(voiceS,'change',function(){ tt.voice=voiceS.value; ttsHint(); try{ localStorage.setItem('rd:tts:voice',tt.voice); }catch(_){} if(tt.play){ tCut(); tSay(); } });
-    on(art,'click',function(e){ if(!tt.open||e._rdLook) return; var sel=getSelection(); if(sel&&!sel.isCollapsed) return; if(e.target.closest('a,button,textarea,input,.el,.rd-card,.rd-nb')) return; var b=e.target.closest('.rd-blk'); if(!b) return; var i=tt.units.indexOf(b); if(i<0) return; tt.idx=i; tt.si=0; tt.sents=[]; tSay(); });
+    on(art,'click',function(e){ if(!tt.open||e._rdLook) return; var sel=getSelection(); if(sel&&!sel.isCollapsed) return; if(e.target.closest('a,button,textarea,input,.el,.rd-card,.rd-nb')) return; var b=e.target.closest('.rd-blk'); if(!b) return; var i=tt.units.indexOf(b); if(i<0) return;
+      var cr=null; try{ if(document.caretPositionFromPoint){ var cp=document.caretPositionFromPoint(e.clientX,e.clientY); if(cp) cr={n:cp.offsetNode,o:cp.offset}; } else if(document.caretRangeFromPoint){ var rg=document.caretRangeFromPoint(e.clientX,e.clientY); if(rg) cr={n:rg.startContainer,o:rg.startOffset}; } }catch(_){}
+      tt.idx=i; tt.si=0; tt.wOff=0; tPrep(b);
+      if(cr&&cr.n&&cr.n.nodeType===3){ var nd=null; for(var q=0;q<tt.map.nodes.length;q++){ if(tt.map.nodes[q].n===cr.n){ nd=tt.map.nodes[q]; break; } }
+        if(nd){ var raw=nd.s+cr.o, nOff=0, mp=tt.nn.map; for(var z=0;z<mp.length;z++){ nOff=z; if(mp[z]>=raw) break; } var k2=0; for(var y=0;y<tt.sents.length;y++){ if(tt.starts[y]<=nOff) k2=y; } tt.si=k2; tt.wOff=Math.max(0,nOff-tt.starts[k2]); tCut(); } }
+      tSay(); });
     on(window,'pagehide',function(){ try{ SS.cancel(); }catch(_){} });
     cleanup.push(function(){ try{ SS.cancel(); }catch(_){} });
   }
