@@ -2979,7 +2979,6 @@ RD.mount = function(root, lesson, init, opts){
     on(art,'click',function(e){ var en=e.target.closest&&e.target.closest('.en'); if(!en||STG.cur!==6) return; var t=en.getAttribute('data-t'); if(t) toast('Âm đuôi “'+en.textContent+'”: '+t); });
     on(pick,'click',function(e){ var x=e.target.closest('.rd-stg-card'); if(x) setStage(+x.getAttribute('data-s')); });
     on(hbar.querySelector('.rd-stg-out'),'click',backToPick);
-    var onlyS=ORD.filter(function(k){ return avail[k]; }); if(onlyS.length===1){ hbar.querySelector('.rd-stg-out').hidden=true; setStage(onlyS[0]); }
   })(); }
 
   // Saving
