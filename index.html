@@ -2203,6 +2203,7 @@ html.rr-fs-on{overflow:hidden}
         <div class="imp-cat" data-start-only><span class="imp-cat-l">Loại bài <em>(bắt buộc)</em></span>
           <div class="cat-pick" role="radiogroup" aria-label="Loại bài"><button type="button" role="radio" aria-checked="false" data-cat="ielts"><b>IELTS Cam</b><small>Bài đọc Cambridge IELTS</small></button><button type="button" role="radio" aria-checked="false" data-cat="content"><b>Kiến thức</b><small>Bài đọc lấy nội dung, thông tin</small></button><button type="button" role="radio" aria-checked="false" data-cat="task1"><b>Mẫu Task 1</b><small>Bài mẫu mô tả số liệu, báo cáo</small></button><button type="button" role="radio" aria-checked="false" data-cat="task2"><b>Mẫu Task 2</b><small>Bài mẫu lập luận, nêu quan điểm</small></button></div>
           <label class="chk"><input type="checkbox" id="imp-exam"><span>Bài này có đề bài (câu hỏi để học viên làm)<small id="imp-exam-s">IELTS Cam mặc định có đề bài.</small></span></label>
+          <label class="chk"><input type="checkbox" id="imp-tw"><span>Bài cho học viên Đài Loan<small>Chỉ có 2 giai đoạn: 1 Đọc hiểu, 2 Nghe và dò theo (tô màu âm đuôi). Có thể đổi lại sau trong nút Kiểu bài trên thanh trên cùng.</small></span></label>
         </div>
       </div>
       <div class="imp-prev">
@@ -6719,7 +6720,7 @@ $('#imp-ok').addEventListener('click',function(){
     loadUI(); saveDraft(); changed(true); if(starting) enterEditor(); else closeImport();
     impBlocks=[]; impLesson=null; $('#imp-text').value=''; renderImp(); toast('Đã nạp bài “'+(L.title||'')+'”'); return;
   }
-  if(starting){ L=blank(); L.cat=impCat; L.examOn=$('#imp-exam').checked; L.examTouched=true; }
+  if(starting){ L=blank(); L.cat=impCat; L.examOn=$('#imp-exam').checked; L.examTouched=true; if($('#imp-tw').checked) L.stages=[1,6]; }
   if(mode==='replace'){
     if(bl[0]&&bl[0].style==='title'){ L.title=bl[0].text; bl.shift(); if(bl[0]&&bl[0].style==='subtitle'){ L.subtitle=bl[0].text; bl.shift(); } }
     L.elicits={}; L.notes={};
