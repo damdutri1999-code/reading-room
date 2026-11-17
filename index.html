@@ -2235,6 +2235,11 @@ function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){retu
 function col(c){ return /^#[0-9a-f]{6}$/i.test(c||'')?c:'#999999'; }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 RD.esc = esc;
+RD.fixEnd = function(html){ /* thẻ {end: từ -> đuôi | chú thích} còn sót ở dạng chữ (bài nạp bằng bản web cũ) -> span.en */
+  return String(html||'').replace(/\{\s*end\s*:\s*([^{}<>]*?)\s*\}/gi,function(all,v){ var bar=v.indexOf('|'), left=bar<0?v:v.slice(0,bar), note=bar<0?'':v.slice(bar+1).trim().replace(/"/g,'&quot;'), m=/^([\s\S]*?)\s*(?:->|-&gt;)\s*(\S[\s\S]*)$/.exec(left.trim()); if(!m) return all; var w=m[1].trim(), sf=m[2].trim();
+    if(!sf||w.length<=sf.length||w.toLowerCase().slice(-sf.length)!==sf.toLowerCase()) return w||all;
+    return w.slice(0,w.length-sf.length)+'<span class="en"'+(note?' data-t="'+note+'" title="'+note+'"':'')+'>'+w.slice(w.length-sf.length)+'</span>'; });
+};
 RD.normalize = function(box){
   var nodes = Array.prototype.slice.call(box.childNodes), p = null;
   nodes.forEach(function(n){
@@ -2437,7 +2442,7 @@ RD.mount = function(root, lesson, init, opts){
   root.appendChild(R);
   function $(s){ return R.querySelector(s); }
   var art = $('.rd-text');
-  art.innerHTML = lesson.html||'';
+  art.innerHTML = RD.fixEnd(lesson.html||'');
   RD.normalize(art);
   art.querySelectorAll('[contenteditable]').forEach(function(e){ e.removeAttribute('contenteditable'); });
   art.querySelectorAll('[style]').forEach(function(e){ if(!e.classList.contains('tc')) e.removeAttribute('style'); });
@@ -7620,7 +7625,7 @@ window.addEventListener('resize',function(){ topH(); growSub(); });
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ topH(); growSub(); });
 
 function loadUI(){
-  ed.innerHTML=L.html||'<p><br></p>';
+  ed.innerHTML=RD.fixEnd(L.html||'')||'<p><br></p>';
   $$('.nb',ed).forEach(decorateNb);
   $$('.tc',ed).forEach(function(e){ var v=e.getAttribute('data-tc'); if(/^#[0-9a-f]{6}$/i.test(v||'')) e.style.color=v; });
   $('#i-title').value=L.title||''; $('#i-sub').value=L.subtitle||''; $('#i-level').value=L.level||''; $('#i-topic').value=L.topic||''; fillTopics(); $('#i-cat').value=L.cat||''; fillDang(); renderExamPane(); growSub();
