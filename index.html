@@ -2559,7 +2559,7 @@ RD.mount = function(root, lesson, init, opts){
   var avail={1:cnt[1]>0||hasVoc, 5:!!MM, 2:cnt[2]>0, 3:cnt[3]>0||!!EX||MT.length>0, 4:cnt[4]>0||BK.length>0};
   if(Array.isArray(lesson.stages)&&lesson.stages.length) [1,2,3,4,5].forEach(function(k){ avail[k]=avail[k]&&lesson.stages.indexOf(k)>=0; });
   var explicit=hasVoc||Array.isArray(lesson.stages)||order.some(function(id){ var d=elicits[id]||{}; return d.group||d.stage; });
-  var STG={on:opts.stages!==false&&explicit&&ORD.filter(function(k){ return avail[k]; }).length>=2, cur:0};
+  var STG={on:opts.stages!==false&&explicit&&ORD.filter(function(k){ return avail[k]; }).length>=(Array.isArray(lesson.stages)&&lesson.stages.length===1?1:2), cur:0};
   order.forEach(function(id,i){
     var def = elicits[id]||{}, sg = stageOf(def), n = STG.on?(++nn[sg]):i+1, gn = i+1, anchors = seen[id];
     anchors[anchors.length-1].setAttribute('data-n','Q'+n);
@@ -2969,6 +2969,7 @@ RD.mount = function(root, lesson, init, opts){
     function backToPick(){ cohClose(); drawCoh(true); var rb=$('.rd-mode-read'); if(rb&&R.classList.contains('qopen')) rb.click(); STG.cur=0; R.removeAttribute('data-stage'); R.classList.add('stg-pick'); hbar.hidden=true; cohlg.hidden=true; if(ppBox) ppBox.hidden=true; if(mmBox) mmBox.hidden=true; if(mmPan) mmPan.hidden=true; R.classList.remove('mm-read','mm-on'); document.documentElement.classList.remove('rd-dr-open','rd-ex-open'); drawPick(); window.scrollTo(0,0); }
     on(pick,'click',function(e){ var x=e.target.closest('.rd-stg-card'); if(x) setStage(+x.getAttribute('data-s')); });
     on(hbar.querySelector('.rd-stg-out'),'click',backToPick);
+    var onlyS=ORD.filter(function(k){ return avail[k]; }); if(onlyS.length===1){ hbar.querySelector('.rd-stg-out').hidden=true; setStage(onlyS[0]); }
   })(); }
 
   // Saving
@@ -6387,6 +6388,7 @@ function pkgStats(){
   return st;
 }
 function pkgList(a){ return a.length>6?a.slice(0,6).join(', ')+'…':a.join(', '); }
+function isLite(){ return Array.isArray(L.stages)&&L.stages.length===1&&L.stages[0]===1; }
 function pkgRows(){
   var st=pkgStats(), cat=L.cat||'', N=st.n, rows=[];
   var m1=[], ok1=true;
@@ -6427,11 +6429,13 @@ function pkgRows(){
     m4.push('Tự viết: '+bt.rewrite+(bt.rewrite<3?' (cần ≥ 3)':'')+(bt.mods<bt.rewrite?', còn '+(bt.rewrite-bt.mods)+' câu chưa đủ 2 đến 3 cách gợi ý':'')); }
   rows.push({k:4,name:'Paraphrase',ok:ok4,m:m4,opt:true,empty:!st.bank});
   var DN={1:1,5:2,2:3,3:4,4:5}; rows.forEach(function(r){ r.n=DN[r.k]; }); rows.sort(function(x,y){ return x.n-y.n; });
+  if(isLite()) rows=rows.filter(function(r){ return r.k===1; }).map(function(r){ r.n=1; return r; });
   return rows;
 }
 function renderPkg(){
   var rows=pkgRows(), off=Array.isArray(L.stages)&&L.stages.length?L.stages:null;
-  $('#pkg-body').innerHTML=rows.map(function(r){
+  var litebar='<label class="chk" style="margin:0 0 10px"><input type="checkbox" id="pkg-lite"'+(isLite()?' checked':'')+'>Bài chỉ có giai đoạn 1 (đọc lấy ý và từ vựng), ví dụ bài cho học viên Đài Loan. Các giai đoạn còn lại sẽ ẩn và không bị tính là thiếu.</label>';
+  $('#pkg-body').innerHTML=litebar+rows.map(function(r){
     var on=!off||off.indexOf(r.k)>=0, tag=r.empty&&r.opt?'Chưa có':(r.ok?'Đủ':'Thiếu'), cls=r.empty&&r.opt?'off':(r.ok?'ok':'miss');
     return '<div class="pkg-row st-'+cls+'"><div class="pkg-h"><b>Giai đoạn '+(r.n||r.k)+' · '+r.name+'</b><span class="pkg-tag">'+tag+'</span></div><ul>'+r.m.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>'+(r.opt?'<label class="chk"><input type="checkbox" data-k="'+r.k+'"'+(on?' checked':'')+'>Hiện giai đoạn này cho học viên</label>':'<div class="pkg-req">Giai đoạn bắt buộc</div>')+'</div>';
   }).join('');
@@ -6440,6 +6444,7 @@ function openPkg(){ closePops(); renderPkg(); $('#pkg').hidden=false; }
 $('#pkg-close').addEventListener('click',function(){ $('#pkg').hidden=true; });
 $('#pkg').addEventListener('click',function(e){ if(e.target===$('#pkg')) $('#pkg').hidden=true; });
 $('#pkg-body').addEventListener('change',function(e){
+  if(e.target.id==='pkg-lite'){ if(e.target.checked) L.stages=[1]; else delete L.stages; changed(true); saveDraft(); renderPkg(); return; }
   var c=e.target.closest('input[data-k]'); if(!c) return;
   var st=[1,3]; $$('#pkg-body input[data-k]').forEach(function(i){ if(i.checked) st.push(+i.getAttribute('data-k')); });
   st.sort(); if(st.length===5) delete L.stages; else L.stages=st; changed(true); saveDraft();
