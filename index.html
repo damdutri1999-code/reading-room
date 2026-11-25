@@ -2179,7 +2179,7 @@ html.rr-fs-on{overflow:hidden}
 
 <div class="modal" id="pkg" hidden>
   <div class="msheet" role="dialog" aria-modal="true" aria-labelledby="pkg-h" style="max-width:680px">
-    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v162</span></p></div></div>
+    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v163</span></p></div></div>
     <div id="pkg-body" class="pkg-body"></div>
     <div class="mrow"><span class="sp"></span><button type="button" class="btn solid" id="pkg-close">Xong</button></div>
   </div>
@@ -2549,7 +2549,10 @@ RD.mount = function(root, lesson, init, opts){
   /* ---------- Guided stages: mỗi nhóm câu hỏi thuộc một giai đoạn đọc ---------- */
   var STGN={1:'Đọc lấy ý và từ vựng',2:'Mạch nối trong bài',3:'Luyện hiểu bài',4:'Luyện paraphrase',5:'Sơ đồ ý (mindmap)',6:'Nghe và dò theo'};
   var STGD={6:'Vừa nghe vừa nhìn chữ chạy theo giọng đọc. Chữ có màu là phần âm đuôi dễ bị bỏ sót: nghe kỹ rồi đọc theo, đừng nuốt âm cuối.',1:'Nắm ý chính từng đoạn và học các cụm từ hay trong bài.',2:'Nhìn cách các câu được nối với nhau. Bấm “Highlight mạch nối” ở mỗi đoạn, rồi bấm vào từ tô màu để xem nó nối tới đâu.',3:'Nối, trắc nghiệm và câu mở có gợi ý để biết mình hiểu bài đến đâu. Không tính điểm.',4:'Viết lại các câu quan trọng, rồi xem từng bước người viết đã nghĩ ra sao.',5:'Kéo các thẻ ý vào đúng nhánh của sơ đồ. Mỗi nhánh là một phần ý của bài. Không tính điểm, thẻ sai sẽ bật lại.'};
-  function stageOf(d){ d=d||{}; if(d.stage>=1&&d.stage<=4) return d.stage|0; var g=(d.group||'').toLowerCase(); if(!g) return 1;
+  var IELTS=(lesson.cat==='ielts');
+  if(IELTS){ STGN[3]='Làm đề (câu hỏi đề IELTS)'; STGD[3]='Làm các câu hỏi theo đề IELTS của bài này. Câu hỏi elicit chỉ nằm ở giai đoạn đọc lấy ý và từ vựng.'; }
+  function stageOf(d){ var r0=stageOf0(d); return (IELTS&&r0===3)?1:r0; }
+  function stageOf0(d){ d=d||{}; if(d.stage>=1&&d.stage<=4) return d.stage|0; var g=(d.group||'').toLowerCase(); if(!g) return 1;
     if(/coherence|mạch|liên kết/.test(g)) return 2;
     if(/paraphrase|định vị|viết thử/.test(g)) return 4;
     if(/chất lượng|not given|chọn và gom|xu hướng|lập trường|câu chủ đề|quan sát/.test(g)) return 3;
@@ -6406,7 +6409,7 @@ function pkgStats(){
     var c=e.querySelectorAll('mark.hl[data-c="signal"],mark.hl[data-c="ref"],mark.hl[data-c="lex"],mark.hl[data-c="zig"]').length; st.coh+=c; if(c<3) st.cohLow.push(k);
     st.noTo+=e.querySelectorAll('mark.hl[data-c="ref"]:not([data-to]),mark.hl[data-c="lex"]:not([data-to]),mark.hl[data-c="zig"]:not([data-to])').length;
   });
-  var seen={}, by={1:0,2:0,3:0,4:0}, open=0; $$('.el',ed).forEach(function(a){ var id=a.getAttribute('data-el'); if(seen[id]) return; seen[id]=1; var d=L.elicits[id]; if(!d) return; var g=stgOf(d); by[g]++; if(g===3&&d.type==='wh') open++; });
+  var seen={}, by={1:0,2:0,3:0,4:0}, open=0; $$('.el',ed).forEach(function(a){ var id=a.getAttribute('data-el'); if(seen[id]) return; seen[id]=1; var d=L.elicits[id]; if(!d) return; var g=stgOf(d); if(L.cat==='ielts'&&g===3) g=1; by[g]++; if(g===3&&d.type==='wh') open++; });
   st.by=by; st.open=open; var pk=L.pkg||{}; st.match=(pk.match||[]).length; st.bank=(pk.bank||[]).length; st.map=(pk.map||[]).length; (function(){ var m=pk.mm, br=m&&Array.isArray(m.branches)?m.branches:[]; st.mm={br:br.length,cards:0,extra:m&&Array.isArray(m.extra)?m.extra.length:0,noSrc:0,thin:0,noVi:0,noEn:0}; if(m&&!m.center_vi) st.mm.noVi++; (m&&m.extra||[]).forEach(function(x){ if(!(x&&x.vi)) st.mm.noVi++; }); br.forEach(function(b){ var sl=(b&&b.slots)||[]; st.mm.cards+=sl.length; if(sl.length<2) st.mm.thin++; if(!(b&&b.en)) st.mm.noEn++; sl.forEach(function(x){ if(!x.src) st.mm.noSrc++; if(!x.vi) st.mm.noVi++; }); }); })(); st.bt={choose:0,pairs:0,name:0,rewrite:0,mods:0}; (pk.bank||[]).forEach(function(b){ if(b&&st.bt[b.type]!=null){ st.bt[b.type]++; if(b.type==='rewrite'&&Array.isArray(b.models)&&b.models.length>=2) st.bt.mods++; } });
   var ex=0; if(L.examOn&&L.examText){ try{ var x=RD.parseExam(L.examText); ex=x?x.count:0; }catch(_){ ex=0; } } st.exam=ex;
   return st;
@@ -6442,10 +6445,13 @@ function pkgRows(){
     if(mm.noSrc) m5.push(mm.noSrc+' thẻ chưa có "src" (mã câu gốc, ví dụ P2.S3)'); }
   rows.push({k:5,name:'Sơ đồ ý (mindmap)',ok:ok5,m:m5});
   var m3=[], ok3=true, tot3=st.by[3]+st.match+st.exam;
+  if(cat==='ielts'){ ok3=st.exam>0; m3.push(st.exam?st.exam+' câu hỏi theo đề IELTS (Task)':'Chưa có đề IELTS (Task). Giai đoạn này chỉ chứa câu hỏi đề; câu elicit nằm ở giai đoạn 1'); }
+  else {
   if(tot3<4){ ok3=false; m3.push('Mới có '+tot3+' câu luyện hiểu, cần ít nhất 4'); } else m3.push(tot3+' câu luyện hiểu ('+st.by[3]+' elicit, '+st.match+' nối ý, '+st.exam+' câu task)');
   if(st.open<2){ ok3=false; m3.push('Câu mở có gợi ý: '+st.open+', nên có ít nhất 2'); } else m3.push(st.open+' câu mở có gợi ý');
   if(st.match) m3.push(st.match+' câu nối tiêu đề với đoạn');
-  rows.push({k:3,name:'Luyện hiểu',ok:ok3,m:m3});
+  }
+  rows.push({k:3,name:cat==='ielts'?'Làm đề (câu hỏi đề IELTS)':'Luyện hiểu',ok:ok3,m:m3});
   var m4=[], bt=st.bt||{choose:0,pairs:0,name:0,rewrite:0,mods:0}, ok4=bt.choose>=10&&bt.pairs>=3&&bt.name>=6&&bt.rewrite>=3&&bt.mods>=bt.rewrite;
   if(!st.bank) m4.push('Chưa có mục paraphrase. Giai đoạn này tuỳ chọn nên sẽ ẩn'); else {
     m4.push('Chọn câu: '+bt.choose+(bt.choose<10?' (cần ≥ 10)':''));
