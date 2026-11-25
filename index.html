@@ -916,7 +916,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
 .rd-count{min-width:20px;padding:3px 6px;border-radius:999px;background:var(--rd-accent);color:var(--rd-paper);font-size:11px;font-variant-numeric:tabular-nums}
 .rd-tip{font-size:12.5px;color:var(--rd-muted);margin:10px 0 0}
 
-.rd-text{font-family:var(--rd-read);font-size:17px;line-height:1.72;max-width:660px}
+.rd-text{font-family:var(--rd-read);font-size:15.5px;line-height:1.72;max-width:660px}
 .rd-text p{margin:0 0 1.1em}
 .rd-row{display:grid;grid-template-columns:minmax(0,1fr)}
 .rd{--panel:var(--rd-paper);--panel-ink:var(--rd-ink);--panel-radius:16px;--panel-shadow:0 1px 2px rgba(16,24,40,.05),0 0 0 1px var(--rd-line);--panel-img:none}
@@ -1063,7 +1063,7 @@ html[data-th] .sheet{--ink:#1f2430;--muted:#5b6577;--line:#e4e7ec;--surface:#fff
   .rd-pop{left:12px!important;right:12px;width:auto;max-width:520px;margin:0 auto;top:auto!important;bottom:calc(12px + env(safe-area-inset-bottom,0px))}
 }
 @media (max-width:600px){
-  .rd-text{font-size:16px}
+  .rd-text{font-size:15px}
   .rd-pop{left:12px!important;right:12px;width:auto;top:auto!important;bottom:calc(12px + env(safe-area-inset-bottom,0px))}
 }
 
@@ -2179,7 +2179,7 @@ html.rr-fs-on{overflow:hidden}
 
 <div class="modal" id="pkg" hidden>
   <div class="msheet" role="dialog" aria-modal="true" aria-labelledby="pkg-h" style="max-width:680px">
-    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v163</span></p></div></div>
+    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v164</span></p></div></div>
     <div id="pkg-body" class="pkg-body"></div>
     <div class="mrow"><span class="sp"></span><button type="button" class="btn solid" id="pkg-close">Xong</button></div>
   </div>
@@ -3167,7 +3167,7 @@ RD.mount = function(root, lesson, init, opts){
   });
   // Zoom: scales text, take-note boxes, elicit cards and comments together
   var ZS=[0.5,0.75,0.9,1,1.1,1.25,1.5,1.75,2,2.5,3], zi=3;
-  try{ var zs=parseFloat(localStorage.getItem('rd:zoom')); if(zs>0){ var bd=9; ZS.forEach(function(v,k){ var d=Math.abs(v-zs); if(d<bd){ bd=d; zi=k; } }); } }catch(e){}
+  try{ var zs=parseFloat(localStorage.getItem('rd:zoom:v2')); if(zs>0){ var bd=9; ZS.forEach(function(v,k){ var d=Math.abs(v-zs); if(d<bd){ bd=d; zi=k; } }); } }catch(e){}
   var zbtn=$('.rd-zv'), zmenu=$('.rd-zmenu');
   zmenu.innerHTML=ZS.map(function(v,k){ return '<button type="button" role="option" data-k="'+k+'"><span>'+Math.round(v*100)+'%</span>'+(v===1?'<small>Mặc định</small>':'')+'</button>'; }).join('');
   function zOpen(o){ zmenu.hidden=!o; zbtn.setAttribute('aria-expanded',String(o)); if(o){ var cur=zmenu.querySelector('[aria-selected="true"]'); if(cur) cur.scrollIntoView({block:'center'}); } }
@@ -3177,7 +3177,7 @@ RD.mount = function(root, lesson, init, opts){
     $('.rd-zt').textContent=Math.round(z*100)+'%';
     R.querySelectorAll('.rd-z').forEach(function(b){ var d=+b.getAttribute('data-z'); b.disabled=(d<0&&zi===0)||(d>0&&zi===ZS.length-1); });
     zmenu.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-selected',String(+b.getAttribute('data-k')===zi)); });
-    try{ localStorage.setItem('rd:zoom',String(z)); }catch(e){}
+    try{ localStorage.setItem('rd:zoom:v2',String(z)); }catch(e){}
     linkClear(); prog();
     if(say) toast('Cỡ chữ '+Math.round(z*100)+'%');
   }
