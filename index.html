@@ -2179,7 +2179,7 @@ html.rr-fs-on{overflow:hidden}
 
 <div class="modal" id="pkg" hidden>
   <div class="msheet" role="dialog" aria-modal="true" aria-labelledby="pkg-h" style="max-width:680px">
-    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v164</span></p></div></div>
+    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v165</span></p></div></div>
     <div id="pkg-body" class="pkg-body"></div>
     <div class="mrow"><span class="sp"></span><button type="button" class="btn solid" id="pkg-close">Xong</button></div>
   </div>
@@ -6409,8 +6409,8 @@ function pkgStats(){
     var c=e.querySelectorAll('mark.hl[data-c="signal"],mark.hl[data-c="ref"],mark.hl[data-c="lex"],mark.hl[data-c="zig"]').length; st.coh+=c; if(c<3) st.cohLow.push(k);
     st.noTo+=e.querySelectorAll('mark.hl[data-c="ref"]:not([data-to]),mark.hl[data-c="lex"]:not([data-to]),mark.hl[data-c="zig"]:not([data-to])').length;
   });
-  var seen={}, by={1:0,2:0,3:0,4:0}, open=0; $$('.el',ed).forEach(function(a){ var id=a.getAttribute('data-el'); if(seen[id]) return; seen[id]=1; var d=L.elicits[id]; if(!d) return; var g=stgOf(d); if(L.cat==='ielts'&&g===3) g=1; by[g]++; if(g===3&&d.type==='wh') open++; });
-  st.by=by; st.open=open; var pk=L.pkg||{}; st.match=(pk.match||[]).length; st.bank=(pk.bank||[]).length; st.map=(pk.map||[]).length; (function(){ var m=pk.mm, br=m&&Array.isArray(m.branches)?m.branches:[]; st.mm={br:br.length,cards:0,extra:m&&Array.isArray(m.extra)?m.extra.length:0,noSrc:0,thin:0,noVi:0,noEn:0}; if(m&&!m.center_vi) st.mm.noVi++; (m&&m.extra||[]).forEach(function(x){ if(!(x&&x.vi)) st.mm.noVi++; }); br.forEach(function(b){ var sl=(b&&b.slots)||[]; st.mm.cards+=sl.length; if(sl.length<2) st.mm.thin++; if(!(b&&b.en)) st.mm.noEn++; sl.forEach(function(x){ if(!x.src) st.mm.noSrc++; if(!x.vi) st.mm.noVi++; }); }); })(); st.bt={choose:0,pairs:0,name:0,rewrite:0,mods:0}; (pk.bank||[]).forEach(function(b){ if(b&&st.bt[b.type]!=null){ st.bt[b.type]++; if(b.type==='rewrite'&&Array.isArray(b.models)&&b.models.length>=2) st.bt.mods++; } });
+  var seen={}, by={1:0,2:0,3:0,4:0}, open=0, nonmc=0; $$('.el',ed).forEach(function(a){ var id=a.getAttribute('data-el'); if(seen[id]) return; seen[id]=1; var d=L.elicits[id]; if(!d) return; if(!/^(mc|tick)$/.test(d.type||'')) nonmc++; var g=stgOf(d); if(L.cat==='ielts'&&g===3) g=1; by[g]++; if(g===3&&d.type==='wh') open++; });
+  st.by=by; st.open=open; st.nonmc=nonmc; var pk=L.pkg||{}; st.match=(pk.match||[]).length; st.bank=(pk.bank||[]).length; st.map=(pk.map||[]).length; (function(){ var m=pk.mm, br=m&&Array.isArray(m.branches)?m.branches:[]; st.mm={br:br.length,cards:0,extra:m&&Array.isArray(m.extra)?m.extra.length:0,noSrc:0,thin:0,noVi:0,noEn:0}; if(m&&!m.center_vi) st.mm.noVi++; (m&&m.extra||[]).forEach(function(x){ if(!(x&&x.vi)) st.mm.noVi++; }); br.forEach(function(b){ var sl=(b&&b.slots)||[]; st.mm.cards+=sl.length; if(sl.length<2) st.mm.thin++; if(!(b&&b.en)) st.mm.noEn++; sl.forEach(function(x){ if(!x.src) st.mm.noSrc++; if(!x.vi) st.mm.noVi++; }); }); })(); st.bt={choose:0,pairs:0,name:0,rewrite:0,mods:0}; (pk.bank||[]).forEach(function(b){ if(b&&st.bt[b.type]!=null){ st.bt[b.type]++; if(b.type==='rewrite'&&Array.isArray(b.models)&&b.models.length>=2) st.bt.mods++; } });
   var ex=0; if(L.examOn&&L.examText){ try{ var x=RD.parseExam(L.examText); ex=x?x.count:0; }catch(_){ ex=0; } } st.exam=ex;
   return st;
 }
@@ -6424,6 +6424,7 @@ function pkgRows(){
   if(cat==='content'||cat==='ielts'){ if(st.noVoc.length){ ok1=false; m1.push('Thiếu bảng từ vựng ở đoạn '+pkgList(st.noVoc)); } else m1.push('Đoạn nào cũng có bảng từ vựng'); }
   else { var need=cat==='task2'?8:6; if(st.voc<need){ ok1=false; m1.push('Mới có '+st.voc+' cụm từ vựng, cần ít nhất '+need); } else m1.push(st.voc+' cụm từ vựng'); }
   if(st.by[1]<1){ ok1=false; m1.push('Chưa có câu dẫn dắt nào'); } else m1.push(st.by[1]+' câu dẫn dắt');
+  if(st.nonmc){ ok1=false; m1.push('Còn '+st.nonmc+' câu elicit chưa phải trắc nghiệm (tự luận, có/không…). Mọi câu elicit cần là trắc nghiệm'); }
   rows.push({k:1,name:'Ý và từ vựng',ok:ok1,m:m1});
   var m2=[], ok2=true, any2=st.role||st.link||st.coh||st.by[2];
   if(!any2){ ok2=false; m2.push('Chưa có dữ liệu cho giai đoạn này, nên học viên sẽ không thấy giai đoạn Mạch nối'); }
