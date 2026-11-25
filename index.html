@@ -2179,7 +2179,7 @@ html.rr-fs-on{overflow:hidden}
 
 <div class="modal" id="pkg" hidden>
   <div class="msheet" role="dialog" aria-modal="true" aria-labelledby="pkg-h" style="max-width:680px">
-    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v166</span></p></div></div>
+    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v167</span></p></div></div>
     <div id="pkg-body" class="pkg-body"></div>
     <div class="mrow"><span class="sp"></span><button type="button" class="btn solid" id="pkg-close">Xong</button></div>
   </div>
@@ -6450,7 +6450,7 @@ function pkgRows(){
   if(ieltsMode()){ ok3=st.exam>0; m3.push(st.exam?st.exam+' câu hỏi theo đề IELTS (Task)':'Chưa có đề IELTS (Task). Giai đoạn này chỉ chứa câu hỏi đề; câu elicit nằm ở giai đoạn 1'); }
   else {
   if(tot3<4){ ok3=false; m3.push('Mới có '+tot3+' câu luyện hiểu, cần ít nhất 4'); } else m3.push(tot3+' câu luyện hiểu ('+st.by[3]+' elicit, '+st.match+' nối ý, '+st.exam+' câu task)');
-  if(st.open<2){ ok3=false; m3.push('Câu mở có gợi ý: '+st.open+', nên có ít nhất 2'); } else m3.push(st.open+' câu mở có gợi ý');
+  if(st.open){ ok3=false; m3.push('Còn '+st.open+' câu mở tự luận. Không còn dùng: mọi câu elicit cần là trắc nghiệm'); }
   if(st.match) m3.push(st.match+' câu nối tiêu đề với đoạn');
   }
   rows.push({k:3,name:ieltsMode()?'Làm đề (câu hỏi đề IELTS)':'Luyện hiểu',ok:ok3,m:m3});
