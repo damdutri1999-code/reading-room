@@ -2179,7 +2179,7 @@ html.rr-fs-on{overflow:hidden}
 
 <div class="modal" id="pkg" hidden>
   <div class="msheet" role="dialog" aria-modal="true" aria-labelledby="pkg-h" style="max-width:680px">
-    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v167</span></p></div></div>
+    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v168</span></p></div></div>
     <div id="pkg-body" class="pkg-body"></div>
     <div class="mrow"><span class="sp"></span><button type="button" class="btn solid" id="pkg-close">Xong</button></div>
   </div>
@@ -2484,14 +2484,14 @@ RD.mount = function(root, lesson, init, opts){
   // Link lines (variant E · signal) between text and its margin card
   var wrapEl=$('.rd-wrap'), NS='http://www.w3.org/2000/svg';
   var ov=document.createElementNS(NS,'svg'); ov.setAttribute('class','rd-ov'); ov.setAttribute('aria-hidden','true'); wrapEl.appendChild(ov);
-  var linkRaf=0, linkId=null, linkHideT=0, linkCard=null;
+  var linkRaf=0, linkId=null, linkHideT=0, linkCard=null, linkArgs=null, linkScrT=0;
   function svgEl(tag,a){ var e=document.createElementNS(NS,tag); for(var k in a) e.setAttribute(k,a[k]); ov.appendChild(e); return e; }
-  function linkClear(){ cancelAnimationFrame(linkRaf); ov.innerHTML=''; if(linkCard) linkCard.classList.remove('pulse'); linkCard=null; linkId=null; }
+  function linkClear(){ linkArgs=null; cancelAnimationFrame(linkRaf); ov.innerHTML=''; if(linkCard) linkCard.classList.remove('pulse'); linkCard=null; linkId=null; }
   function linkHide(){ clearTimeout(linkHideT); linkHideT=setTimeout(linkClear,90); }
-  function linkShow(id, anchors, card, col){
+  function linkShow(id, anchors, card, col, still){
     clearTimeout(linkHideT);
     if(linkId===id) return;
-    linkClear();
+    linkClear(); linkArgs={id:id,anchors:anchors,card:card,col:col};
     if(!card||!anchors.length||innerWidth<1080||getComputedStyle(card).display==='none') return;
     var rects=anchors[anchors.length-1].getClientRects(); if(!rects.length) return;
     linkId=id; linkCard=card;
@@ -2507,7 +2507,7 @@ RD.mount = function(root, lesson, init, opts){
     }
     var base=svgEl('path',{d:d,'class':'ln',stroke:col,'stroke-dasharray':'2 5',opacity:0}), len=base.getTotalLength();
     card.style.setProperty('--pc',col);
-    if(reduce){ base.setAttribute('opacity','.6'); svgEl('circle',{cx:x2,cy:y2,r:3.5,fill:col}); return; }
+    if(reduce||still){ base.setAttribute('opacity','.55'); svgEl('circle',{cx:x2,cy:y2,r:3.5,fill:col}); return; }
     var tl=Math.min(70,len*0.35), trail=svgEl('path',{d:d,'class':'ln',stroke:col,'stroke-width':3});
     trail.style.strokeDasharray=tl+' '+(len+tl); trail.style.strokeDashoffset=tl;
     var head=svgEl('circle',{r:4.5,fill:col,cx:x0,cy:ym}), glow=svgEl('circle',{r:4,fill:col,opacity:0,cx:x2,cy:y2});
@@ -2524,7 +2524,10 @@ RD.mount = function(root, lesson, init, opts){
       (function g(n){ var u=Math.min(1,(n-t1)/500); glow.setAttribute('r',4+16*u); glow.setAttribute('opacity',0.5*(1-u)); if(u<1) linkRaf=requestAnimationFrame(g); })(t1);
     })(t0);
   }
-  on(window,'resize',linkClear);
+  on(window,'resize',linkClear); on(document,'fullscreenchange',linkClear);
+  // Khi cuộn (trang hoặc khung câu hỏi cố định) hoặc đổi cỡ, vẽ lại đường nối theo vị trí thật của câu và thẻ
+  function linkRedraw(){ if(!linkArgs) return; cancelAnimationFrame(linkScrT); linkScrT=requestAnimationFrame(function(){ var a=linkArgs; if(!a) return; linkId=null; linkShow(a.id,a.anchors,a.card,a.col,true); }); }
+  on(document,'scroll',linkRedraw,true);
 
   // Take-note boxes
   var nbs = [];
