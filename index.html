@@ -2179,7 +2179,7 @@ html.rr-fs-on{overflow:hidden}
 
 <div class="modal" id="pkg" hidden>
   <div class="msheet" role="dialog" aria-modal="true" aria-labelledby="pkg-h" style="max-width:680px">
-    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v168</span></p></div></div>
+    <div class="mh"><span class="ic"><i data-i="check"></i></span><div><h2 id="pkg-h">Kiểm tra gói nạp bài</h2><p>Bài cần gì cho từng giai đoạn đọc. Chỉ là nhắc, không chặn việc lưu hay đăng bài. <span style="opacity:.6">Phiên bản web v169</span></p></div></div>
     <div id="pkg-body" class="pkg-body"></div>
     <div class="mrow"><span class="sp"></span><button type="button" class="btn solid" id="pkg-close">Xong</button></div>
   </div>
@@ -2488,10 +2488,13 @@ RD.mount = function(root, lesson, init, opts){
   function svgEl(tag,a){ var e=document.createElementNS(NS,tag); for(var k in a) e.setAttribute(k,a[k]); ov.appendChild(e); return e; }
   function linkClear(){ linkArgs=null; cancelAnimationFrame(linkRaf); ov.innerHTML=''; if(linkCard) linkCard.classList.remove('pulse'); linkCard=null; linkId=null; }
   function linkHide(){ clearTimeout(linkHideT); linkHideT=setTimeout(linkClear,90); }
+  function linkSig(an,cd){ try{ var r=an[an.length-1].getClientRects(), l=r[r.length-1], c=cd.getBoundingClientRect(), w=wrapEl.getBoundingClientRect(); return l?[l.left,l.bottom,l.right,c.left,c.top,w.left,w.top].map(Math.round).join():''; }catch(e){ return ''; } }
+  // Theo dõi: nếu câu đọc hoặc thẻ dời chỗ (bố cục đổi, vào toàn màn hình, khung câu hỏi mở ra…) thì vẽ lại đường nối
+  var linkPollRaf=0; cleanup.push(function(){ cancelAnimationFrame(linkPollRaf); linkPollRaf=-1; }); (function poll(){ if(linkPollRaf===-1) return; var a=linkArgs; if(a&&a.anchors&&a.anchors.length&&a.card&&a.card.isConnected){ var sg=linkSig(a.anchors,a.card); if(sg!==a.sig){ linkId=null; linkShow(a.id,a.anchors,a.card,a.col,true); } } linkPollRaf=requestAnimationFrame(poll); })();
   function linkShow(id, anchors, card, col, still){
     clearTimeout(linkHideT);
     if(linkId===id) return;
-    linkClear(); linkArgs={id:id,anchors:anchors,card:card,col:col};
+    linkClear(); linkArgs={id:id,anchors:anchors,card:card,col:col,sig:linkSig(anchors,card)};
     if(!card||!anchors.length||innerWidth<1080||getComputedStyle(card).display==='none') return;
     var rects=anchors[anchors.length-1].getClientRects(); if(!rects.length) return;
     linkId=id; linkCard=card;
